@@ -11,9 +11,13 @@ namespace minisql {
 
 /* Byte IO
  * Class exposing static methods for reading and writing trivially copyable
- * types to std::byte arrays. */
+ * types into std::byte arrays. */
 class ByteIO {
 public:
+
+    /* Read T from bytes starting from the given offset.
+     * Throws an std::out_or_range exception if attempting to read beyond the
+     * end of bytes. */
     template <typename T>
     static T read(
         const std::vector<std::byte>& bytes, std::size_t offset,
@@ -31,6 +35,9 @@ public:
         return t;
     }
 
+    /* Write T into bytes starting at the given offset.
+     * Throws an std::out_or_range exception if attempting to write beyond the
+     * end of bytes. */
     template <typename T>
     static void write(
         std::vector<std::byte>& bytes, std::size_t offset, const T& t
