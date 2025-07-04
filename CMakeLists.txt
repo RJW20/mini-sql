@@ -7,3 +7,5 @@ set(SOURCES)
 add_library(mini-sql ${SOURCES})
 
 target_include_directories(mini-sql PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+add_subdirectory(tests)
