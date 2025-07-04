@@ -22,9 +22,28 @@ void test_write_read() {
 }
 
 template <typename T>
+void test_out_of_range() {
+    std::vector<std::byte> bytes(20);
+    T test_case = generate_new<T>();
+    int test_offset = bytes.size() - sizeof(T) + 1;
+    try {
+        ByteIO::write<T>(bytes, test_offset, test_case);
+        assert(false);
+    }
+    catch (const std::out_of_range&) {}
+    try {
+        ByteIO::read<T>(bytes, test_offset);
+        assert(false);
+    }
+    catch (const std::out_of_range&) {}
+    std::cout << "- test_out_of_range passed" << std::endl;
+}
+
+template <typename T>
 void run_tests() {
     std::cout << "Running tests for " << typeid(T).name() << ":" << std::endl;
     test_write_read<T>();
+    test_out_of_range<T>();
 }
 
 int main() {
