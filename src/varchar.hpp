@@ -9,6 +9,8 @@
 #include <string_view>
 #include <algorithm>
 
+#include "byte_io.hpp"
+
 namespace minisql {
 
 /* Varchar
@@ -93,6 +95,27 @@ private:
 };
 
 const Varchar VCHR_MIN(std::size_t(0));
+
+template <>
+Varchar ByteIO::read<Varchar>(
+    const std::vector<std::byte>& bytes, std::size_t offset, std::size_t size
+) {
+    if (offset + size > bytes.size())
+        throw std::out_of_range("ByteIO read error");
+    Varchar v(size);
+    std::memcpy(v.data(), bytes.data() + offset, size);
+    return v;
+}
+
+template <>
+void ByteIO::write<Varchar>(
+    std::vector<std::byte>& bytes, std::size_t offset, const Varchar& v
+) {
+    const std::size_t size = v.size();
+    if (offset + size > bytes.size())
+        throw std::out_of_range("ByteIO write error");
+    std::memcpy(bytes.data() + offset, v.data(), size);
+}
 
 } // namespace minisql
 

@@ -32,7 +32,9 @@ public:
     }
 
     template <typename T>
-    static void write(std::vector<std::byte>& bytes, std::size_t offset, T t) {
+    static void write(
+        std::vector<std::byte>& bytes, std::size_t offset, const T& t
+    ) {
         static_assert(
             std::is_trivially_copyable_v<T>,
             "ByteIO::write<T>: T must be trivially copyable or you need a "
