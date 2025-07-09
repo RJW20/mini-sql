@@ -20,7 +20,7 @@ FrameView::FrameView(FrameView&& other)
 // Move assignment needs to unpin the current Frame and move all resources.
 FrameView& FrameView::operator=(FrameView&& other) {
     if (this != &other) {
-        cache_->unpin(f_->pid, dirty_);
+        if (cache_) cache_->unpin(f_->pid, dirty_);
         cache_ = other.cache_;
         other.cache_ = nullptr;
         f_ = other.f_;
