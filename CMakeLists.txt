@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
     src/frame_manager/disk_manager/disk_manager.cpp
+    src/frame_manager/cache/frame_view.cpp
+    src/frame_manager/cache/cache.cpp
 )
 add_library(mini-sql ${SOURCES})
 
