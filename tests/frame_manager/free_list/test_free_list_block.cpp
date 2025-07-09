@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <cstdint>
 #include <cstddef>
 #include <vector>
 
@@ -34,7 +35,7 @@ void test_constructor() {
     std::cout << "- test_constructor passed" << std::endl;
 }
 
-void test_pop_push() {
+void test_push_pop() {
     Frame f;
     f.data.resize(2048);
     FreeListBlock block{FrameView{nullptr, &f}, true};
@@ -52,12 +53,12 @@ void test_pop_push() {
         pids.pop_back();
     }
     assert(block.empty());
-    std::cout << "- test_pop_push passed" << std::endl;
+    std::cout << "- test_push_pop passed" << std::endl;
 }
 
 int main() {
     test_constructor();
-    test_pop_push();
+    test_push_pop();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
