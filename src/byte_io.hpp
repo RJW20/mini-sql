@@ -4,32 +4,47 @@
 #include <cstddef>
 #include <cstring>
 #include <type_traits>
-#include <vector>
 #include <stdexcept>
 
+#include "span.hpp"
+ 
 namespace minisql {
 
 /* Byte IO
- * Class exposing static methods for reading and writing trivially copyable
- * types into std::byte arrays. */
+ * Class exposing static methods for copying and writing trivially copyable
+ * types from and to std::byte containers. */
 class ByteIO {
 public:
 
-    /* Read T from bytes starting from the given offset.
-     * Throws an std::out_or_range exception if attempting to read beyond the
-     * end of bytes. */
+    // Calls copy<T>.
     template <typename T>
-    static T read(
-        const std::vector<std::byte>& bytes, std::size_t offset,
+    static const T view(
+        span<std::byte> bytes, std::size_t offset,
         std::size_t size = sizeof(T)
     ) {
         static_assert(
             std::is_trivially_copyable_v<T>,
-            "ByteIO::read<T>: T must be trivially copyable or you need a "
-            "ByteIO::read specialisation"
+            "ByteIO::view<T>: T must be trivially copyable or you need a "
+            "ByteIO::view specialisation"
+        );
+        return copy<T>(bytes, offset);
+    }
+
+    /* Copy T from bytes starting from the given offset.
+     * Throws an std::out_or_range exception if attempting to copy beyond the
+     * end of bytes. */
+    template <typename T>
+    static T copy(
+        span<std::byte> bytes, std::size_t offset,
+        std::size_t size = sizeof(T)
+    ) {
+        static_assert(
+            std::is_trivially_copyable_v<T>,
+            "ByteIO::copy<T>: T must be trivially copyable or you need a "
+            "ByteIO::copy specialisation"
         );
         if (offset + size > bytes.size())
-            throw std::out_of_range("ByteIO read error");
+            throw std::out_of_range("ByteIO copy error");
         T t;
         std::memcpy(&t, bytes.data() + offset, size);
         return t;
@@ -40,7 +55,7 @@ public:
      * end of bytes. */
     template <typename T>
     static void write(
-        std::vector<std::byte>& bytes, std::size_t offset, const T& t
+        span<std::byte> bytes, std::size_t offset, const T& t
     ) {
         static_assert(
             std::is_trivially_copyable_v<T>,

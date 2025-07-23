@@ -12,13 +12,13 @@
 using namespace minisql;
 
 template <typename T>
-void test_write_read() {
+void test_write_copy() {
     std::vector<std::byte> bytes(20);
     const std::size_t test_offset = 0;
     T test_case = generate_new<T>();
     ByteIO::write<T>(bytes, test_offset, test_case);
-    assert(ByteIO::read<T>(bytes, test_offset) == test_case);
-    std::cout << "- test_write_read passed" << std::endl;
+    assert(ByteIO::copy<T>(bytes, test_offset) == test_case);
+    std::cout << "- test_write_copy passed" << std::endl;
 }
 
 template <typename T>
@@ -32,7 +32,7 @@ void test_out_of_range() {
     }
     catch (const std::out_of_range&) {}
     try {
-        ByteIO::read<T>(bytes, test_offset);
+        ByteIO::copy<T>(bytes, test_offset);
         assert(false);
     }
     catch (const std::out_of_range&) {}
@@ -42,7 +42,7 @@ void test_out_of_range() {
 template <typename T>
 void run_tests() {
     std::cout << "Running tests for " << typeid(T).name() << ":" << std::endl;
-    test_write_read<T>();
+    test_write_copy<T>();
     test_out_of_range<T>();
 }
 
