@@ -26,14 +26,14 @@ public:
             set_next_block(nullpid);
         }
         else {
-            Magic magic = fv_.read<Magic>(FreeListBlockHeader::MAGIC_OFFSET);
+            Magic magic = fv_.view<Magic>(FreeListBlockHeader::MAGIC_OFFSET);
             if (magic != Magic::FREE_LIST_BLOCK)
                 throw InvalidMagicException(magic);
         }
     }
 
     page_id_t next_block() const { 
-        return fv_.read<page_id_t>(FreeListBlockHeader::NEXT_BLOCK_OFFSET);
+        return fv_.view<page_id_t>(FreeListBlockHeader::NEXT_BLOCK_OFFSET);
     }
     void set_next_block(page_id_t pid) {
         fv_.write<page_id_t>(FreeListBlockHeader::NEXT_BLOCK_OFFSET, pid);
@@ -42,7 +42,7 @@ public:
     page_id_t pop_back() {
         std::size_t sp = stack_pointer() - sizeof(page_id_t);
         set_stack_pointer(sp);
-        return fv_.read<page_id_t>(sp);
+        return fv_.copy<page_id_t>(sp);
     }
     void push_back(page_id_t pid) {
         std::size_t sp = stack_pointer();
@@ -60,7 +60,7 @@ private:
     FrameView fv_;
 
     std::uint16_t stack_pointer() const { 
-        return fv_.read<std::uint16_t>(
+        return fv_.view<std::uint16_t>(
             FreeListBlockHeader::STACK_POINTER_OFFSET
         );
     }

@@ -29,8 +29,13 @@ public:
     std::size_t page_size() const { return f_->data.size(); }
 
     template <typename T>
-    T read(std::size_t offset, std::size_t size = sizeof(T)) const {
-        return ByteIO::read<T>(f_->data, offset, size);
+    const T view(std::size_t offset, std::size_t size = sizeof(T)) const {
+        return ByteIO::view<T>(f_->data, offset, size);
+    }
+
+    template <typename T>
+    T copy(std::size_t offset, std::size_t size = sizeof(T)) const {
+        return ByteIO::copy<T>(f_->data, offset, size);
     }
 
     template <typename T>
