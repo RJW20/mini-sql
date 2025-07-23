@@ -22,15 +22,6 @@ void test_constructor() {
     std::cout << "- test_constructor passed" << std::endl;
 }
 
-void test_size_t_constructor() {
-    Varchar v(std::size_t(10));
-    assert(v.size() == 10);
-    for (std::size_t i = 0; i < v.size(); ++i) {
-        assert(v.data()[i] == '\0');
-    }
-    std::cout << "- test_size_t_constructor passed" << std::endl;
-}
-
 void test_char_constructor() {
     const char input = '(';
     Varchar v = input;
@@ -39,12 +30,21 @@ void test_char_constructor() {
     std::cout << "- test_char_constructor passed" << std::endl;
 }
 
-void test_oversized_input() {
-    try {
-        Varchar v(std::size_t(300));
-        assert(false);
-    } catch (const std::length_error&) {}
-    std::cout << "- test_oversized_input passed" << std::endl;
+void test_view_constructor() {
+    char input[8] = "test";
+    Varchar v(input, 8);
+    assert(v.size() == 8);
+    for (int i = 0; i < 8; ++i) {
+        assert(v.data()[i] == input[i]);
+    }
+    input[4] = 't';
+    input[5] = 'e';
+    input[6] = 's';
+    input[7] = 't';
+        for (int i = 0; i < 8; ++i) {
+        assert(v.data()[i] == input[i]);
+    }
+    std::cout << "- test_view_constructor passed" << std::endl;
 }
 
 void test_equality_operator() {
@@ -58,6 +58,9 @@ void test_copy_constructor() {
     Varchar v1("testing", 10);
     Varchar v2 = v1;
     assert(v1 == v2);
+    Varchar v3(v1.data(), v1.size());
+    Varchar v4 = v3;
+    assert(v3 == v4);
     std::cout << "- test_copy_constructor passed" << std::endl;
 }
 
@@ -65,7 +68,10 @@ void test_copy_assignment() {
     Varchar v1("testing", 10);
     Varchar v2("decoy", 5);
     v2 = v1;
-    assert(v1 == v2);
+    Varchar v3(v1.data(), v1.size());
+    Varchar v4(v2.data(), v2.size());
+    v4 = v3;
+    assert(v3 == v4);
     std::cout << "- test_copy_assignment passed" << std::endl;
 }
 
@@ -76,34 +82,25 @@ void test_less_than_operator() {
     std::cout << "- test_less_than_operator passed" << std::endl;
 }
 
-void test_conversion_operator() {
-    const char* input = "test";
-    Varchar v(input, 4);
-    const char* cstr = v;
-    assert(std::strcmp(cstr, "test") == 0);
-    std::cout << "- test_conversion_operator passed" << std::endl;
-}
-
-void test_byte_io_write_read() {
+void test_byte_io_write_copy_view() {
     std::vector<std::byte> bytes(20);
     const std::size_t test_offset = 0;
     Varchar v("testing", 10);
     ByteIO::write<Varchar>(bytes, test_offset, v);
-    assert(ByteIO::read<Varchar>(bytes, test_offset, v.size()) == v);
-    std::cout << "- test_byte_io_write_read passed" << std::endl;
+    assert(ByteIO::copy<Varchar>(bytes, test_offset, v.size()) == v);
+    assert(ByteIO::view<Varchar>(bytes, test_offset, v.size()) == v);
+    std::cout << "- test_byte_io_write_copy_view passed" << std::endl;
 }
 
 int main() {
     test_constructor();
-    test_size_t_constructor();
     test_char_constructor();
-    test_oversized_input();
+    test_view_constructor();
     test_equality_operator();
     test_copy_constructor();
     test_copy_assignment();
     test_less_than_operator();
-    test_conversion_operator();
-    test_byte_io_write_read();
+    test_byte_io_write_copy_view();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

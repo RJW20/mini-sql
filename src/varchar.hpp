@@ -3,61 +3,66 @@
 
 #include <cstddef>
 #include <cstring>
-#include <stdexcept>
-#include <string>
 #include <memory>
-#include <string_view>
 #include <algorithm>
+#include <stdexcept>
 
 #include "byte_io.hpp"
+#include "span.hpp"
 
 namespace minisql {
 
 /* Varchar
- * Class for storing char arrays of fixed size (which are padded with '/0'
- * where necessary). */
+ * Class for storing or viewing char arrays of fixed size (which are padded
+ * with '/0' where necessary). */
 class Varchar {
 public:
-    Varchar(const char* data, std::size_t size) {
-        if (size > MAX_SIZE) {
-            throw std::length_error(
-                "Varchar size cannot exceed " + std::to_string(MAX_SIZE) + "."
-            );
-        }
-        data_ = std::make_unique<char[]>(size + 1);
-        std::strncpy(data_.get(), data, size);
-        data_[size] = '\0';
-        size_ = size;
+    // Constructor: copies from src
+    Varchar(const char* src, std::size_t size)
+        : owned_{std::make_unique<char[]>(size + 1)}, data_{owned_.get()},
+          size_{size} {
+        if (size_) std::strncpy(data_, src, size_);
+        data_[size_] = '\0';
     }
 
-    explicit Varchar(std::size_t size) {
-        if (size > MAX_SIZE) {
-            throw std::length_error(
-                "Varchar size cannot exceed " + std::to_string(MAX_SIZE) + "."
-            );
-        }
-        data_ = std::make_unique<char[]>(size + 1);
-        std::memset(data_.get(), 0, size + 1);
-        size_ = size;
-    }
-
-    Varchar(const char c) {
-        data_ = std::make_unique<char[]>(2);
+    // Constructor: copy single char
+    Varchar(const char c)
+        : owned_{std::make_unique<char[]>(2)}, data_{owned_.get()}, size_{1} {
         data_[0] = c;
         data_[1] = '\0';
-        size_ = 1;
     }
 
-    Varchar(const Varchar& other) {
-        data_ = std::make_unique<char[]>(other.size_ + 1);
-        std::strncpy(data_.get(), other.data(), other.size_);
+    // Constructor: view-only
+    Varchar(char* external, std::size_t size)
+        : owned_{nullptr}, data_{external}, size_{size} {}
+
+    ~Varchar() = default;
+
+    Varchar(const Varchar& other) : size_{other.size_} {
+        if (other.owned_) {
+            owned_ = std::make_unique<char[]>(size_ + 1);
+            data_ = owned_.get();
+            std::strncpy(data_, other.data_, size_);
+            data_[size_] = '\0';
+        }
+        else {
+            owned_ = nullptr;
+            data_ = other.data_;
+        }
+    }
+
+    Varchar& operator=(const Varchar& other) {
+        if (this == &other) return *this;
         size_ = other.size_;
-    }
-
-    const Varchar& operator=(const Varchar& other) {
-        if (this != &other) {
-            std::strncpy(data_.get(), other.data(), other.size_);
-            size_ = other.size_;
+        if (other.owned_) {
+            owned_ = std::make_unique<char[]>(size_ + 1);
+            data_ = owned_.get();
+            std::strncpy(data_, other.data_, size_);
+            data_[size_] = '\0';
+        }
+        else {
+            owned_.reset();
+            data_ = other.data_;
         }
         return *this;
     }
@@ -83,33 +88,44 @@ public:
         return size_ < other.size_;
     }
 
-    char* data() const { return data_.get(); }
+    char* data() const { return data_; }
     std::size_t size() const { return size_; }
-    operator char*() const { return data(); } 
+    operator char*() const { return data_; } 
 
 private:
-    std::unique_ptr<char[]> data_;
+    std::unique_ptr<char[]> owned_;
+    char* data_;
     std::size_t size_;
-
-    static constexpr std::size_t MAX_SIZE = 64;
 };
 
-const Varchar VCHR_MIN(std::size_t(0));
+// Minimum value for an object of type Varchar
+const Varchar VCHR_MIN("", 0);
+
+// ----------------------------------------------------------------------------
+// Template specialisations for ByteIO
+// ----------------------------------------------------------------------------
 
 template <>
-Varchar ByteIO::read<Varchar>(
-    const std::vector<std::byte>& bytes, std::size_t offset, std::size_t size
+const Varchar ByteIO::view<Varchar>(
+    span<std::byte> bytes, std::size_t offset, std::size_t size
 ) {
     if (offset + size > bytes.size())
-        throw std::out_of_range("ByteIO read error");
-    Varchar v(size);
-    std::memcpy(v.data(), bytes.data() + offset, size);
-    return v;
+        throw std::out_of_range("ByteIO view error");
+    return Varchar(reinterpret_cast<char*>(bytes.data() + offset), size);
+}
+
+template <>
+Varchar ByteIO::copy<Varchar>(
+    span<std::byte> bytes, std::size_t offset, std::size_t size
+) {
+    if (offset + size > bytes.size())
+        throw std::out_of_range("ByteIO copy error");
+    return Varchar(reinterpret_cast<const char*>(bytes.data() + offset), size);
 }
 
 template <>
 void ByteIO::write<Varchar>(
-    std::vector<std::byte>& bytes, std::size_t offset, const Varchar& v
+    span<std::byte> bytes, std::size_t offset, const Varchar& v
 ) {
     const std::size_t size = v.size();
     if (offset + size > bytes.size())
