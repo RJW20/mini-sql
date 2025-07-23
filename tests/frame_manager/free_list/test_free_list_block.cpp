@@ -20,7 +20,7 @@ void test_constructor() {
     {
         FreeListBlock block{FrameView{nullptr, &f}, true};
         assert(
-            ByteIO::read<Magic>(f.data, FreeListBlockHeader::MAGIC_OFFSET) ==
+            ByteIO::view<Magic>(f.data, FreeListBlockHeader::MAGIC_OFFSET) ==
             Magic::FREE_LIST_BLOCK
         );
         assert(block.next_block() == nullpid);
