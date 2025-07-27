@@ -23,10 +23,10 @@ public:
     using size_t = NodeHeader::size_t;
 
     Node(
-        FrameView fv, Magic magic, key_size_t key_size, slot_size_t slot_size,
-        page_id_t parent
+        FrameView&& fv, Magic magic, key_size_t key_size,
+        slot_size_t slot_size, page_id_t parent
     );
-    Node(FrameView fv);
+    Node(FrameView&& fv);
     virtual ~Node() = default;
 
     bool is_root() const { return parent() == nullpid; }

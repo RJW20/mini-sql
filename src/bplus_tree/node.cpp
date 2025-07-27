@@ -14,7 +14,7 @@ namespace minisql {
  * Populates the pages header. */
 template <typename Key>
 Node<Key>::Node(
-    FrameView fv, Magic magic, key_size_t key_size, slot_size_t slot_size,
+    FrameView&& fv, Magic magic, key_size_t key_size, slot_size_t slot_size,
     page_id_t parent
 ) : fv_{std::move(fv)}, key_size_{key_size}, slot_size_{slot_size} {
     fv_.write<Magic>(NodeHeader::MAGIC_OFFSET, magic);
@@ -27,7 +27,7 @@ Node<Key>::Node(
 /* Constructor for reading a Node from a page.
  * Reads key_size, slot_size_ and size_ eagerly. */
 template <typename Key>
-Node<Key>::Node(FrameView fv) : fv_{std::move(fv)} {
+Node<Key>::Node(FrameView&& fv) : fv_{std::move(fv)} {
     key_size_ = fv_.view<key_size_t>(NodeHeader::KEY_SIZE_OFFSET);
     slot_size_ = fv_.view<slot_size_t>(NodeHeader::SLOT_SIZE_OFFSET);
     size_ = fv_.view<size_t>(NodeHeader::SIZE_OFFSET);

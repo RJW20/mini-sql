@@ -17,7 +17,7 @@ class FreeListBlock {
 public:
     using stack_pointer_t = FreeListBlockHeader::stack_pointer_t;
 
-    FreeListBlock(FrameView fv, bool new_ = false) : fv_{std::move(fv)} {
+    FreeListBlock(FrameView&& fv, bool new_ = false) : fv_{std::move(fv)} {
         if (new_) {
             fv_.write<Magic>(
                 FreeListBlockHeader::MAGIC_OFFSET, Magic::FREE_LIST_BLOCK
