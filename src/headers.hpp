@@ -9,7 +9,7 @@
 namespace minisql {
 
 /* Magic
- * Indicates the type and structure of a Page. */
+ * Indicates the type and structure of a page. */
 enum class Magic : std::uint8_t {
     FREE_LIST_BLOCK = 0,
 };
@@ -26,9 +26,11 @@ struct BaseHeader {
  * - std::uint16_t stack_pointer
  * - page_id_t next_block */
 struct FreeListBlockHeader : public BaseHeader {
+    using stack_pointer_t = std::uint16_t;
+
     static constexpr std::size_t STACK_POINTER_OFFSET = BaseHeader::SIZE;
     static constexpr std::size_t NEXT_BLOCK_OFFSET =
-        STACK_POINTER_OFFSET + sizeof(std::uint16_t);
+        STACK_POINTER_OFFSET + sizeof(stack_pointer_t);
     static constexpr std::size_t SIZE = NEXT_BLOCK_OFFSET + sizeof(page_id_t);
 };
 

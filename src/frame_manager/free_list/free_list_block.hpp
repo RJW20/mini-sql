@@ -1,12 +1,10 @@
 #ifndef MINISQL_FREE_LIST_BLOCK_HPP
 #define MINISQL_FREE_LIST_BLOCK_HPP
 
-#include <cstdint>
-#include <cstddef>
 #include <utility>
 
-#include "frame_manager/cache/frame_view.hpp"
 #include "headers.hpp"
+#include "frame_manager/cache/frame_view.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "exceptions.hpp"
 
@@ -17,6 +15,8 @@ namespace minisql {
  * followed by a stack of pids. */
 class FreeListBlock {
 public:
+    using stack_pointer_t = FreeListBlockHeader::stack_pointer_t;
+
     FreeListBlock(FrameView fv, bool new_ = false) : fv_{std::move(fv)} {
         if (new_) {
             fv_.write<Magic>(
@@ -40,12 +40,12 @@ public:
     }
 
     page_id_t pop_back() {
-        std::size_t sp = stack_pointer() - sizeof(page_id_t);
+        stack_pointer_t sp = stack_pointer() - sizeof(page_id_t);
         set_stack_pointer(sp);
         return fv_.copy<page_id_t>(sp);
     }
     void push_back(page_id_t pid) {
-        std::size_t sp = stack_pointer();
+        stack_pointer_t sp = stack_pointer();
         fv_.write<page_id_t>(sp, pid);
         set_stack_pointer(sp + sizeof(page_id_t));
     }
@@ -59,13 +59,13 @@ public:
 private:
     FrameView fv_;
 
-    std::uint16_t stack_pointer() const { 
-        return fv_.view<std::uint16_t>(
+    stack_pointer_t stack_pointer() const { 
+        return fv_.view<stack_pointer_t>(
             FreeListBlockHeader::STACK_POINTER_OFFSET
         );
     }
-    void set_stack_pointer(std::uint16_t stack_pointer) {
-        fv_.write<std::uint16_t>(
+    void set_stack_pointer(stack_pointer_t stack_pointer) {
+        fv_.write<stack_pointer_t>(
             FreeListBlockHeader::STACK_POINTER_OFFSET, stack_pointer
         );
     }
