@@ -106,7 +106,7 @@ const Varchar VCHR_MIN("", 0);
 // ----------------------------------------------------------------------------
 
 template <>
-const Varchar ByteIO::view<Varchar>(
+inline const Varchar ByteIO::view<Varchar>(
     span<std::byte> bytes, std::size_t offset, std::size_t size
 ) {
     if (offset + size > bytes.size())
@@ -115,7 +115,7 @@ const Varchar ByteIO::view<Varchar>(
 }
 
 template <>
-Varchar ByteIO::copy<Varchar>(
+inline Varchar ByteIO::copy<Varchar>(
     span<std::byte> bytes, std::size_t offset, std::size_t size
 ) {
     if (offset + size > bytes.size())
@@ -124,7 +124,7 @@ Varchar ByteIO::copy<Varchar>(
 }
 
 template <>
-void ByteIO::write<Varchar>(
+inline void ByteIO::write<Varchar>(
     span<std::byte> bytes, std::size_t offset, const Varchar& v
 ) {
     const std::size_t size = v.size();
