@@ -34,6 +34,26 @@ struct FreeListBlockHeader : public BaseHeader {
     static constexpr std::size_t SIZE = NEXT_BLOCK_OFFSET + sizeof(page_id_t);
 };
 
+/* NodeHeader Structure:
+ * - BaseHeader
+ * - std::uint8_t key_size
+ * - std::uint16_t slot_size
+ * - std::uint16_t size
+ * - page_id_t parent */
+struct NodeHeader : public BaseHeader {
+    using key_size_t = std::uint8_t;
+    using slot_size_t = std::uint16_t;
+    using size_t = std::uint16_t;
+
+    static constexpr std::size_t KEY_SIZE_OFFSET = BaseHeader::SIZE;
+    static constexpr std::size_t SLOT_SIZE_OFFSET =
+        KEY_SIZE_OFFSET + sizeof(key_size_t);
+    static constexpr std::size_t SIZE_OFFSET =
+        SLOT_SIZE_OFFSET + sizeof(slot_size_t);
+    static constexpr std::size_t PARENT_OFFSET = SIZE_OFFSET + sizeof(size_t);
+    static constexpr std::size_t SIZE = PARENT_OFFSET + sizeof(page_id_t);
+};
+
 } // namespace minisql
 
 #endif // MINISQL_HEADERS_HPP

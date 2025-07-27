@@ -43,6 +43,8 @@ public:
         ByteIO::write<T>(f_->data, offset, value);
         dirty_ = true;
     }
+    
+    std::byte* data() const { return f_->data.data(); }
 
     void mark_deleted() { 
         f_->dirty = false;

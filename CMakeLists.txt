@@ -8,6 +8,7 @@ set(SOURCES
     src/frame_manager/cache/frame_view.cpp
     src/frame_manager/cache/cache.cpp
     src/frame_manager/free_list/free_list.cpp
+    src/bplus_tree/node.cpp
 )
 add_library(mini-sql ${SOURCES})
 
