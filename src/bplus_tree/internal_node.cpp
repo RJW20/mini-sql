@@ -11,11 +11,10 @@ namespace minisql {
 
 /* Constructor for a new InternalNode.
  * Populates the pages header. */
-template <typename Key>
-InternalNode<Key>::InternalNode(
+InternalNode::InternalNode(
     FrameView&& fv, key_size_t key_size, page_id_t parent,
     page_id_t first_child
-) : Node<Key>(
+) : Node(
     std::move(fv), Magic::INTERNAL_NODE, key_size,
     key_size + sizeof(page_id_t), parent
 ) {
@@ -26,12 +25,12 @@ InternalNode<Key>::InternalNode(
  * the current middle slot, with the key being returned and the page_id_t being
  * set as node's first_child. */
 template <typename Key>
-Key InternalNode<Key>::split_into(InternalNode<Key>* node) {
-    const size_t middle_slot = this->size() / 2 + this->size() % 2 - 1;
-    const Key separator = this->key(middle_slot);
+Key InternalNode::split_into(InternalNode* node) {
+    const size_t middle_slot = size() / 2 + size() % 2 - 1;
+    const Key separator = key<Key>(middle_slot);
     node->set_first_child(child(middle_slot));
-    this->transfer_to_front(node, middle_slot + 1);
-    this->remove(middle_slot);
+    transfer_to_front(node, size() - (middle_slot + 1));
+    remove(middle_slot);
     return separator;
 }
 
@@ -39,11 +38,9 @@ Key InternalNode<Key>::split_into(InternalNode<Key>* node) {
  * from node, with the key being returned and the page_id_t being set as
  * first_child. */
 template <typename Key>
-Key InternalNode<Key>::take_back(
-    InternalNode<Key>* node, const Key& separator
-) {
+Key InternalNode::take_back(InternalNode* node, const Key& separator) {
     insert(0, separator, first_child());
-    const Key new_separator = node->key(node->size() - 1);
+    const Key new_separator = node->key<Key>(node->size() - 1);
     set_first_child(node->child(node->size() - 1));
     node->remove(node->size() - 1);
     return new_separator;
@@ -53,11 +50,9 @@ Key InternalNode<Key>::take_back(
  * slot 0 from node, with the key being returned and the page_id_t being set as
  * node's first_child. */
 template <typename Key>
-Key InternalNode<Key>::take_front(
-    InternalNode<Key>* node, const Key& separator
-) {
-    insert(this->size(), separator, node->first_child());
-    const Key new_separator = node->key(0);
+Key InternalNode::take_front(InternalNode* node, const Key& separator) {
+    insert(size(), separator, node->first_child());
+    const Key new_separator = node->key<Key>(0);
     node->set_first_child(node->child(0));
     node->remove(0);
     return new_separator;
@@ -66,15 +61,43 @@ Key InternalNode<Key>::take_front(
 /* Insert separator and first child at node's last slot and then transfer all
  * slots onto the back of node. */
 template <typename Key>
-void InternalNode<Key>::merge_into(
-    InternalNode<Key>* node, const Key& separator
-) {
+void InternalNode::merge_into(InternalNode* node, const Key& separator) {
     node->insert(node->size(), separator, first_child());
-    this->transfer_to_back(node, this->size());
+    transfer_to_back(node, size());
 }
 
-template class InternalNode<int>;
-template class InternalNode<double>;
-template class InternalNode<Varchar>;
+template int InternalNode::split_into<int>(InternalNode* node);
+template double InternalNode::split_into<double>(InternalNode* node);
+template Varchar InternalNode::split_into<Varchar>(InternalNode* node);
+
+template int InternalNode::take_back<int>(
+    InternalNode* node, const int& separator
+);
+template double InternalNode::take_back<double>(
+    InternalNode* node, const double& separator
+);
+template Varchar InternalNode::take_back<Varchar>(
+    InternalNode* node, const Varchar& separator
+);
+
+template int InternalNode::take_front<int>(
+    InternalNode* node, const int& separator
+);
+template double InternalNode::take_front<double>(
+    InternalNode* node, const double& separator
+);
+template Varchar InternalNode::take_front<Varchar>(
+    InternalNode* node, const Varchar& separator
+);
+
+template void InternalNode::merge_into<int>(
+    InternalNode* node, const int& separator
+);
+template void InternalNode::merge_into<double>(
+    InternalNode* node, const double& separator
+);
+template void InternalNode::merge_into<Varchar>(
+    InternalNode* node, const Varchar& separator
+);
 
 } // namespace minisql

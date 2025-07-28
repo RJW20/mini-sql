@@ -13,10 +13,7 @@ namespace minisql {
 /* Node
  * Acts as an interface over a page, consisting of a NodeHeader followed by an
  * array of fixed-size slots of bytes. */
-template <typename Key>
 class Node {
-    static_assert(IsValidKey<Key>::value, "Key type not supported.");
-
 public:
     using key_size_t = NodeHeader::key_size_t;
     using slot_size_t = NodeHeader::slot_size_t;
@@ -41,9 +38,11 @@ public:
         fv_.write<page_id_t>(NodeHeader::PARENT_OFFSET, pid);
     }
 
+    template <typename Key>
     Key key(size_t slot) const {
         return fv_.view<Key>(offset(slot), key_size_);
     }
+    template <typename Key>
     void set_key(size_t slot, const Key& key) {
         fv_.write<Key>(offset(slot), key);
     }
@@ -65,8 +64,8 @@ protected:
     }
 
     void shift(size_t start_slot, int steps);
-    void transfer_to_front(Node<Key>* node, size_t start_slot);
-    void transfer_to_back(Node<Key>* node, size_t end_slot);
+    void transfer_to_front(Node* node, size_t count);
+    void transfer_to_back(Node* node, size_t count);
 
     virtual size_t min_size() const = 0;
     size_t max_size() const {
