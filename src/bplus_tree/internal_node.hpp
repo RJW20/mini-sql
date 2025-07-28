@@ -7,6 +7,7 @@
 #include "bplus_tree/node.hpp"
 #include "frame_manager/cache/frame_view.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
+#include "headers.hpp"
 
 namespace minisql {
 
@@ -23,9 +24,9 @@ public:
         FrameView&& fv, key_size_t key_size, page_id_t parent,
         page_id_t first_child = nullpid
     );
-    InternalNode(FrameView&& fv) : Node<Key>(std::move(fv)) {}
+    InternalNode(FrameView&& fv) : Node<Key>{std::move(fv)} {}
 
-    bool is_leaf() const override { return false; }
+    bool is_leaf() const override final { return false; }
 
     page_id_t child(size_t slot) const {
         if (slot == -1) return first_child();
@@ -62,11 +63,11 @@ private:
         );
     }
 
-    std::size_t header_size() const override {
+    std::size_t header_size() const override final {
         return InternalNodeHeader::SIZE;
     }
 
-    size_t min_size() const override {
+    size_t min_size() const override final {
         if (this->is_root()) return 1;
         size_t max_size_ = this->max_size();
         return max_size_ / 2 + max_size_ % 2 - 1;

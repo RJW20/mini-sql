@@ -13,6 +13,7 @@ namespace minisql {
 enum class Magic : std::uint8_t {
     FREE_LIST_BLOCK = 0,
     INTERNAL_NODE = 1,
+    LEAF_NODE = 2,
 };
 
 /* BaseHeader Structure:
@@ -61,6 +62,14 @@ struct NodeHeader : public BaseHeader {
 struct InternalNodeHeader : public NodeHeader {
     static constexpr std::size_t FIRST_CHILD_OFFSET = NodeHeader::SIZE;
     static constexpr std::size_t SIZE = FIRST_CHILD_OFFSET + sizeof(page_id_t);
+};
+
+/* LeafNodeHeader Structure
+ * - NodeHeader
+ * - page_id_t next_leaf */
+struct LeafNodeHeader : public NodeHeader {
+    static constexpr std::size_t NEXT_LEAF_OFFSET = NodeHeader::SIZE;
+    static constexpr std::size_t SIZE = NEXT_LEAF_OFFSET + sizeof(page_id_t);
 };
 
 } // namespace minisql

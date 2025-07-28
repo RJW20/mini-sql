@@ -10,6 +10,7 @@ set(SOURCES
     src/frame_manager/free_list/free_list.cpp
     src/bplus_tree/node.cpp
     src/bplus_tree/internal_node.cpp
+    src/bplus_tree/leaf_node.cpp
 )
 add_library(mini-sql ${SOURCES})
 
