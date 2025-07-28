@@ -12,6 +12,7 @@ namespace minisql {
  * Indicates the type and structure of a page. */
 enum class Magic : std::uint8_t {
     FREE_LIST_BLOCK = 0,
+    INTERNAL_NODE = 1,
 };
 
 /* BaseHeader Structure:
@@ -52,6 +53,14 @@ struct NodeHeader : public BaseHeader {
         SLOT_SIZE_OFFSET + sizeof(slot_size_t);
     static constexpr std::size_t PARENT_OFFSET = SIZE_OFFSET + sizeof(size_t);
     static constexpr std::size_t SIZE = PARENT_OFFSET + sizeof(page_id_t);
+};
+
+/* InternalNodeHeader Structure
+ * - NodeHeader
+ * - page_id_t first_child */
+struct InternalNodeHeader : public NodeHeader {
+    static constexpr std::size_t FIRST_CHILD_OFFSET = NodeHeader::SIZE;
+    static constexpr std::size_t SIZE = FIRST_CHILD_OFFSET + sizeof(page_id_t);
 };
 
 } // namespace minisql

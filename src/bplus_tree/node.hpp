@@ -61,24 +61,24 @@ protected:
     size_t size_;
 
     std::size_t offset(size_t slot) const { 
-        return header_length() + slot * slot_size_;
+        return header_size() + slot * slot_size_;
     }
 
     void shift(size_t start_slot, int steps);
-    void transfer_right(size_t start_slot, Node<Key>* right_node);
-    void transfer_left(size_t end_slot, Node<Key>* left_node);
+    void transfer_to_front(Node<Key>* node, size_t start_slot);
+    void transfer_to_back(Node<Key>* node, size_t end_slot);
+
+    virtual size_t min_size() const = 0;
+    size_t max_size() const {
+        return (fv_.page_size() - header_size()) / slot_size_;
+    }
 
 private:
-    virtual std::size_t header_length() const = 0;
+    virtual std::size_t header_size() const = 0;
 
     void set_size(size_t size) {
         size_ = size;
         fv_.write<size_t>(NodeHeader::SIZE_OFFSET, size_);
-    }
-
-    virtual size_t min_size() const = 0;
-    size_t max_size() const {
-        return (fv_.page_size() - header_length()) / slot_size_;
     }
 };
 

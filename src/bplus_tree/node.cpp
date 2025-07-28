@@ -45,29 +45,29 @@ void Node<Key>::shift(size_t start_slot, int steps) {
     set_size(size_ + steps);
 }
 
-/* Transfer slots >= start_slot onto the beginning of right_node.
- * Slots already in right_node will be shifted to make the required space. */
+/* Transfer slots >= start_slot onto the front of node.
+ * Slots already in node will be shifted to make the required space. */
 template <typename Key>
-void Node<Key>::transfer_right(size_t start_slot, Node<Key>* right_node) {
+void Node<Key>::transfer_to_front(Node<Key>* node, size_t start_slot) {
     if (start_slot > size_) return;
-    right_node->shift(0, size_ - start_slot);
+    node->shift(0, size_ - start_slot);
     std::memcpy(
-        right_node->fv_.data() + right_node->offset(0),
-        fv_.data() + offset(start_slot), (size_ - start_slot) * slot_size_
+        node->fv_.data() + node->offset(0), fv_.data() + offset(start_slot),
+        (size_ - start_slot) * slot_size_
     );
     set_size(start_slot);
 }
 
-/* Transfer slots < end_slot onto the end of left_node.
- * Slots left in this Node will be shifted so they start from index 0. */
+/* Transfer slots < end_slot onto the back of node.
+ * Slots left in this node will be shifted so they start from index 0. */
 template <typename Key>
-void Node<Key>::transfer_left(size_t end_slot, Node<Key>* left_node) {
+void Node<Key>::transfer_to_back(Node<Key>* node, size_t end_slot) {
     if (end_slot > size_) end_slot = size_;
     std::memcpy(
-        left_node->fv_.data() + left_node->offset(left_node->size_),
-        fv_.data() + offset(0), end_slot * slot_size_
+        node->fv_.data() + node->offset(node->size_), fv_.data() + offset(0),
+        end_slot * slot_size_
     );
-    left_node->set_size(left_node->size_ + end_slot);
+    node->set_size(node->size_ + end_slot);
     shift(end_slot, - end_slot);
 }
 
