@@ -46,7 +46,7 @@ public:
         fv_.write<Key>(offset(slot), key);
     }
 
-    void remove(size_t slot) { shift(slot + 1, -1); }
+    void erase(size_t slot) { shift(slot + 1, -1); }
 
     size_t size() const { return size_; }
     bool at_min_capacity() const { return size_ == min_size(); }
@@ -63,8 +63,10 @@ protected:
     }
 
     void shift(size_t start_slot, int steps);
-    void transfer_to_front(Node* node, size_t count);
-    void transfer_to_back(Node* node, size_t count);
+
+    static void assert_compatibility(Node* n1, Node* n2);
+    static void splice_back_to_front(Node* dst, Node* src, size_t count);
+    static void splice_front_to_back(Node* dst, Node* src, size_t count);
 
     virtual size_t min_size() const = 0;
     size_t max_size() const {

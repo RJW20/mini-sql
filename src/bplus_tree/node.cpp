@@ -6,6 +6,7 @@
 #include "frame_manager/cache/frame_view.hpp"
 #include "headers.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
+#include "exceptions.hpp"
 #include "varchar.hpp"
 
 namespace minisql {
@@ -42,28 +43,41 @@ void Node::shift(size_t start_slot, int steps) {
     set_size(size_ + steps);
 }
 
-/* Transfer the back count slots onto the front of node.
- * Slots already in node will be shifted to make the required space. */
-void Node::transfer_to_front(Node* node, size_t count) {
-    if (count > size_) count = size_;
-    node->shift(0, count);
-    std::memcpy(
-        node->fv_.data() + node->offset(0), fv_.data() + offset(size_ - count),
-        count * slot_size_
-    );
-    set_size(size_ - count);
+/* Throw a NodeIncompatibilityException if the Nodes don't have matching key
+ * and slot sizes. */
+void Node::assert_compatibility(Node* n1, Node* n2) {
+    if (n1->key_size_ != n2->key_size_ || n1->slot_size_ != n2->slot_size_)
+        throw NodeIncompatibilityException(
+            n1->key_size_, n2->key_size_, n1->slot_size_, n2->slot_size_
+        );
 }
 
-/* Transfer the front count slots onto the back of node.
- * Slots left in this node will be shifted so they start from index 0. */
-void Node::transfer_to_back(Node* node, size_t count) {
-    if (count > size_) count = size_;
+/* Transfer count slots from the back of src onto the front of dst.
+ * Slots already in dst will be shifted to make the required space. */
+void Node::splice_back_to_front(Node* dst, Node* src, size_t count) {
+    assert_compatibility(dst, src);
+    if (count > src->size_) count = src->size_;
+    dst->shift(0, count);
     std::memcpy(
-        node->fv_.data() + node->offset(node->size_), fv_.data() + offset(0),
-        count * slot_size_
+        dst->fv_.data() + dst->offset(0),
+        src->fv_.data() + src->offset(src->size_ - count),
+        count * src->slot_size_
     );
-    node->set_size(node->size_ + count);
-    shift(count, - count);
+    src->set_size(src->size_ - count);
+}
+
+/* Transfer count slots from the front of src onto the back of dst.
+ * Slots left in src will be shifted to start from index 0. */
+void Node::splice_front_to_back(Node* dst, Node* src, size_t count) {
+    assert_compatibility(dst, src);
+    if (count > src->size_) count = src->size_;
+    std::memcpy(
+        dst->fv_.data() + dst->offset(dst->size_),
+        src->fv_.data() + src->offset(0),
+        count * src->slot_size_
+    );
+    dst->set_size(dst->size_ + count);
+    src->shift(count, - count);
 }
 
 } // namespace minisql
