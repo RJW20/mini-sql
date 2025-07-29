@@ -45,10 +45,15 @@ public:
         set_slot(slot, bytes);
     }
 
-    void split_into(LeafNode* node);
-    void take_back(LeafNode* node) { node->transfer_to_front(this, 1); }
-    void take_front(LeafNode* node) { node->transfer_to_back(this, 1); }
-    void merge_into(LeafNode* node);
+    static void split(LeafNode* dst, LeafNode* src);
+    static void merge(LeafNode* dst, LeafNode* src);
+    
+    static void take_back(LeafNode* dst, LeafNode* src) {
+        splice_back_to_front(dst, src, 1);
+    }
+    static void take_front(LeafNode* dst, LeafNode* src) {
+        splice_front_to_back(dst, src, 1);
+    }
 
 private:
     std::size_t header_size() const override final {

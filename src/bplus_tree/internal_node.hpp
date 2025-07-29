@@ -36,18 +36,26 @@ public:
     template <typename Key>
     void insert(size_t slot, const Key& key, page_id_t pid) {
         shift(slot, 1);
-        set_key(slot, key);
+        set_key<Key>(slot, key);
         set_child(slot, pid);
     }
 
     template <typename Key>
-    Key split_into(InternalNode* node);
+    static Key split(InternalNode* dst, InternalNode* src);
     template <typename Key>
-    Key take_back(InternalNode* node, const Key& separator);
+    static void merge(
+        InternalNode* dst, InternalNode* src, const Key& separator
+    );
+
     template <typename Key>
-    Key take_front(InternalNode* node, const Key& separator);
+    static Key take_back(
+        InternalNode* dst, InternalNode* src, const Key& separator
+    );
     template <typename Key>
-    void merge_into(InternalNode* node, const Key& separator);
+    static Key take_front(
+        InternalNode* dst, InternalNode* src, const Key& separator
+    );
+
 
 private:
     page_id_t first_child() const {

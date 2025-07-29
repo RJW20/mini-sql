@@ -18,19 +18,19 @@ LeafNode::LeafNode(
     set_next_leaf(next_leaf);
 }
 
-/* Transfer slots >= current middle slot onto the front of node.
- * Sets next_leaf to node. */
-void LeafNode::split_into(LeafNode* node) {
-    const size_t middle_slot = size() / 2;
-    transfer_to_front(node, size() - middle_slot);
-    set_next_leaf(node->pid());
+/* Transfer slots >= src's middle slot from src onto the front of dst.
+ * Sets src's next_leaf to dst. */
+void LeafNode::split(LeafNode* dst, LeafNode* src) {
+    const size_t middle_slot = src->size_ / 2;
+    splice_back_to_front(dst, src, src->size_ - middle_slot);
+    src->set_next_leaf(dst->pid());
 }
 
-/* Transfer all slots onto the back of node.
- * Sets node's next_leaf to next_leaf. */
-void LeafNode::merge_into(LeafNode* node) {
-    transfer_to_back(node, size());
-    node->set_next_leaf(next_leaf());
+/* Transfer all slots from src onto the back of dst.
+ * Sets dst's next_leaf to src's next_leaf. */
+void LeafNode::merge(LeafNode* dst, LeafNode* src) {
+    splice_front_to_back(dst, src, src->size_);
+    dst->set_next_leaf(src->next_leaf());
 }
 
 } // namespace minisql

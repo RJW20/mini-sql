@@ -21,83 +21,89 @@ InternalNode::InternalNode(
     set_first_child(first_child);
 }
 
-/* Transfer slots > current middle slot onto the front of node and then remove
- * the current middle slot, with the key being returned and the page_id_t being
- * set as node's first_child. */
+/* Transfer slots > src's middle slot from src onto the front of dst and then
+ * remove src's middle slot, with the key being returned and the page_id_t
+ * being set as dst's first_child. */
 template <typename Key>
-Key InternalNode::split_into(InternalNode* node) {
-    const size_t middle_slot = size() / 2 + size() % 2 - 1;
-    const Key separator = key<Key>(middle_slot);
-    node->set_first_child(child(middle_slot));
-    transfer_to_front(node, size() - (middle_slot + 1));
-    remove(middle_slot);
+Key InternalNode::split(InternalNode* dst, InternalNode* src) {
+    const size_t middle_slot = src->size_ / 2 + src->size_ % 2 - 1;
+    const Key separator = src->key<Key>(middle_slot);
+    dst->set_first_child(src->child(middle_slot));
+    splice_back_to_front(dst, src, src->size_ - (middle_slot + 1));
+    src->erase(middle_slot);
     return separator;
 }
 
-/* Insert separator and first_child at slot 0 and then remove the last slot
- * from node, with the key being returned and the page_id_t being set as
- * first_child. */
+/* Insert separator and src's first child at dst's last slot and then transfer
+ * all slots from src onto the back of dst. */
 template <typename Key>
-Key InternalNode::take_back(InternalNode* node, const Key& separator) {
-    insert(0, separator, first_child());
-    const Key new_separator = node->key<Key>(node->size() - 1);
-    set_first_child(node->child(node->size() - 1));
-    node->remove(node->size() - 1);
+void InternalNode::merge(
+    InternalNode* dst, InternalNode* src, const Key& separator
+) {
+    dst->insert(dst->size_, separator, src->first_child());
+    splice_front_to_back(dst, src, src->size_);
+}
+
+/* Insert separator and dst's first_child at dst's slot 0 and then remove the
+ * last slot from src, with the key being returned and the page_id_t being set as
+ * dst's first_child. */
+template <typename Key>
+Key InternalNode::take_back(
+    InternalNode* dst, InternalNode* src, const Key& separator
+) {
+    dst->insert(0, separator, dst->first_child());
+    const Key new_separator = src->key<Key>(src->size_ - 1);
+    dst->set_first_child(src->child(src->size_ - 1));
+    src->erase(src->size_ - 1);
     return new_separator;
 }
 
-/* Insert separator and node's first_child at the last slot and then remove
- * slot 0 from node, with the key being returned and the page_id_t being set as
- * node's first_child. */
+/* Insert separator and src's first_child at dst's last slot and then remove
+ * slot 0 from src, with the key being returned and the page_id_t being set as
+ * src's first_child. */
 template <typename Key>
-Key InternalNode::take_front(InternalNode* node, const Key& separator) {
-    insert(size(), separator, node->first_child());
-    const Key new_separator = node->key<Key>(0);
-    node->set_first_child(node->child(0));
-    node->remove(0);
+Key InternalNode::take_front(
+    InternalNode* dst, InternalNode* src, const Key& separator
+) {
+    dst->insert(dst->size_, separator, src->first_child());
+    const Key new_separator = src->key<Key>(0);
+    src->set_first_child(src->child(0));
+    src->erase(0);
     return new_separator;
 }
 
-/* Insert separator and first child at node's last slot and then transfer all
- * slots onto the back of node. */
-template <typename Key>
-void InternalNode::merge_into(InternalNode* node, const Key& separator) {
-    node->insert(node->size(), separator, first_child());
-    transfer_to_back(node, size());
-}
+template int InternalNode::split<int>(InternalNode*, InternalNode*);
+template double InternalNode::split<double>(InternalNode*, InternalNode*);
+template Varchar InternalNode::split<Varchar>(InternalNode*, InternalNode*);
 
-template int InternalNode::split_into<int>(InternalNode* node);
-template double InternalNode::split_into<double>(InternalNode* node);
-template Varchar InternalNode::split_into<Varchar>(InternalNode* node);
+template void InternalNode::merge<int>(
+    InternalNode*, InternalNode*, const int&
+);
+template void InternalNode::merge<double>(
+    InternalNode*, InternalNode*, const double&
+);
+template void InternalNode::merge<Varchar>(
+    InternalNode*, InternalNode*, const Varchar&
+);
 
 template int InternalNode::take_back<int>(
-    InternalNode* node, const int& separator
+    InternalNode*, InternalNode*, const int&
 );
 template double InternalNode::take_back<double>(
-    InternalNode* node, const double& separator
+    InternalNode*, InternalNode*, const double&
 );
 template Varchar InternalNode::take_back<Varchar>(
-    InternalNode* node, const Varchar& separator
+    InternalNode*, InternalNode*, const Varchar&
 );
 
 template int InternalNode::take_front<int>(
-    InternalNode* node, const int& separator
+    InternalNode*, InternalNode*, const int&
 );
 template double InternalNode::take_front<double>(
-    InternalNode* node, const double& separator
+    InternalNode*, InternalNode*, const double&
 );
 template Varchar InternalNode::take_front<Varchar>(
-    InternalNode* node, const Varchar& separator
-);
-
-template void InternalNode::merge_into<int>(
-    InternalNode* node, const int& separator
-);
-template void InternalNode::merge_into<double>(
-    InternalNode* node, const double& separator
-);
-template void InternalNode::merge_into<Varchar>(
-    InternalNode* node, const Varchar& separator
+    InternalNode*, InternalNode*, const Varchar&
 );
 
 } // namespace minisql
