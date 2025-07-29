@@ -3,7 +3,6 @@
 
 #include <cstddef>
 
-#include "bplus_tree/keys.hpp"
 #include "headers.hpp"
 #include "frame_manager/cache/frame_view.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
