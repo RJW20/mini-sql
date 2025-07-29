@@ -29,6 +29,23 @@ public:
     ) {}
 };
 
+// NodeIncompatibilityException for Nodes with different key or slot sizes.
+class NodeIncompatibilityException : public std::runtime_error {
+public:
+    using key_size_t = NodeHeader::key_size_t;
+    using slot_size_t = NodeHeader::slot_size_t;
+
+    NodeIncompatibilityException(
+        key_size_t key_size_1, key_size_t key_size_2,
+        slot_size_t slot_size_1, slot_size_t slot_size_2
+    ) : std::runtime_error(
+            "Incompatible nodes: key_sizes = " + std::to_string(key_size_1) +
+            "," + std::to_string(key_size_2) + ", slot_sizes = " +
+            std::to_string(slot_size_1) + "," + std::to_string(slot_size_2) +
+            "."
+    ) {}
+};
+
 } // namespace minisql
 
 #endif // MINISQL_EXCEPTIONS_HPP
