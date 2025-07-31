@@ -37,11 +37,14 @@ public:
                     data_, column.offset, column.size
                 );
         }
+        __builtin_unreachable();
     }
 
     Row::Field operator[](Varchar name) const {
         return (*this)[schema_->index_of(name)];
     }
+
+    Row::Field primary() const { return (*this)[0]; }
 
     Row deserialise() const {
         std::vector<Row::Field> fields;

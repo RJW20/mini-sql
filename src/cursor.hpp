@@ -10,6 +10,7 @@
 #include "row/row_view.hpp"
 #include "bplus_tree/leaf_node.hpp"
 #include "bplus_tree/node.hpp"
+#include "exceptions.hpp"
 
 namespace minisql {
 
@@ -25,19 +26,10 @@ public:
     );
 
     void seek(const Row::Field& key) { (this->*seek_)(key); }
-
     bool next();
-
-    RowView current() const {
-        return RowView{leaf_node_->slot(slot_), schema_};
-    }
-
+    RowView current();
     void insert(const RowView& rv) { (this->*insert_)(rv); }
-
-    void update(const RowView& rv) const {
-        leaf_node_->set_slot(slot_, rv.data());
-    }
-
+    void update(const RowView& rv) { (this->*update_)(rv); }
     void erase() { (this->*erase_)(); }
 
     void close();
@@ -52,6 +44,7 @@ private:
 
     void (Cursor::* seek_)(const Row::Field&);
     void (Cursor::* insert_)(const RowView&);
+    void (Cursor::* update_)(const RowView&);
     void (Cursor::* erase_)();
 
     void validate();
@@ -65,11 +58,29 @@ private:
 
     template <typename Key>
     void insert__(const RowView& rv) {
+        if (slot_ < leaf_node_->size() && 
+            leaf_node_->key<Key>(slot_) == std::get<Key>(rv.primary()));
+            throw DBConstraintViolation(
+                "Insert failed: primary key already exists."
+            );
         bp_tree_->insert_into<Key>(leaf_node_.get(), slot_, rv.data());
+        if (eof_) eof_ = false;
+    }
+
+    template <typename Key>
+    void update__(const RowView& rv) {
+        validate();
+        if (eof_ || leaf_node_->key<Key>(slot_) != std::get<Key>(rv.primary()))
+            throw DBConstraintViolation(
+                "Update failed: primary key does not match."
+            );
+        leaf_node_->set_slot(slot_, rv.data());
     }
 
     template <typename Key>
     void erase__() {
+        validate();
+        if (eof_) throw DBConstraintViolation("Delete failed: at eof.");
         if (slot_ + 1 != leaf_node_->size()) {
             Key next_key = leaf_node_->key<Key>(slot_ + 1);
             bp_tree_->erase_from<Key>(leaf_node_.get(), slot_);

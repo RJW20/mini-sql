@@ -9,11 +9,10 @@
 #include "bplus_tree/leaf_node.hpp"
 #include "bplus_tree/node.hpp"
 #include "span.hpp"
-#include "byte_io.hpp"
-#include "exceptions.hpp"
 #include "bplus_tree/internal_node.hpp"
 #include "frame_manager/cache/frame_view.hpp"
 #include "headers.hpp"
+#include "exceptions.hpp"
 #include "varchar.hpp"
 
 namespace minisql {
@@ -66,9 +65,6 @@ template <typename Key>
 void BPlusTree::insert_into(LeafNode* node, size_t slot, span<std::byte> bytes)
 {
     // Attempt to insert into node
-    if (slot < node->size() &&
-        node->key<Key>(slot) == ByteIO::view<Key>(bytes, 0, key_size_))
-        throw DBConstraintViolation("Primary key already exists.");
     if (!node->at_max_capacity()) {
         node->insert(slot, bytes);
         return;
