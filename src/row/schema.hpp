@@ -32,14 +32,16 @@ public:
         return name_to_index_.at(name);
     }
 
-    Schema project(const std::vector<Varchar>& column_names) const;
+    const Column& primary() const { return columns_[0]; }
 
     std::size_t size() const { return columns_.size(); }
     std::size_t row_size() const { 
         std::size_t row_size;
         for (const Column& column : columns_) row_size += column.size;
         return row_size;
-    }   
+    }
+
+    Schema project(const std::vector<Varchar>& column_names) const;
 
 private:
     std::vector<Column> columns_;

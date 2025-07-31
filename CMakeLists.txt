@@ -13,6 +13,7 @@ set(SOURCES
     src/bplus_tree/leaf_node.cpp
     src/bplus_tree/bplus_tree.cpp
     src/row/row.cpp
+    src/cursor.cpp
 )
 add_library(mini-sql ${SOURCES})
 

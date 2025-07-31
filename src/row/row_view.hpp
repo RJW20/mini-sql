@@ -67,6 +67,8 @@ public:
         return Row{std::move(fields), schema_};
     }
 
+    span<std::byte> data() const { return data_; }
+
 private:
     span<std::byte> data_;
     std::shared_ptr<Schema> schema_;
