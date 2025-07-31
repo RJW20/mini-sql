@@ -14,7 +14,8 @@
 namespace minisql {
 
 /* B+ Tree
- * Manages tree structure and enforces ordering within nodes. */
+ * Manages a tree structure of InternalNodes and LeafNodes throughout inserts
+ * into and erases from LeafNodes for efficient key searching. */
 class BPlusTree {
 public:
     using key_size_t = Node::key_size_t;
