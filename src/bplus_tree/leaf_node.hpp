@@ -24,7 +24,7 @@ public:
     LeafNode(FrameView&& fv) : Node{std::move(fv)} {}
 
     bool is_leaf() const override final { return true; }
-    bool is_leftmost() const { return next_leaf() == nullpid; }
+    bool is_rightmost() const { return next_leaf() == nullpid; }
 
     page_id_t next_leaf() const {
         return fv_.view<page_id_t>(LeafNodeHeader::NEXT_LEAF_OFFSET);

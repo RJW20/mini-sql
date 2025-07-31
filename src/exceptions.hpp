@@ -46,6 +46,12 @@ public:
     ) {}
 };
 
+// DBConstraintViolation for failed DDL/DML instructions
+class DBConstraintViolation : public std::runtime_error {
+public:
+    DBConstraintViolation(const std::string& arg) : std::runtime_error(arg) {}
+};
+
 } // namespace minisql
 
 #endif // MINISQL_EXCEPTIONS_HPP
