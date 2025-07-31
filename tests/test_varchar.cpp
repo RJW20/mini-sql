@@ -3,8 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <cstddef>
-#include <stdexcept>
-#include <cstring>
+#include <utility>
 #include <vector>
 
 #include "byte_io.hpp"
@@ -75,6 +74,27 @@ void test_copy_assignment() {
     std::cout << "- test_copy_assignment passed" << std::endl;
 }
 
+void test_move_constructor() {
+    Varchar v1("testing", 10);
+    Varchar v2 = std::move(v1);
+    assert(v1 == v2);
+    Varchar v3(v1.data(), v1.size());
+    Varchar v4 = std::move(v3);
+    assert(v3 == v4);
+    std::cout << "- test_move_constructor passed" << std::endl;
+}
+
+void test_move_assignment() {
+    Varchar v1("testing", 10);
+    Varchar v2("decoy", 5);
+    v2 = std::move(v1);
+    Varchar v3(v1.data(), v1.size());
+    Varchar v4(v2.data(), v2.size());
+    v4 = std::move(v3);
+    assert(v3 == v4);
+    std::cout << "- test_move_assignment passed" << std::endl;
+}
+
 void test_less_than_operator() {
     assert(Varchar("a", 1) < Varchar("b", 1));
     assert(Varchar("a", 2) < Varchar("b", 1));
@@ -99,6 +119,8 @@ int main() {
     test_equality_operator();
     test_copy_constructor();
     test_copy_assignment();
+    test_move_constructor();
+    test_move_assignment();
     test_less_than_operator();
     test_byte_io_write_copy_view();
     std::cout << "All tests passed." << std::endl;

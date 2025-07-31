@@ -67,6 +67,18 @@ public:
         return *this;
     }
 
+    Varchar(Varchar&& other)
+        : owned_{std::move(other.owned_)}, data_{other.data_},
+          size_{other.size_} {}
+
+    Varchar& operator=(Varchar&& other) {
+        if (this == &other) return *this;
+        owned_ = std::move(other.owned_);
+        data_ = other.data_;
+        size_ = other.size_;
+        return *this;
+    }
+
     bool operator==(const Varchar& other) const {
         if (size_ != other.size_) return false;
         for (std::size_t i = 0; i < size_; i++) {
