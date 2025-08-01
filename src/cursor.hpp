@@ -6,7 +6,7 @@
 
 #include "bplus_tree/bplus_tree.hpp"
 #include "row/schema.hpp"
-#include "row/row.hpp"
+#include "row/field.hpp"
 #include "row/row_view.hpp"
 #include "bplus_tree/leaf_node.hpp"
 #include "bplus_tree/node.hpp"
@@ -22,10 +22,10 @@ public:
     Cursor() {}
 
     void open(
-        BPlusTree* bp_tree, const Schema* schema, const Row::Field& origin
+        BPlusTree* bp_tree, const Schema* schema, const Field& origin
     );
 
-    void seek(const Row::Field& key) { (this->*seek_)(key); }
+    void seek(const Field& key) { (this->*seek_)(key); }
     bool next();
     RowView current();
     void insert(const RowView& rv) { (this->*insert_)(rv); }
@@ -37,12 +37,12 @@ public:
 private:
     BPlusTree* bp_tree_ {nullptr};
     std::shared_ptr<Schema> schema_ {nullptr};
-    Row::Field origin_ {0};
+    Field origin_ {0};
     bool eof_ {true};
     std::unique_ptr<LeafNode> leaf_node_ {nullptr};
     Node::size_t slot_;
 
-    void (Cursor::* seek_)(const Row::Field&);
+    void (Cursor::* seek_)(const Field&);
     void (Cursor::* insert_)(const RowView&);
     void (Cursor::* update_)(const RowView&);
     void (Cursor::* erase_)();
@@ -50,7 +50,7 @@ private:
     void validate();
 
     template <typename Key>
-    void seek__(const Row::Field& key) {
+    void seek__(const Field& key) {
         Key key_ = std::get<Key>(key);
         leaf_node_ = bp_tree_->seek_leaf<Key>(key_);
         slot_ = bp_tree_->seek_slot<Key>(leaf_node_.get(), key_);

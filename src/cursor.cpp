@@ -2,7 +2,7 @@
 
 #include "bplus_tree/bplus_tree.hpp"
 #include "row/schema.hpp"
-#include "row/row.hpp"
+#include "row/field.hpp"
 #include "varchar.hpp"
 #include "row/row_view.hpp"
 #include "exceptions.hpp"
@@ -12,7 +12,7 @@ namespace minisql {
 /* Open the Cursor on bp_tree to read slots using schema.
  * Positions the Cursor to advance to the slot in bp_tree with key = origin. */
 void Cursor::open(
-    BPlusTree* bp_tree, const Schema* schema, const Row::Field& origin
+    BPlusTree* bp_tree, const Schema* schema, const Field& origin
 ) {
     bp_tree_ = bp_tree;
     schema_ = std::make_shared<Schema>(*schema);

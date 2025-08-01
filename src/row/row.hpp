@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 
+#include "row/field.hpp"
 #include "row/schema.hpp"
 #include "varchar.hpp"
 
@@ -18,8 +19,6 @@ class RowView;
  * A vector containing fields indexable by index or name. */
 class Row {
 public:
-    using Field = std::variant<int, double, Varchar>;
-
     Row(const std::vector<Field>& fields, std::shared_ptr<Schema> schema)
         : fields_{std::move(fields)}, schema_{std::move(schema)} {}
 

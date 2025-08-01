@@ -8,9 +8,10 @@
 
 #include "span.hpp"
 #include "row/schema.hpp"
-#include "row.hpp"
+#include "row/field.hpp"
 #include "byte_io.hpp"
 #include "varchar.hpp"
+#include "row.hpp"
 
 namespace minisql {
 
@@ -25,7 +26,7 @@ public:
         std::unique_ptr<std::vector<std::byte>> owned = nullptr
     ) : data_{data}, schema_{std::move(schema)}, owned_{std::move(owned)} {}
 
-    Row::Field operator[](std::size_t index) const {
+    Field operator[](std::size_t index) const {
         const Schema::Column& column = (*schema_)[index];
         switch (column.type) {
             case Schema::FieldType::INT:
@@ -40,14 +41,14 @@ public:
         __builtin_unreachable();
     }
 
-    Row::Field operator[](Varchar name) const {
+    Field operator[](Varchar name) const {
         return (*this)[schema_->index_of(name)];
     }
 
-    Row::Field primary() const { return (*this)[0]; }
+    Field primary() const { return (*this)[0]; }
 
     Row deserialise() const {
-        std::vector<Row::Field> fields;
+        std::vector<Field> fields;
         fields.reserve(schema_->size());
         for (int i = 0; i < schema_->size(); i++) {
             const Schema::Column& column = (*schema_)[i];
