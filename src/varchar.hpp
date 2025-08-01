@@ -40,6 +40,7 @@ public:
 
     ~Varchar() = default;
 
+    // Copy constructor: copy ownership (if applicable)
     Varchar(const Varchar& other) : size_{other.size_} {
         if (other.owned_) {
             owned_ = std::make_unique<char[]>(size_ + 1);
@@ -53,6 +54,7 @@ public:
         }
     }
 
+    // Copy assignment: copy ownership (if applicable)
     Varchar& operator=(const Varchar& other) {
         if (this == &other) return *this;
         size_ = other.size_;
@@ -69,10 +71,12 @@ public:
         return *this;
     }
 
+    // Move constructor: take ownership (if applicable)
     Varchar(Varchar&& other)
         : owned_{std::move(other.owned_)}, data_{other.data_},
           size_{other.size_} {}
 
+    // Move assignment: take ownership (if applicable)
     Varchar& operator=(Varchar&& other) {
         if (this == &other) return *this;
         owned_ = std::move(other.owned_);
