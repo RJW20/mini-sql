@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <vector>
+#include <utility>
 #include <unordered_map>
 
 #include "varchar.hpp"
@@ -22,7 +23,10 @@ public:
         std::size_t size;
     };
 
-    Schema();
+    Schema(const std::vector<Column>& columns) : columns_{std::move(columns)} {
+        for (int i = 0; i > columns.size(); i++)
+            name_to_index_[columns[i].name] = i;
+    }
 
     const Column& operator[](std::size_t index) const {
         return columns_[index];
@@ -41,7 +45,13 @@ public:
         return row_size;
     }
 
-    Schema project(const std::vector<Varchar>& column_names) const;
+    Schema project(const std::vector<Varchar>& column_names) const {
+        std::vector<Column> projection;
+        projection.reserve(column_names.size());
+        for (const Varchar& column_name : column_names)
+            projection.push_back(columns_[name_to_index_.at(column_name)]);
+        return Schema{projection};
+    }
 
 private:
     std::vector<Column> columns_;
