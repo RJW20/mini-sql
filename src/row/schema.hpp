@@ -32,7 +32,7 @@ public:
         return columns_[index];
     }
 
-    std::size_t index_of(Varchar name) const {
+    std::size_t index_of(const Varchar& name) const {
         return name_to_index_.at(name);
     }
 

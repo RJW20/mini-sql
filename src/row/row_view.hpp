@@ -41,11 +41,36 @@ public:
         __builtin_unreachable();
     }
 
-    Field operator[](Varchar name) const {
+    Field operator[](const Varchar& name) const {
         return (*this)[schema_->index_of(name)];
     }
 
     Field primary() const { return (*this)[0]; }
+
+    void set_field(std::size_t index, const Field& field) {
+        const Schema::Column& column = (*schema_)[index];
+        switch (column.type) {
+            case Schema::FieldType::INT:
+                ByteIO::write<int>(
+                    data_, column.offset, std::get<int>(field)
+                );
+                break;
+            case Schema::FieldType::REAL:
+                ByteIO::write<double>(
+                    data_, column.offset, std::get<double>(field)
+                );
+                break;
+            case Schema::FieldType::TEXT:
+                ByteIO::write<Varchar>(
+                    data_, column.offset, std::get<Varchar>(field)
+                );
+                break;
+        }
+    }
+
+    void set_field(const Varchar& name, const Field& field) {
+        set_field(schema_->index_of(name), field);
+    }
 
     Row deserialise() const {
         std::vector<Field> fields;
