@@ -66,7 +66,7 @@ void test_write_read() {
         std::size_t i = 0;
         while (true) {
             try {
-                ByteIO::write<double>(src, i, generate_new<double>());
+                ByteIO::write<double>(src, i, i);
                 i = i + sizeof(double);
             }
             catch (const std::out_of_range&) { break; }

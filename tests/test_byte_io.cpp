@@ -7,27 +7,23 @@
 #include <vector>
 #include <type_traits>
 
-#include "utils.hpp"
-
 using namespace minisql;
 
 template <typename T>
-void test_write_copy() {
+void test_write_copy(T t) {
     std::vector<std::byte> bytes(20);
     const std::size_t test_offset = 0;
-    T test_case = generate_new<T>();
-    ByteIO::write<T>(bytes, test_offset, test_case);
-    assert(ByteIO::copy<T>(bytes, test_offset) == test_case);
+    ByteIO::write<T>(bytes, test_offset, t);
+    assert(ByteIO::copy<T>(bytes, test_offset) == t);
     std::cout << "- test_write_copy passed" << std::endl;
 }
 
 template <typename T>
-void test_out_of_range() {
+void test_out_of_range(T t) {
     std::vector<std::byte> bytes(20);
-    T test_case = generate_new<T>();
     int test_offset = bytes.size() - sizeof(T) + 1;
     try {
-        ByteIO::write<T>(bytes, test_offset, test_case);
+        ByteIO::write<T>(bytes, test_offset, t);
         assert(false);
     }
     catch (const std::out_of_range&) {}
@@ -40,17 +36,17 @@ void test_out_of_range() {
 }
 
 template <typename T>
-void run_tests() {
+void run_tests(T t) {
     std::cout << "Running tests for " << typeid(T).name() << ":" << std::endl;
-    test_write_copy<T>();
-    test_out_of_range<T>();
+    test_write_copy<T>(t);
+    test_out_of_range<T>(t);
 }
 
 int main() {
-    run_tests<std::uint8_t>();
-    run_tests<std::uint16_t>();
-    run_tests<int>();
-    run_tests<double>();
+    run_tests<std::uint8_t>(0x80);
+    run_tests<std::uint16_t>(0x8000);
+    run_tests<int>(0x80000000);
+    run_tests<double>(5555.5555);
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

@@ -15,7 +15,7 @@ set(SOURCES
     src/row/row.cpp
     src/cursor.cpp
 )
-add_library(mini-sql ${SOURCES})
+add_library(mini-sql STATIC ${SOURCES})
 
 target_include_directories(mini-sql PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
