@@ -16,4 +16,15 @@ std::filesystem::path make_temp_path();
 void create_file(const std::filesystem::path& path, std::size_t size = 0);
 void delete_path(const std::filesystem::path& path);
 
+// Node page_id_t/key generation
+static int seed = 0;
+inline constexpr std::size_t DEFAULT_VARCHAR_SIZE = 10;
+template <typename T>
+T generate(
+    int seed = seed, const minisql::Varchar& prefix = 'v',
+    std::size_t = DEFAULT_VARCHAR_SIZE
+);
+template <typename Key>
+minisql::NodeHeader::key_size_t key_size();
+
 #endif // UTILS_HPP
