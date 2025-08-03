@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-#include <type_traits>
+#include <typeinfo>
 
 using namespace minisql;
 

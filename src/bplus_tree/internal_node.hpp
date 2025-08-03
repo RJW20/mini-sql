@@ -25,11 +25,11 @@ public:
     bool is_leaf() const override final { return false; }
 
     page_id_t child(size_t slot) const {
-        if (slot == -1) return first_child();
+        if (slot == static_cast<size_t>(-1)) return first_child();
         return fv_.view<page_id_t>(offset(slot) + key_size_);
     }
     void set_child(size_t slot, page_id_t pid) {
-        if (slot == -1) set_first_child(pid);
+        if (slot == static_cast<size_t>(-1)) set_first_child(pid);
         else fv_.write<page_id_t>(offset(slot) + key_size_, pid);
     }
 

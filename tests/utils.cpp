@@ -63,7 +63,7 @@ template double generate<double>(int, const Varchar&, std::size_t);
 
 template <>
 Varchar generate<Varchar>(int seed, const Varchar& prefix, std::size_t size) {
-    std::string underlying = prefix.data() + std::to_string('_') +
+    std::string underlying = std::string(prefix.data()) + "_" +
         std::to_string(seed);
     return Varchar{underlying.c_str(), size};
 }

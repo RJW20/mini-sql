@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <typeinfo>
 
 #include "frame_manager/cache/frame.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
@@ -57,6 +58,7 @@ void test_shift() {
             assert(node.size() == max_slots - i - 1);
             if (node.size()) assert(node.key<Key>(0) == generate<Key>(i + 1));
         }
+        assert(node.at_min_capacity());
 
         const Node::size_t shift_start = max_slots / 2;
         const Node::size_t shift_steps = max_slots / 4;
@@ -66,12 +68,12 @@ void test_shift() {
         assert(node.size() == max_slots);
         for (int i = 0; i < shift_start; i++)
             assert(node.key<Key>(i) == generate<Key>(i));
-        for (int i = shift_start + shift_steps; i < max_slots; i++)
+        for (int i = shift_start + shift_steps; i < node.size(); i++)
             assert(node.key<Key>(i) == generate<Key>(i - shift_steps));
 
         node.shift(shift_start + shift_steps, - shift_steps);
         assert(node.size() == max_slots - shift_steps);
-        for (int i = 0; i < max_slots - shift_steps; i++)
+        for (int i = 0; i < node.size(); i++)
             assert(node.key<Key>(i) == generate<Key>(i));
     }
     std::cout << "- test_shift passed" << std::endl;
@@ -130,10 +132,10 @@ void test_splice() {
                 dst.key<Key>(i) ==
                 generate<Key>(i + max_slots - splice_count)
             );
-        for (int i = splice_count; i < max_slots; i++)
+        for (int i = splice_count; i < dst.size(); i++)
             assert(dst.key<Key>(i) == generate<Key>(i - splice_count));
         assert(src.size() == max_slots - splice_count);
-        for (int i = 0; i < max_slots - splice_count; i++)
+        for (int i = 0; i < src.size(); i++)
             assert(src.key<Key>(i) == generate<Key>(i));
     }
     {
@@ -152,13 +154,13 @@ void test_splice() {
         assert(dst.size() == max_slots);
         for (int i = 0; i < max_slots - splice_count; i++)
             assert(dst.key<Key>(i) == generate<Key>(i));
-        for (int i = max_slots - splice_count; i < max_slots; i++)
+        for (int i = max_slots - splice_count; i < dst.size(); i++)
             assert(
                 dst.key<Key>(i) ==
                 generate<Key>(i - (max_slots - splice_count))
             );
         assert(src.size() == max_slots - splice_count);
-        for (int i = 0; i < max_slots - splice_count; i++)
+        for (int i = 0; i < src.size(); i++)
             assert(src.key<Key>(i) == generate<Key>(i + splice_count));
     }
     std::cout << "- test_splice passed" << std::endl;

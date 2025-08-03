@@ -22,12 +22,13 @@ InternalNode::InternalNode(
 }
 
 /* Transfer slots > src's middle slot from src onto the front of dst and then
- * remove src's middle slot, with the key being returned and the page_id_t
- * being set as dst's first_child. */
+ * remove src's middle slot, with the key being copied and returned and the
+ * page_id_t being set as dst's first_child. */
 template <typename Key>
 Key InternalNode::split(InternalNode* dst, InternalNode* src) {
     const size_t middle_slot = src->size_ / 2 + src->size_ % 2 - 1;
-    const Key separator = src->key<Key>(middle_slot);
+    const Key separator =
+        src->fv_.copy<Key>(src->offset(middle_slot), src->key_size_);
     dst->set_first_child(src->child(middle_slot));
     splice_back_to_front(dst, src, src->size_ - (middle_slot + 1));
     src->erase(middle_slot);
@@ -45,28 +46,30 @@ void InternalNode::merge(
 }
 
 /* Insert separator and dst's first_child at dst's slot 0 and then remove the
- * last slot from src, with the key being returned and the page_id_t being set as
- * dst's first_child. */
+ * last slot from src, with the key being copied returned and the page_id_t
+ * being set as dst's first_child. */
 template <typename Key>
 Key InternalNode::take_back(
     InternalNode* dst, InternalNode* src, const Key& separator
 ) {
     dst->insert(0, separator, dst->first_child());
-    const Key new_separator = src->key<Key>(src->size_ - 1);
+    const Key new_separator =
+        src->fv_.copy<Key>(src->offset(src->size_ - 1), src->key_size_);
     dst->set_first_child(src->child(src->size_ - 1));
     src->erase(src->size_ - 1);
     return new_separator;
 }
 
 /* Insert separator and src's first_child at dst's last slot and then remove
- * slot 0 from src, with the key being returned and the page_id_t being set as
- * src's first_child. */
+ * slot 0 from src, with the key being copied and returned and the page_id_t
+ * being set as src's first_child. */
 template <typename Key>
 Key InternalNode::take_front(
     InternalNode* dst, InternalNode* src, const Key& separator
 ) {
     dst->insert(dst->size_, separator, src->first_child());
-    const Key new_separator = src->key<Key>(0);
+    const Key new_separator =
+        src->fv_.copy<Key>(src->offset(0), src->key_size_);
     src->set_first_child(src->child(0));
     src->erase(0);
     return new_separator;
