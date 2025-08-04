@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <cstddef>
 #include <typeinfo>
 
 #include "frame_manager/cache/frame.hpp"
@@ -83,7 +84,7 @@ void test_split() {
     }
     assert(src.size() == middle_slot);
     assert(src.child(-1) == generate<page_id_t>(-1));
-    for (int i = 0; i < middle_slot; i++) {
+    for (int i = 0; i < src.size(); i++) {
         assert(src.key<Key>(i) == generate<Key>(i));
         assert(src.child(i) == generate<page_id_t>(i));
     }

@@ -1,6 +1,7 @@
 #include "bplus_tree/node.hpp"
 #include "bplus_tree/test_node.hpp"
 
+#include <cstddef>
 #include <cassert>
 #include <iostream>
 #include <typeinfo>
