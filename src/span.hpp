@@ -29,13 +29,8 @@ public:
     template <std::size_t N>
     span(std::array<value_type, N>& arr)
         : data_{arr.data()}, size_{N} {}
-    template <std::size_t N>
-    span(const std::array<value_type, N>& arr)
-        : data_{arr.data()}, size_{N} {}
 
     span(std::vector<value_type>& vec) 
-        : data_{vec.data()}, size_{vec.size()} {}
-    span(const std::vector<value_type>& vec) 
         : data_{vec.data()}, size_{vec.size()} {}
 
     reference operator[](size_type idx) { return data_[idx]; }
