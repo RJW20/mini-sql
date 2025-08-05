@@ -1,5 +1,4 @@
 #include "bplus_tree/node.hpp"
-#include "bplus_tree/test_node.hpp"
 
 #include <cstddef>
 #include <cassert>
@@ -14,6 +13,7 @@
 #include "varchar.hpp"
 
 #include "utils.hpp"
+#include "bplus_tree/test_node.hpp"
 
 using namespace minisql;
 
@@ -42,41 +42,39 @@ void test_shift() {
     const Node::key_size_t key_size_ = key_size<Key>();
     const Node::size_t max_slots =
         (f.data.size() - NodeHeader::SIZE) / key_size_;
-    {
-        TestNode node{
-            FrameView{nullptr, &f}, key_size_, generate<page_id_t>()
-        };
 
-        for (int i = 0; i < max_slots; i++) {
-            node.insert<Key>(i, generate<Key>(i));
-            assert(node.size() == i + 1);
-            assert(node.key<Key>(i) == generate<Key>(i));
-        }
-        assert(node.at_max_capacity());
+    TestNode node{FrameView{nullptr, &f}, key_size_, generate<page_id_t>()};
 
-        for (int i = 0; i < max_slots; i++) {
-            node.erase(0);
-            assert(node.size() == max_slots - i - 1);
-            if (node.size()) assert(node.key<Key>(0) == generate<Key>(i + 1));
-        }
-        assert(node.at_min_capacity());
-
-        const Node::size_t shift_start = max_slots / 2;
-        const Node::size_t shift_steps = max_slots / 4;
-        for (int i = 0; i < max_slots - shift_steps; i++)
-            node.insert<Key>(i, generate<Key>(i));
-        node.shift(shift_start, shift_steps);
-        assert(node.size() == max_slots);
-        for (int i = 0; i < shift_start; i++)
-            assert(node.key<Key>(i) == generate<Key>(i));
-        for (int i = shift_start + shift_steps; i < node.size(); i++)
-            assert(node.key<Key>(i) == generate<Key>(i - shift_steps));
-
-        node.shift(shift_start + shift_steps, - shift_steps);
-        assert(node.size() == max_slots - shift_steps);
-        for (int i = 0; i < node.size(); i++)
-            assert(node.key<Key>(i) == generate<Key>(i));
+    for (int i = 0; i < max_slots; i++) {
+        node.insert<Key>(i, generate<Key>(i));
+        assert(node.size() == i + 1);
+        assert(node.key<Key>(i) == generate<Key>(i));
     }
+    assert(node.at_max_capacity());
+
+    for (int i = 0; i < max_slots; i++) {
+        node.erase(0);
+        assert(node.size() == max_slots - i - 1);
+        if (node.size()) assert(node.key<Key>(0) == generate<Key>(i + 1));
+    }
+    assert(node.at_min_capacity());
+
+    const Node::size_t shift_start = max_slots / 2;
+    const Node::size_t shift_steps = max_slots / 4;
+    for (int i = 0; i < max_slots - shift_steps; i++)
+        node.insert<Key>(i, generate<Key>(i));
+    node.shift(shift_start, shift_steps);
+    assert(node.size() == max_slots);
+    for (int i = 0; i < shift_start; i++)
+        assert(node.key<Key>(i) == generate<Key>(i));
+    for (int i = shift_start + shift_steps; i < node.size(); i++)
+        assert(node.key<Key>(i) == generate<Key>(i - shift_steps));
+
+    node.shift(shift_start + shift_steps, - shift_steps);
+    assert(node.size() == max_slots - shift_steps);
+    for (int i = 0; i < node.size(); i++)
+        assert(node.key<Key>(i) == generate<Key>(i));
+
     std::cout << "- test_shift passed" << std::endl;
 }
 
