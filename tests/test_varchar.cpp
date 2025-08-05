@@ -107,9 +107,9 @@ void test_byte_io_write_copy_view() {
     std::vector<std::byte> bytes(20);
     const std::size_t test_offset = 0;
     Varchar v("testing", 10);
-    ByteIO::write<Varchar>(bytes, test_offset, v);
-    assert(ByteIO::copy<Varchar>(bytes, test_offset, v.size()) == v);
-    assert(ByteIO::view<Varchar>(bytes, test_offset, v.size()) == v);
+    byte_io::write<Varchar>(bytes, test_offset, v);
+    assert(byte_io::copy<Varchar>(bytes, test_offset, v.size()) == v);
+    assert(byte_io::view<Varchar>(bytes, test_offset, v.size()) == v);
     std::cout << "- test_byte_io_write_copy_view passed" << std::endl;
 }
 

@@ -13,8 +13,8 @@ template <typename T>
 void test_write_copy(T t) {
     std::vector<std::byte> bytes(20);
     const std::size_t test_offset = 0;
-    ByteIO::write<T>(bytes, test_offset, t);
-    assert(ByteIO::copy<T>(bytes, test_offset) == t);
+    byte_io::write<T>(bytes, test_offset, t);
+    assert(byte_io::copy<T>(bytes, test_offset) == t);
     std::cout << "- test_write_copy passed" << std::endl;
 }
 
@@ -23,12 +23,12 @@ void test_out_of_range(T t) {
     std::vector<std::byte> bytes(20);
     int test_offset = bytes.size() - sizeof(T) + 1;
     try {
-        ByteIO::write<T>(bytes, test_offset, t);
+        byte_io::write<T>(bytes, test_offset, t);
         assert(false);
     }
     catch (const std::out_of_range&) {}
     try {
-        ByteIO::copy<T>(bytes, test_offset);
+        byte_io::copy<T>(bytes, test_offset);
         assert(false);
     }
     catch (const std::out_of_range&) {}

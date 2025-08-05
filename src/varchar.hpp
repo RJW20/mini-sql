@@ -120,34 +120,34 @@ private:
 const Varchar VCHR_MIN("", 0);
 
 // ----------------------------------------------------------------------------
-// Template specialisations for ByteIO
+// Template specialisations for byte_io
 // ----------------------------------------------------------------------------
 
 template <>
-inline const Varchar ByteIO::view<Varchar>(
+inline const Varchar byte_io::view<Varchar>(
     span<std::byte> bytes, std::size_t offset, std::size_t size
 ) {
     if (offset + size > bytes.size())
-        throw std::out_of_range("ByteIO view error");
+        throw std::out_of_range("byte_io view error");
     return Varchar(reinterpret_cast<char*>(bytes.data() + offset), size);
 }
 
 template <>
-inline Varchar ByteIO::copy<Varchar>(
+inline Varchar byte_io::copy<Varchar>(
     span<std::byte> bytes, std::size_t offset, std::size_t size
 ) {
     if (offset + size > bytes.size())
-        throw std::out_of_range("ByteIO copy error");
+        throw std::out_of_range("byte_io copy error");
     return Varchar(reinterpret_cast<const char*>(bytes.data() + offset), size);
 }
 
 template <>
-inline void ByteIO::write<Varchar>(
+inline void byte_io::write<Varchar>(
     span<std::byte> bytes, std::size_t offset, const Varchar& v
 ) {
     const std::size_t size = v.size();
     if (offset + size > bytes.size())
-        throw std::out_of_range("ByteIO write error");
+        throw std::out_of_range("byte_io write error");
     std::memcpy(bytes.data() + offset, v.data(), size);
 }
 

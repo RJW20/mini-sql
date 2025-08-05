@@ -75,7 +75,7 @@ void test_insert() {
             Node::size_t slot =
                 BPlusTree::seek_slot<Key>(leaf_node.get(), key);
             std::vector<std::byte> bytes{key_size_};
-            ByteIO::write<Key>(bytes, 0, key);
+            byte_io::write<Key>(bytes, 0, key);
             bp_tree.insert_into<Key>(leaf_node.get(), slot, bytes);
         }
 
@@ -118,7 +118,7 @@ void test_erase() {
             Node::size_t slot =
                 BPlusTree::seek_slot<Key>(leaf_node.get(), key);
             std::vector<std::byte> bytes{key_size_};
-            ByteIO::write<Key>(bytes, 0, key);
+            byte_io::write<Key>(bytes, 0, key);
             bp_tree.insert_into<Key>(leaf_node.get(), slot, bytes);
         }
 

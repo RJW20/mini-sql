@@ -30,17 +30,17 @@ public:
 
     template <typename T>
     const T view(std::size_t offset, std::size_t size = sizeof(T)) const {
-        return ByteIO::view<T>(f_->data, offset, size);
+        return byte_io::view<T>(f_->data, offset, size);
     }
 
     template <typename T>
     T copy(std::size_t offset, std::size_t size = sizeof(T)) const {
-        return ByteIO::copy<T>(f_->data, offset, size);
+        return byte_io::copy<T>(f_->data, offset, size);
     }
 
     template <typename T>
     void write(std::size_t offset, const T& value) {
-        ByteIO::write<T>(f_->data, offset, value);
+        byte_io::write<T>(f_->data, offset, value);
         dirty_ = true;
     }
     

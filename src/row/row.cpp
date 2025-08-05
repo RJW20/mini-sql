@@ -19,17 +19,17 @@ RowView Row::serialise() const {
         const Schema::Column& column = (*schema_)[i];
         switch (column.type) {
             case Schema::FieldType::INT:
-                ByteIO::write<int>(
+                byte_io::write<int>(
                     data, column.offset, std::get<int>(fields_[i])
                 );
                 break;
             case Schema::FieldType::REAL:
-                ByteIO::write<double>(
+                byte_io::write<double>(
                     data, column.offset, std::get<double>(fields_[i])
                 );
                 break;
             case Schema::FieldType::TEXT:
-                ByteIO::write<Varchar>(
+                byte_io::write<Varchar>(
                     data, column.offset, std::get<Varchar>(fields_[i])
                 );
                 break;

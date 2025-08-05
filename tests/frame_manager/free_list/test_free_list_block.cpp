@@ -21,13 +21,13 @@ void test_constructor() {
     {
         FreeListBlock block{FrameView{nullptr, &f}, true};
         assert(
-            ByteIO::view<Magic>(f.data, FreeListBlockHeader::MAGIC_OFFSET) ==
+            byte_io::view<Magic>(f.data, FreeListBlockHeader::MAGIC_OFFSET) ==
             Magic::FREE_LIST_BLOCK
         );
         assert(block.next_block() == nullpid);
         assert(block.empty());
     }
-    ByteIO::write<std::uint8_t>(f.data, FreeListBlockHeader::MAGIC_OFFSET, -1);
+    byte_io::write<std::uint8_t>(f.data, FreeListBlockHeader::MAGIC_OFFSET, -1);
     try {
         FreeListBlock block{FrameView{nullptr, &f}};
         assert(false);

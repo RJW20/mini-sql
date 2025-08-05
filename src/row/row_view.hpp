@@ -30,11 +30,11 @@ public:
         const Schema::Column& column = (*schema_)[index];
         switch (column.type) {
             case Schema::FieldType::INT:
-                return ByteIO::view<int>(data_, column.offset);
+                return byte_io::view<int>(data_, column.offset);
             case Schema::FieldType::REAL:
-                return ByteIO::view<double>(data_, column.offset);
+                return byte_io::view<double>(data_, column.offset);
             case Schema::FieldType::TEXT:
-                return ByteIO::view<Varchar>(
+                return byte_io::view<Varchar>(
                     data_, column.offset, column.size
                 );
         }
@@ -51,17 +51,17 @@ public:
         const Schema::Column& column = (*schema_)[index];
         switch (column.type) {
             case Schema::FieldType::INT:
-                ByteIO::write<int>(
+                byte_io::write<int>(
                     data_, column.offset, std::get<int>(field)
                 );
                 break;
             case Schema::FieldType::REAL:
-                ByteIO::write<double>(
+                byte_io::write<double>(
                     data_, column.offset, std::get<double>(field)
                 );
                 break;
             case Schema::FieldType::TEXT:
-                ByteIO::write<Varchar>(
+                byte_io::write<Varchar>(
                     data_, column.offset, std::get<Varchar>(field)
                 );
                 break;
@@ -79,15 +79,15 @@ public:
             const Schema::Column& column = (*schema_)[i];
             switch (column.type) {
                 case Schema::FieldType::INT:
-                    fields.push_back(ByteIO::copy<int>(data_, column.offset));
+                    fields.push_back(byte_io::copy<int>(data_, column.offset));
                     break;
                 case Schema::FieldType::REAL:
                     fields.push_back(
-                        ByteIO::copy<double>(data_, column.offset)
+                        byte_io::copy<double>(data_, column.offset)
                     );
                     break;
                 case Schema::FieldType::TEXT:
-                    fields.push_back(ByteIO::copy<Varchar>(
+                    fields.push_back(byte_io::copy<Varchar>(
                         data_, column.offset, column.size
                     ));
                     break;
