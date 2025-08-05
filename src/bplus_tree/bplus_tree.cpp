@@ -33,7 +33,7 @@ BPlusTree::BPlusTree(
  * Returns node.size() if target > all keys in node.
  * Assumes the slots are ordered by key and applies binary search. */
 template <typename Key>
-Node::size_t BPlusTree::seek_slot(Node* node, const Key& target) const {
+Node::size_t BPlusTree::seek_slot(Node* node, const Key& target) {
     size_t l = 0;
     size_t r = node->size();
     size_t m;
@@ -54,7 +54,9 @@ std::unique_ptr<LeafNode> BPlusTree::seek_leaf(const Key& target) const {
             seek_slot<Key>(current.get(), target) - 1
         )
     );
-    return std::unique_ptr<LeafNode>(dynamic_cast<LeafNode*>(current.get()));
+    return std::unique_ptr<LeafNode>(dynamic_cast<LeafNode*>(
+        current.release()
+    ));
 }
 
 /* Copy bytes' underlying data to the given slot in node.
@@ -76,7 +78,7 @@ void BPlusTree::insert_into(LeafNode* node, size_t slot, span<std::byte> bytes)
         node->next_leaf()
     };
     LeafNode::split(&new_node, node);
-    if (slot < node->size()) node->insert(slot, bytes);
+    if (slot <= node->size()) node->insert(slot, bytes);
     else new_node.insert(slot - node->size(), bytes);
 
     // If node is the root then create a parent
@@ -113,10 +115,10 @@ void BPlusTree::erase_from(LeafNode* node, size_t slot) {
     std::unique_ptr<InternalNode> parent = open_internal(node->parent());
     size_t child_slot = seek_slot<Key>(
         parent.get(), node->key<Key>(node->size() - 1)
-    );
+    ) - 1;
 
     // Try to take from a sibling
-    if (child_slot != -1) {
+    if (child_slot != static_cast<size_t>(-1)) {
         std::unique_ptr<LeafNode> sibling = open_leaf(
             parent->child(child_slot - 1)
         );
@@ -133,7 +135,7 @@ void BPlusTree::erase_from(LeafNode* node, size_t slot) {
         std::unique_ptr<LeafNode> sibling = open_leaf(
             parent->child(child_slot + 1)
         );
-        if (!sibling->at_max_capacity()) {
+        if (!sibling->at_min_capacity()) {
             LeafNode::take_front(node, sibling.get());
             parent->set_key<Key>(
                 child_slot + 1, node->key<Key>(node->size() - 1)
@@ -144,7 +146,7 @@ void BPlusTree::erase_from(LeafNode* node, size_t slot) {
     }
 
     // Merge with a sibling
-    if (child_slot != -1) {
+    if (child_slot != static_cast<size_t>(-1)) {
         std::unique_ptr<LeafNode> sibling = open_leaf(
             parent->child(child_slot - 1)
         );
@@ -181,8 +183,8 @@ void BPlusTree::insert_into(
     // Carry out a split
     InternalNode new_node{fm_->allocate(), key_size_, node->parent()};
     const Key separator = InternalNode::split<Key>(&new_node, node.get());
-    if (slot < node->size()) node->insert<Key>(slot, key, pid);
-    else new_node.insert<Key>(slot - node->size(), key, pid);
+    if (slot <= node->size()) node->insert<Key>(slot, key, pid);
+    else new_node.insert<Key>(slot - node->size() - 1, key, pid);
 
     // Update parent for moved children
     const page_id_t new_parent = new_node.pid();
@@ -219,7 +221,7 @@ void BPlusTree::erase_from(std::unique_ptr<InternalNode> node, size_t slot) {
     if (node->is_root()) {
         root_ = node->child(-1);
         fm_->deallocate(node->pid());
-        open_leaf(root_)->set_parent(nullpid);
+        open_node(root_)->set_parent(nullpid);
         return;
     }
 
@@ -227,10 +229,10 @@ void BPlusTree::erase_from(std::unique_ptr<InternalNode> node, size_t slot) {
     std::unique_ptr<InternalNode> parent = open_internal(node->parent());
     size_t child_slot = seek_slot<Key>(
         parent.get(), node->key<Key>(node->size() - 1)
-    );
+    ) - 1;
 
     // Try to take from a sibling
-    if (child_slot != -1) {
+    if (child_slot != static_cast<size_t>(-1)) {
         std::unique_ptr<InternalNode> sibling = open_internal(
             parent->child(child_slot - 1)
         );
@@ -248,7 +250,7 @@ void BPlusTree::erase_from(std::unique_ptr<InternalNode> node, size_t slot) {
         std::unique_ptr<InternalNode> sibling = open_internal(
             parent->child(child_slot + 1)
         );
-        if (!sibling->at_max_capacity()) {
+        if (!sibling->at_min_capacity()) {
             const Key separator = InternalNode::take_front<Key>(
                 node.get(), sibling.get(), parent->key<Key>(child_slot + 1)
             );
@@ -260,14 +262,14 @@ void BPlusTree::erase_from(std::unique_ptr<InternalNode> node, size_t slot) {
     }
 
     // Merge with a sibling
-    if (child_slot != -1) {
+    if (child_slot != static_cast<size_t>(-1)) {
         std::unique_ptr<InternalNode> sibling = open_internal(
             parent->child(child_slot - 1)
         );
         const page_id_t new_parent = sibling->pid();
         for (int i = -1; i < node->size(); i++)
             open_node(node->child(i))->set_parent(new_parent);
-        slot = sibling->size() + slot;
+        slot = sibling->size() + 1 + slot;
         InternalNode::merge<Key>(
             sibling.get(), node.get(), parent->key<Key>(child_slot)
         );
@@ -328,13 +330,11 @@ std::unique_ptr<Node> BPlusTree::open_node(page_id_t pid) const {
     }
 }
 
-template BPlusTree::size_t BPlusTree::seek_slot<int>(Node*, const int&) const;
-template BPlusTree::size_t BPlusTree::seek_slot<double>(
-    Node*, const double&
-) const;
+template BPlusTree::size_t BPlusTree::seek_slot<int>(Node*, const int&);
+template BPlusTree::size_t BPlusTree::seek_slot<double>(Node*, const double&);
 template BPlusTree::size_t BPlusTree::seek_slot<Varchar>(
     Node*, const Varchar&
-) const;
+);
 
 template std::unique_ptr<LeafNode> BPlusTree::seek_leaf<int>(const int&) const;
 template std::unique_ptr<LeafNode> BPlusTree::seek_leaf<double>(

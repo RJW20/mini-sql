@@ -28,7 +28,7 @@ public:
     );
 
     template <typename Key>
-    size_t seek_slot(Node* node, const Key& target) const;
+    static size_t seek_slot(Node* node, const Key& target);
     template <typename Key>
     std::unique_ptr<LeafNode> seek_leaf(const Key& target) const;
 
@@ -38,6 +38,8 @@ public:
     void erase_from(LeafNode* node, size_t slot);
 
     std::unique_ptr<LeafNode> open_leaf(page_id_t pid) const;
+
+    page_id_t root() const noexcept { return root_; }
 
 private:
     FrameManager* fm_;
