@@ -20,7 +20,7 @@ public:
     FrameManager(
         const std::filesystem::path& path, std::streamoff base_offset,
         std::size_t page_size, page_id_t page_count,
-        std::size_t cache_capacity, page_id_t first_free_list_block
+        std::size_t cache_capacity, page_id_t first_free_list_block = nullpid
     ) : disk_{path, base_offset, page_size, page_count},
         cache_{disk_, cache_capacity},
         free_list_{cache_, first_free_list_block} {}
@@ -40,6 +40,11 @@ public:
     void deallocate(page_id_t pid) { free_list_.push_back(pid); }
 
     void flush_all() { cache_.flush_all(); }
+
+    page_id_t page_count() const noexcept { return disk_.page_count(); }
+    page_id_t first_free_list_block() const noexcept {
+        return free_list_.first_free_list_block();
+    }
 
 private:
     DiskManager disk_;
