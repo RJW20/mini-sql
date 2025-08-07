@@ -5,12 +5,15 @@
 
 #include "row/field.hpp"
 #include "row/schema.hpp"
+#include "row/row_view.hpp"
 
 namespace minisql::planner {
 
 std::function<bool(const Field&, const Field&)> compile_less_than(
     Schema::FieldType type
 );
+
+using Predicate = std::function<bool(const RowView&)>;
 
 } // namespace minisql::planner
 
