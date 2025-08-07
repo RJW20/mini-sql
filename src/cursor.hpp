@@ -2,7 +2,6 @@
 #define MINISQL_CURSOR_HPP
 
 #include <memory>
-#include <variant>
 
 #include "bplus_tree/bplus_tree.hpp"
 #include "row/schema.hpp"
@@ -19,24 +18,20 @@ namespace minisql {
  * Tree. */
 class Cursor {
 public:
-    Cursor() {}
+    Cursor(BPlusTree* bp_tree, const Schema* schema);
 
-    void open(
-        BPlusTree* bp_tree, const Schema* schema, const Field& origin
-    );
-
+    void open(const Field& origin = 0);
     void seek(const Field& key) { (this->*seek_)(key); }
     bool next();
     RowView current();
     void insert(const RowView& rv) { (this->*insert_)(rv); }
-    void update(const RowView& rv) { (this->*update_)(rv); }
     void erase() { (this->*erase_)(); }
 
     void close();
 
 private:
-    BPlusTree* bp_tree_ {nullptr};
-    std::shared_ptr<Schema> schema_ {nullptr};
+    BPlusTree* bp_tree_;
+    std::shared_ptr<Schema> schema_;
     Field origin_ {0};
     bool eof_ {true};
     std::unique_ptr<LeafNode> leaf_node_ {nullptr};
@@ -44,7 +39,6 @@ private:
 
     void (Cursor::* seek_)(const Field&);
     void (Cursor::* insert_)(const RowView&);
-    void (Cursor::* update_)(const RowView&);
     void (Cursor::* erase_)();
 
     void validate();
@@ -53,7 +47,7 @@ private:
     void seek__(const Field& key) {
         Key key_ = std::get<Key>(key);
         leaf_node_ = bp_tree_->seek_leaf<Key>(key_);
-        slot_ = bp_tree_->seek_slot<Key>(leaf_node_.get(), key_);
+        slot_ = BPlusTree::seek_slot<Key>(leaf_node_.get(), key_);
     }
 
     template <typename Key>
@@ -65,16 +59,6 @@ private:
             );
         bp_tree_->insert_into<Key>(leaf_node_.get(), slot_, rv.data());
         if (eof_) eof_ = false;
-    }
-
-    template <typename Key>
-    void update__(const RowView& rv) {
-        validate();
-        if (eof_ || leaf_node_->key<Key>(slot_) != std::get<Key>(rv.primary()))
-            throw DBConstraintViolation(
-                "Update failed: primary key does not match."
-            );
-        leaf_node_->set_slot(slot_, rv.data());
     }
 
     template <typename Key>
