@@ -20,7 +20,8 @@ public:
 
     bool next() override {
         if (!child_->next()) return false;
-        modifier_(child_->current());
+        RowView current = child_->current();
+        modifier_(current);
         count_++;
         return true;
     }
