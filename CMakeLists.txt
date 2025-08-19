@@ -14,6 +14,7 @@ set(SOURCES
     src/bplus_tree/bplus_tree.cpp
     src/row/row.cpp
     src/cursor.cpp
+    src/planner/compiler.cpp
 )
 add_library(mini-sql STATIC ${SOURCES})
 

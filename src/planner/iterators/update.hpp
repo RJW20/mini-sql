@@ -2,25 +2,25 @@
 #define MINISQL_PLANNER_UPDATE_HPP
 
 #include <memory>
-#include <functional>
 #include <utility>
 
 #include "planner/iterators/iterator.hpp"
+#include "planner/compiler.hpp"
 #include "row/row_view.hpp"
-#include "cursor.hpp"
 
 namespace minisql::planner {
 
 // Updates Rows (in-place) from an Iterator.
 class Update : public Iterator {
 public:
-    Update(std::unique_ptr<Iterator> child) : child_{std::move(child)} {}
+    Update(std::unique_ptr<Iterator> child, const Modifier& modifier)
+        : child_{std::move(child)}, modifier_{std::move(modifier)} {}
 
     void open() override { child_->open(); }
 
     bool next() override {
         if (!child_->next()) return false;
-        modify_(child_->current());
+        modifier_(child_->current());
         count_++;
         return true;
     }
@@ -31,7 +31,7 @@ public:
 
 private:
     std::unique_ptr<Iterator> child_;
-    std::function<void(const RowView&)> modify_;
+    Modifier modifier_;
 };
 
 } // namespace minisql::planner
