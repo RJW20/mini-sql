@@ -46,6 +46,16 @@ public:
     ) {}
 };
 
+// FieldTypeException for valid Field types in invalid locations.
+class FieldTypeException : public std::runtime_error {
+public:
+    FieldTypeException(const std::string& expected, const std::string& actual)
+        : std::runtime_error(
+            "Invalid Field type: expected " + expected + ", got " + actual +
+            "."
+        ) {}
+};
+
 // DBConstraintViolation for failed DDL/DML instructions.
 class DBConstraintViolation : public std::runtime_error {
 public:
