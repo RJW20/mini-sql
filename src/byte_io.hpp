@@ -61,6 +61,7 @@ namespace byte_io {
             throw std::out_of_range("byte_io write error");
         std::memcpy(bytes.data() + offset, &t, size);
     }
+
 } // namespace byte_io
 
 } // namespace minisql
