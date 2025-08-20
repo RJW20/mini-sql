@@ -9,7 +9,7 @@
 
 namespace minisql {
 
-// Enum detailing supporting datatypes.
+// Enum detailing supported datatypes.
 enum class FieldType : std::uint8_t { INT, REAL, TEXT };
 
 // Variant holding any supported datatype.
