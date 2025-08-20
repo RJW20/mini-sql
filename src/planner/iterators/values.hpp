@@ -5,30 +5,36 @@
 #include <utility>
 
 #include "planner/iterators/iterator.hpp"
-#include "row/row.hpp"
+#include "row/field.hpp"
+#include "row/schema.hpp"
 #include "row/row_view.hpp"
 
 namespace minisql::planner {
 
-// Outputs Rows from a vector.
+// Outputs Rows from a vector of vectors of Fields.
 class Values : public Iterator {
 public:
-    Values(const std::vector<Row>& rows) : rows_{std::move(rows)} {}
+    Values(
+        std::vector<std::vector<Field>> values, std::shared_ptr<Schema> schema
+    ) : values_{std::move(values)}, schema_{std::move(schema)} {}
 
     void open() override {}
 
     bool next() override {
-        if (!(++pos_ < rows_.size())) return false;
+        if (!(++pos_ < values_.size())) return false;
         count_++;
         return true;
     }
 
-    RowView current() override { return rows_[pos_].serialise(); }
+    RowView current() override {
+        return Row{std::move(values_[pos_]), schema_}.serialise();
+    }
 
-    void close() override { rows_.clear(); }
+    void close() override { values_.clear(); }
 
 private:
-    std::vector<Row> rows_;
+    std::vector<std::vector<Field>> values_;
+    std::shared_ptr<Schema> schema_;
     std::size_t pos_ {-1};
 };
 
