@@ -1,12 +1,16 @@
 #ifndef MINISQL_FIELD_HPP
 #define MINISQL_FIELD_HPP
 
+#include <cstdint>
 #include <variant>
 #include <type_traits>
 
 #include "varchar.hpp"
 
 namespace minisql {
+
+// Enum detailing supporting datatypes.
+enum class FieldType : std::uint8_t { INT, REAL, TEXT };
 
 // Variant holding any supported datatype.
 using Field = std::variant<int, double, Varchar>;

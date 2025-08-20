@@ -4,8 +4,8 @@
 
 #include "bplus_tree/bplus_tree.hpp"
 #include "row/schema.hpp"
+#include "field.hpp"
 #include "varchar.hpp"
-#include "row/field.hpp"
 #include "row/row_view.hpp"
 #include "exceptions.hpp"
 
@@ -15,17 +15,17 @@ namespace minisql {
 Cursor::Cursor(BPlusTree* bp_tree, const Schema* schema)
     : bp_tree_{bp_tree}, schema_{std::make_shared<Schema>(*schema)} {
     switch (schema_->primary().type) {
-        case Schema::FieldType::INT:
+        case FieldType::INT:
             seek_ = &Cursor::seek__<int>;
             insert_ = &Cursor::insert__<int>;
             erase_ = &Cursor::erase__<int>;
             break;
-        case Schema::FieldType::REAL:
+        case FieldType::REAL:
             seek_ = &Cursor::seek__<double>;
             insert_ = &Cursor::insert__<double>;
             erase_ = &Cursor::erase__<double>;
             break;
-        case Schema::FieldType::TEXT:
+        case FieldType::TEXT:
             seek_ = &Cursor::seek__<Varchar>;
             insert_ = &Cursor::insert__<Varchar>;
             erase_ = &Cursor::erase__<Varchar>;

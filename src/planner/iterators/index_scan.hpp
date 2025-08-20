@@ -9,7 +9,7 @@
 #include "planner/iterators/table_scan.hpp"
 #include "cursor.hpp"
 #include "row/schema.hpp"
-#include "row/field.hpp"
+#include "field.hpp"
 #include "planner/compiler.hpp"
 
 namespace minisql::planner {

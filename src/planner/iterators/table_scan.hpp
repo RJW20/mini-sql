@@ -9,6 +9,7 @@
 #include "planner/iterators/iterator.hpp"
 #include "cursor.hpp"
 #include "row/schema.hpp"
+#include "field.hpp"
 #include "varchar.hpp"
 #include "row/row_view.hpp"
 
@@ -22,13 +23,13 @@ public:
 
     void open() override {
         switch (schema_->primary().type) {
-            case Schema::FieldType::INT:
+            case FieldType::INT:
                 cursor_->open(INT_MIN);
                 break;
-            case Schema::FieldType::REAL:
+            case FieldType::REAL:
                 cursor_->open(DBL_MIN);
                 break;
-            case Schema::FieldType::TEXT:
+            case FieldType::TEXT:
                 cursor_->open(VCHR_MIN);
                 break;
         }

@@ -1,13 +1,13 @@
 #ifndef MINISQL_SCHEMA_HPP
 #define MINISQL_SCHEMA_HPP
 
-#include <cstdint>
 #include <cstddef>
 #include <vector>
 #include <utility>
 #include <unordered_map>
 
 #include "varchar.hpp"
+#include "field.hpp"
 
 namespace minisql {
 
@@ -15,7 +15,6 @@ namespace minisql {
  * Details the structure of a Row. */
 class Schema {
 public:
-    enum class FieldType : std::uint8_t { INT, REAL, TEXT };
     struct Column {
         Varchar name;
         FieldType type;

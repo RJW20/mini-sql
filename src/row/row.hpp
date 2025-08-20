@@ -7,7 +7,7 @@
 #include <memory>
 #include <utility>
 
-#include "row/field.hpp"
+#include "field.hpp"
 #include "row/schema.hpp"
 #include "varchar.hpp"
 

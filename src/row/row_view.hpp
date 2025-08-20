@@ -8,7 +8,7 @@
 
 #include "span.hpp"
 #include "row/schema.hpp"
-#include "row/field.hpp"
+#include "field.hpp"
 #include "byte_io.hpp"
 #include "varchar.hpp"
 #include "row.hpp"
@@ -16,7 +16,7 @@
 namespace minisql {
 
 /* Row View
- * Provides access to fields in a Row without materialising the entire Row.
+ * Provides access to Fields in a Row without materialising the entire Row.
  * The span pointing to the underlying data either points to an external source
  * or into the vector held within owned_ if it is not nullptr. */
 class RowView {
@@ -29,11 +29,11 @@ public:
     Field operator[](std::size_t index) const {
         const Schema::Column& column = (*schema_)[index];
         switch (column.type) {
-            case Schema::FieldType::INT:
+            case FieldType::INT:
                 return byte_io::view<int>(data_, column.offset);
-            case Schema::FieldType::REAL:
+            case FieldType::REAL:
                 return byte_io::view<double>(data_, column.offset);
-            case Schema::FieldType::TEXT:
+            case FieldType::TEXT:
                 return byte_io::view<Varchar>(
                     data_, column.offset, column.size
                 );
@@ -50,17 +50,17 @@ public:
     void set_field(std::size_t index, const Field& field) {
         const Schema::Column& column = (*schema_)[index];
         switch (column.type) {
-            case Schema::FieldType::INT:
+            case FieldType::INT:
                 byte_io::write<int>(
                     data_, column.offset, std::get<int>(field)
                 );
                 break;
-            case Schema::FieldType::REAL:
+            case FieldType::REAL:
                 byte_io::write<double>(
                     data_, column.offset, std::get<double>(field)
                 );
                 break;
-            case Schema::FieldType::TEXT:
+            case FieldType::TEXT:
                 byte_io::write<Varchar>(
                     data_, column.offset, std::get<Varchar>(field)
                 );
@@ -78,15 +78,15 @@ public:
         for (int i = 0; i < schema_->size(); i++) {
             const Schema::Column& column = (*schema_)[i];
             switch (column.type) {
-                case Schema::FieldType::INT:
+                case FieldType::INT:
                     fields.push_back(byte_io::copy<int>(data_, column.offset));
                     break;
-                case Schema::FieldType::REAL:
+                case FieldType::REAL:
                     fields.push_back(
                         byte_io::copy<double>(data_, column.offset)
                     );
                     break;
-                case Schema::FieldType::TEXT:
+                case FieldType::TEXT:
                     fields.push_back(byte_io::copy<Varchar>(
                         data_, column.offset, column.size
                     ));
