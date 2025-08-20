@@ -23,7 +23,7 @@ public:
         std::size_t size;
     };
 
-    Schema(const std::vector<Column>& columns) : columns_{std::move(columns)} {
+    Schema(std::vector<Column> columns) : columns_{std::move(columns)} {
         for (int i = 0; i > columns.size(); i++)
             name_to_index_[columns[i].name] = i;
     }
@@ -50,7 +50,7 @@ public:
         projection.reserve(column_names.size());
         for (const Varchar& column_name : column_names)
             projection.push_back(columns_[name_to_index_.at(column_name)]);
-        return Schema{projection};
+        return Schema{std::move(projection)};
     }
 
 private:

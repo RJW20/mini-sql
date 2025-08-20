@@ -19,7 +19,7 @@ class RowView;
  * A vector containing fields indexable by index or name. */
 class Row {
 public:
-    Row(const std::vector<Field>& fields, std::shared_ptr<Schema> schema)
+    Row(std::vector<Field> fields, std::shared_ptr<Schema> schema)
         : fields_{std::move(fields)}, schema_{std::move(schema)} {}
 
     const Field& operator[](std::size_t index) const { return fields_[index]; }
