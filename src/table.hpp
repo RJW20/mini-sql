@@ -20,7 +20,7 @@ public:
     virtual void create_table(
         Varchar name, std::unique_ptr<Schema> schema
     ) = 0;
-    virtual const Table* table(const Varchar& name) const = 0;
+    virtual Table* table(const Varchar& name) const = 0;
 };
 
 } // namespace minisql

@@ -7,7 +7,7 @@
 #include "planner/iterators/iterator.hpp"
 #include "table.hpp"
 #include "varchar.hpp"
-#include "schema.hpp"
+#include "row/schema.hpp"
 #include "row/row_view.hpp"
 
 namespace minisql::planner {

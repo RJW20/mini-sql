@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <utility>
+#include <limits>
 
 #include "planner/iterators/iterator.hpp"
 #include "field.hpp"
@@ -35,7 +36,7 @@ public:
 private:
     std::vector<std::vector<Field>> values_;
     std::shared_ptr<Schema> schema_;
-    std::size_t pos_ {-1};
+    std::size_t pos_ = std::numeric_limits<std::size_t>::max();
 };
 
 } // namespace minisql::planner

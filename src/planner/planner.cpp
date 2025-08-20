@@ -163,7 +163,7 @@ Plan plan_create(const CreateQuery& query, TableCatalog& catalog) {
  * Project. */
 Plan plan_select(const SelectQuery& query, const TableCatalog& catalog) {
 
-    const Table* table = catalog.table(query.table);
+    Table* table = catalog.table(query.table);
     std::unique_ptr<Cursor> cursor = std::make_unique<Cursor>(
         &(table->bp_tree), &(table->schema)
     );
@@ -190,7 +190,7 @@ Plan plan_select(const SelectQuery& query, const TableCatalog& catalog) {
  * Chains together a Values and an Insert. */
 Plan plan_insert(const InsertQuery& query, const TableCatalog& catalog) {
 
-    const Table* table = catalog.table(query.table);
+    Table* table = catalog.table(query.table);
     std::unique_ptr<Cursor> cursor = std::make_unique<Cursor>(
         &(table->bp_tree), &(table->schema)
     );
@@ -208,7 +208,7 @@ Plan plan_insert(const InsertQuery& query, const TableCatalog& catalog) {
  */
 Plan plan_update(const UpdateQuery& query, const TableCatalog& catalog) {
 
-    const Table* table = catalog.table(query.table);
+    Table* table = catalog.table(query.table);
     std::unique_ptr<Cursor> cursor = std::make_unique<Cursor>(
         &(table->bp_tree), &(table->schema)
     );
@@ -233,7 +233,7 @@ Plan plan_update(const UpdateQuery& query, const TableCatalog& catalog) {
  */
 Plan plan_delete(const DeleteQuery& query, const TableCatalog& catalog) {
 
-    const Table* table = catalog.table(query.table);
+    Table* table = catalog.table(query.table);
     std::unique_ptr<Cursor> cursor = std::make_unique<Cursor>(
         &(table->bp_tree), &(table->schema)
     );
