@@ -13,7 +13,7 @@ namespace minisql::planner {
 // Outputs projections of Rows from an Iterator.
 class Project : public Iterator {
 public:
-    Project(std::unique_ptr<Iterator> child, std::unique_ptr<Schema> schema)
+    Project(std::unique_ptr<Iterator> child, std::shared_ptr<Schema> schema)
         : child_{std::move(child)}, projected_schema_{std::move(schema)} {}
 
     void open() override { child_->open(); }

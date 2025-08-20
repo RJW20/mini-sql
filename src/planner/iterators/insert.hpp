@@ -5,10 +5,8 @@
 #include <utility>
 
 #include "planner/iterators/iterator.hpp"
-#include "bplus_tree/bplus_tree.hpp"
-#include "row/schema.hpp"
-#include "row/row_view.hpp"
 #include "cursor.hpp"
+#include "row/row_view.hpp"
 
 namespace minisql::planner {
 
