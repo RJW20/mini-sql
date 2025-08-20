@@ -1,10 +1,16 @@
 #include "planner/compiler.hpp"
 
 #include <functional>
+#include <utility>
+#include <variant>
+#include <vector>
 
 #include "field.hpp"
 #include "varchar.hpp"
 #include "exceptions.hpp"
+#include "parser/query.hpp"
+#include "row/schema.hpp"
+#include "row/row_view.hpp"
 
 namespace minisql::planner {
 
@@ -75,6 +81,169 @@ std::function<Field(const Field&, const Field&)> compile_division(
     __builtin_unreachable();
 }
 
+Predicate compile(Condition& condition, const Schema* schema) {
+
+    auto less_than = compile_less_than(
+        (*schema)[schema->index_of(condition.column)].type
+    );
+
+    switch (condition.op) {
+        case Condition::Operator::EQ:
+            return [col = std::move(condition.column),
+                    rhs = std::move(condition.value)]
+                    (const RowView& rv) { return rv[col] == rhs; };
+        case Condition::Operator::NEQ:
+            return [col = std::move(condition.column),
+                    rhs = std::move(condition.value)]
+                    (const RowView& rv) { return rv[col] != rhs; };
+        case Condition::Operator::GT:
+            return [col = std::move(condition.column),
+                    lhs = std::move(condition.value),
+                    lt = std::move(less_than)]
+                    (const RowView& rv) { return lt(lhs, rv[col]); };
+        case Condition::Operator::GTE:
+            return [col = std::move(condition.column),
+                    lhs = std::move(condition.value),
+                    lt = std::move(less_than)]
+                    (const RowView& rv) {
+                return lt(lhs, rv[col]) || lhs == rv[col];
+            };
+        case Condition::Operator::LT:
+            return [col = std::move(condition.column),
+                    rhs = std::move(condition.value),
+                    lt = std::move(less_than)]
+                    (const RowView& rv) { return lt(rv[col], rhs); };
+        case Condition::Operator::LTE:
+            return [col = std::move(condition.column),
+                    rhs = std::move(condition.value),
+                    lt = std::move(less_than)]
+                    (const RowView& rv) {
+                return lt(rv[col], rhs) || rv[col] == rhs;
+            };
+    }
+
+    __builtin_unreachable();
+}
+
+Modifier compile(const Modification& modification, const Schema* schema) {
+
+    switch (modification.op) {
+        case Modification::Operator::EQ:
+            if (std::holds_alternative<Field>(modification.value))
+                return [col = modification.column,
+                        value = std::get<Field>(modification.value)]
+                        (RowView& rv) { rv.set_field(col, value); };
+            else
+                return [col1 = modification.column,
+                        col2 = std::get<Varchar>(modification.value)]
+                        (RowView& rv) { rv.set_field(col1, rv[col2]); };
+        case Modification::Operator::ADD: {
+            auto add = compile_addition(
+                (*schema)[schema->index_of(modification.column)].type
+            );
+            if (std::holds_alternative<Field>(modification.value))
+                return [col = modification.column,
+                        value = std::get<Field>(modification.value),
+                        add = std::move(add)]
+                        (RowView& rv) {
+                    rv.set_field(col, add(rv[col], value));
+                };
+            else
+                return [col1 = modification.column,
+                        col2 = std::get<Varchar>(modification.value),
+                        add = std::move(add)]
+                        (RowView& rv) {
+                    rv.set_field(col1, add(rv[col1], rv[col2]));
+                };
+            }
+        case Modification::Operator::SUB: {
+            auto sub = compile_subtraction(
+                (*schema)[schema->index_of(modification.column)].type
+            );
+            if (std::holds_alternative<Field>(modification.value))
+                return [col = modification.column,
+                        value = std::get<Field>(modification.value),
+                        sub = std::move(sub)]
+                        (RowView& rv) {
+                    rv.set_field(col, sub(rv[col], value));
+                };
+            else
+                return [col1 = modification.column,
+                        col2 = std::get<Varchar>(modification.value),
+                        sub = std::move(sub)]
+                        (RowView& rv) {
+                    rv.set_field(col1, sub(rv[col1], rv[col2]));
+                };
+            }
+        case Modification::Operator::MUL: {
+            auto mul = compile_multiplication(
+                (*schema)[schema->index_of(modification.column)].type
+            );
+            if (std::holds_alternative<Field>(modification.value))
+                return [col = modification.column,
+                        value = std::get<Field>(modification.value),
+                        mul = std::move(mul)]
+                        (RowView& rv) {
+                    rv.set_field(col, mul(rv[col], value));
+                };
+            else
+                return [col1 = modification.column,
+                        col2 = std::get<Varchar>(modification.value),
+                        mul = std::move(mul)]
+                        (RowView& rv) {
+                    rv.set_field(col1, mul(rv[col1], rv[col2]));
+                };
+            }
+        case Modification::Operator::DIV: {
+            auto div = compile_division(
+                (*schema)[schema->index_of(modification.column)].type
+            );
+            if (std::holds_alternative<Field>(modification.value))
+                return [col = modification.column,
+                        value = std::get<Field>(modification.value),
+                        div = std::move(div)]
+                        (RowView& rv) {
+                    rv.set_field(col, div(rv[col], value));
+                };
+            else
+                return [col1 = modification.column,
+                        col2 = std::get<Varchar>(modification.value),
+                        div = std::move(div)]
+                        (RowView& rv) {
+                    rv.set_field(col1, div(rv[col1], rv[col2]));
+                };
+            }
+    }
+
+    __builtin_unreachable();
+}
+
 } // namespace
+
+/* Compile the conditions into one function that returns true when all are met.
+ * Moves from and clears the conditions vector. */
+Predicate compile(std::vector<Condition>& conditions, const Schema* schema) {
+    Predicate predicate = [](const RowView&){ return true; };
+    for (Condition& condition : conditions)
+        predicate = [previous = std::move(predicate),
+                     current = compile(condition, schema)]
+                     (const RowView& rv) {
+            return previous(rv) && current(rv);
+        };
+    conditions.clear();
+    return std::move(predicate);
+}
+
+// Compile the modifications into one function that modifies a RowView.
+Modifier compile(
+    const std::vector<Modification>& modifications, const Schema* schema
+) {
+    Modifier modifier = [](RowView&){ return; };
+    for (const Modification& modification : modifications)
+        modifier = [previous = std::move(modifier),
+                    current = compile(modification, schema)]
+                    (RowView& rv) { previous(rv); current(rv); };
+    return std::move(modifier);
+}
 
 } // namespace minisql::planner
