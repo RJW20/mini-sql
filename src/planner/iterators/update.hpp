@@ -13,7 +13,7 @@ namespace minisql::planner {
 // Updates Rows (in-place) from an Iterator.
 class Update : public Iterator {
 public:
-    Update(std::unique_ptr<Iterator> child, const Modifier& modifier)
+    Update(std::unique_ptr<Iterator> child, Modifier modifier)
         : child_{std::move(child)}, modifier_{std::move(modifier)} {}
 
     void open() override { child_->open(); }

@@ -19,12 +19,12 @@ class IndexScan : public TableScan {
 public:
     IndexScan(
         std::unique_ptr<Cursor> cursor, const Schema* schema,
-        const std::optional<Field>& lb, bool inclusive_lb,
-        const std::optional<Field>& ub, bool inclusive_ub 
-    ) : TableScan{std::move(cursor), schema}, lb_{lb},
-        inclusive_lb_{inclusive_lb}, ub_{ub}, inclusive_ub_{inclusive_ub},
+        std::optional<Field> lb, bool inclusive_lb, std::optional<Field> ub,
+        bool inclusive_ub 
+    ) : TableScan{std::move(cursor), schema}, lb_{std::move(lb)},
+        inclusive_lb_{inclusive_lb}, ub_{std::move(ub)},
+        inclusive_ub_{inclusive_ub},
         less_than_{compile_less_than(schema_->primary().type)} {}
-
     void open() override {
         if (lb_) cursor_->open(*lb_);
         else TableScan::open();

@@ -13,7 +13,7 @@ namespace minisql::planner {
 // Outputs Rows from an Iterator that pass a Predicate.
 class Filter : public Iterator {
 public:
-    Filter(std::unique_ptr<Iterator> child, const Predicate& predicate)
+    Filter(std::unique_ptr<Iterator> child, Predicate predicate)
         : child_{std::move(child)}, predicate_{std::move(predicate)} {}
 
     void open() override { child_->open(); }
