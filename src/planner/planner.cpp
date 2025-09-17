@@ -178,7 +178,7 @@ Plan plan_select(const SelectQuery& query, const TableCatalog& catalog) {
         std::move(plan), compile(filter_conditions, &(table->schema))
     );
 
-    if (!query.columns[0] == '*') plan = std::make_unique<Project>(
+    if (query.columns[0] != '*') plan = std::make_unique<Project>(
         std::move(plan),
         std::make_shared<Schema>(table->schema.project(query.columns))
     );
