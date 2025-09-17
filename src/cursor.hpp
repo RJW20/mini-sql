@@ -53,7 +53,7 @@ private:
     template <typename Key>
     void insert__(const RowView& rv) {
         if (slot_ < leaf_node_->size() && 
-            leaf_node_->key<Key>(slot_) == std::get<Key>(rv.primary()));
+            leaf_node_->key<Key>(slot_) == std::get<Key>(rv.primary()))
             throw DBConstraintViolation(
                 "Insert failed: primary key already exists."
             );
