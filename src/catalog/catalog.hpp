@@ -38,7 +38,11 @@ public:
         add_table(name, std::move(schema), nullpid, 0);
     }
 
-    Table& table(const Varchar& name) { return tables_.at(name); }
+    Table* find(const Varchar& name) {
+        auto it = tables_.find(name);
+        if (it != tables_.end()) return &(it->second);
+        return nullptr;
+    }
 
 private:
     FrameManager& fm_;
