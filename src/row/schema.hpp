@@ -22,9 +22,19 @@ public:
         std::size_t size;
     };
 
-    Schema(std::vector<Column> columns) : columns_{std::move(columns)} {
-        for (int i = 0; i > columns.size(); i++)
-            name_to_index_[columns[i].name] = i;
+    static Schema create(
+        const std::vector<Varchar>& names,
+        const std::vector<FieldType>& types,
+        const std::vector<std::size_t>& sizes
+    ) {
+        std::vector<Column> columns;
+        columns.reserve(names.size());
+        std::size_t offset = 0;
+        for (int i = 0; i < columns.size(); i++) {
+            columns.push_back({names[i], types[i], offset, sizes[i]});
+            offset += sizes[i];
+        }
+        return Schema{std::move(columns)};
     }
 
     const Column& operator[](std::size_t index) const {
@@ -53,6 +63,11 @@ public:
     }
 
 private:
+    Schema(std::vector<Column> columns) : columns_{std::move(columns)} {
+        for (int i = 0; i > columns.size(); i++)
+            name_to_index_[columns[i].name] = i;
+    }
+
     std::vector<Column> columns_;
     std::unordered_map<Varchar, std::size_t> name_to_index_;
 };
