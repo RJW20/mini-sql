@@ -14,7 +14,7 @@ namespace minisql::planner {
 std::function<bool(const Field&, const Field&)> compile_less_than(FieldType);
 
 using Predicate = std::function<bool(const RowView&)>;
-Predicate compile(std::vector<Condition>&, const Schema*);
+Predicate compile(const std::vector<Condition>&, const Schema*);
 
 using Modifier = std::function<void(RowView&)>;
 Modifier compile(const std::vector<Modification>&, const Schema*);

@@ -81,7 +81,7 @@ std::function<Field(const Field&, const Field&)> compile_division(
     __builtin_unreachable();
 }
 
-Predicate compile(Condition& condition, const Schema* schema) {
+Predicate compile(const Condition& condition, const Schema* schema) {
 
     auto less_than = compile_less_than(
         (*schema)[schema->index_of(condition.column)].type
@@ -89,33 +89,27 @@ Predicate compile(Condition& condition, const Schema* schema) {
 
     switch (condition.op) {
         case Condition::Operator::EQ:
-            return [col = std::move(condition.column),
-                    rhs = std::move(condition.value)]
+            return [col = condition.column, rhs = condition.value]
                     (const RowView& rv) { return rv[col] == rhs; };
         case Condition::Operator::NEQ:
-            return [col = std::move(condition.column),
-                    rhs = std::move(condition.value)]
+            return [col = condition.column, rhs = condition.value]
                     (const RowView& rv) { return rv[col] != rhs; };
         case Condition::Operator::GT:
-            return [col = std::move(condition.column),
-                    lhs = std::move(condition.value),
+            return [col = condition.column, lhs = condition.value,
                     lt = std::move(less_than)]
                     (const RowView& rv) { return lt(lhs, rv[col]); };
         case Condition::Operator::GTE:
-            return [col = std::move(condition.column),
-                    lhs = std::move(condition.value),
+            return [col = condition.column, lhs = condition.value,
                     lt = std::move(less_than)]
                     (const RowView& rv) {
                 return lt(lhs, rv[col]) || lhs == rv[col];
             };
         case Condition::Operator::LT:
-            return [col = std::move(condition.column),
-                    rhs = std::move(condition.value),
+            return [col = condition.column, rhs = condition.value,
                     lt = std::move(less_than)]
                     (const RowView& rv) { return lt(rv[col], rhs); };
         case Condition::Operator::LTE:
-            return [col = std::move(condition.column),
-                    rhs = std::move(condition.value),
+            return [col = condition.column, rhs = condition.value,
                     lt = std::move(less_than)]
                     (const RowView& rv) {
                 return lt(rv[col], rhs) || rv[col] == rhs;
@@ -220,21 +214,21 @@ Modifier compile(const Modification& modification, const Schema* schema) {
 
 } // namespace
 
-/* Compile the conditions into one function that returns true when all are met.
- * Moves from and clears the conditions vector. */
-Predicate compile(std::vector<Condition>& conditions, const Schema* schema) {
+// Compile conditions into one function that returns true when all are met.
+Predicate compile(
+    const std::vector<Condition>& conditions, const Schema* schema
+) {
     Predicate predicate = [](const RowView&){ return true; };
-    for (Condition& condition : conditions)
+    for (const Condition& condition : conditions)
         predicate = [previous = std::move(predicate),
                      current = compile(condition, schema)]
                      (const RowView& rv) {
             return previous(rv) && current(rv);
         };
-    conditions.clear();
     return std::move(predicate);
 }
 
-// Compile the modifications into one function that modifies a RowView.
+// Compile modifications into one function that modifies a RowView.
 Modifier compile(
     const std::vector<Modification>& modifications, const Schema* schema
 ) {
