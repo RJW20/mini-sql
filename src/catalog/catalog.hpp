@@ -23,19 +23,15 @@ public:
     virtual ~Catalog() = default;
 
     void add_table(
-        const Varchar& name, std::unique_ptr<Schema> schema, page_id_t root,
-        std::uint32_t next_rowid
+        const Varchar& name, std::unique_ptr<Schema> schema,
+        page_id_t root = nullpid, std::uint32_t next_rowid = 0
     ) {
         auto bp_tree = std::make_unique<BPlusTree>(
             fm_, schema->primary().size, schema->row_size(), root
         );
         tables_.emplace(
-            name, Table{std::move(schema), std::move(bp_tree), next_rowid}
+            name, Table{std::move(bp_tree), std::move(schema), next_rowid}
         );
-    }
-
-    void new_table(const Varchar& name, std::unique_ptr<Schema> schema) {
-        add_table(name, std::move(schema), nullpid, 0);
     }
 
     Table* find(const Varchar& name) {

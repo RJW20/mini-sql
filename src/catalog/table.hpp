@@ -4,14 +4,14 @@
 #include <cstdint>
 #include <memory>
 
-#include "row/schema.hpp"
 #include "bplus_tree/bplus_tree.hpp"
+#include "row/schema.hpp"
 
 namespace minisql {
 
 struct Table {
-    const std::unique_ptr<Schema> schema;
     std::unique_ptr<BPlusTree> bp_tree;
+    const std::unique_ptr<Schema> schema;
     std::uint32_t next_rowid;
 };
 
