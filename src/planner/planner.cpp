@@ -144,12 +144,10 @@ std::unique_ptr<TableScan> make_scan(
 }
 
 // Return a Create iterator corresponding to a CreateQuery.
-Plan plan_create(const CreateQuery& query, const Catalog& catalog) {
+Plan plan_create(const CreateQuery& query, Catalog& catalog) {
     return std::make_unique<Create>(
         catalog, query.table,
-        std::make_unique<Schema>(
-            query.columns, query.types, query.sizes, query.primary
-        )
+        Schema::create(query.columns, query.types, query.sizes, query.primary)
     );
 }
 
@@ -253,7 +251,7 @@ Plan plan_delete(const DeleteQuery& query, const Catalog& catalog) {
 
 // Visitor struct for dispatching queries to correct planner.
 struct Planner {
-    const Catalog& c;
+    Catalog& c;
 
     Plan operator()(const CreateQuery& q) const { return plan_create(q, c); }
     Plan operator()(const SelectQuery& q) const { return plan_select(q, c); }
@@ -265,7 +263,7 @@ struct Planner {
 } // namespace
 
 // Return a plan according to the given Query.
-Plan plan(const Query& query, const Catalog& catalog) {
+Plan plan(const Query& query, Catalog& catalog) {
     return std::visit(Planner{catalog}, query);
 }
 

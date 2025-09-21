@@ -10,7 +10,7 @@
 namespace minisql::planner {
 
 using Plan = std::unique_ptr<Iterator>;
-Plan plan(const Query&, const Catalog&);
+Plan plan(const Query&, Catalog&);
 
 } // namespace minisql::planner
 
