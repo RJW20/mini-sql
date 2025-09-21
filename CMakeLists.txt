@@ -17,6 +17,7 @@ set(SOURCES
     src/planner/compiler.cpp
     src/planner/planner.cpp
     src/parser/parser.cpp
+    src/database.cpp
 )
 add_library(mini-sql STATIC ${SOURCES})
 
