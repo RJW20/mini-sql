@@ -2,6 +2,7 @@
 #define MINISQL_SCHEMA_HPP
 
 #include <cstddef>
+#include <memory>
 #include <vector>
 #include <algorithm>
 #include <iterator>
@@ -24,7 +25,7 @@ public:
         std::size_t size;
     };
 
-    static Schema create(
+    static std::unique_ptr<Schema> create(
         const std::vector<Varchar>& names,
         const std::vector<FieldType>& types,
         const std::vector<std::size_t>& sizes,
@@ -43,7 +44,9 @@ public:
                 offset += sizes[i];
             }
         }
-        return Schema{std::move(columns), primary_index};
+        return std::make_unique<Schema>(
+            Schema{std::move(columns), primary_index}
+        );
     }
 
     const Column& operator[](std::size_t index) const {
