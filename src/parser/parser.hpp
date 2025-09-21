@@ -51,12 +51,14 @@ private:
         if (t.type == TokenType::REAL) return FieldType::REAL;
         if (t.type == TokenType::TEXT) return FieldType::TEXT;
         raise_exception();
+        __builtin_unreachable();
     }
     Field parse_value() {
         Token& t = advance();
         if (t.type == TokenType::NUMBER) return std::stod(t.text.data());
         if (t.type == TokenType::STRING) return std::move(t.text);
         raise_exception();
+        __builtin_unreachable();
     }
 
     void raise_exception() { throw InvalidSQLException(std::string(sql_)); }
