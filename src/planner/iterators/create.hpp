@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "planner/iterators/iterator.hpp"
-#include "table.hpp"
+#include "catalog/table.hpp"
 #include "varchar.hpp"
 #include "row/schema.hpp"
 #include "row/row_view.hpp"
@@ -16,7 +16,7 @@ namespace minisql::planner {
 class Create : public Iterator {
 public:
     Create(
-        TableCatalog& catalog, Varchar table, std::unique_ptr<Schema> schema
+        Catalog& catalog, Varchar table, std::unique_ptr<Schema> schema
     ) : catalog_{catalog}, table_{std::move(table)}, schema_{std::move(schema)}
         {}
 
@@ -24,7 +24,7 @@ public:
 
     bool next() override {
         if (count_) return false;
-        catalog_.create_table(std::move(table_), std::move(schema_));
+        catalog_.add_table(table_, std::move(schema_));
         count_++;
         return true;
     }
@@ -34,7 +34,7 @@ public:
     void close() override {}
 
 private:
-    TableCatalog& catalog_;
+    Catalog& catalog_;
     Varchar table_;
     std::unique_ptr<Schema> schema_;
 };
