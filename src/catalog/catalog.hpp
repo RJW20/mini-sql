@@ -27,10 +27,12 @@ public:
         page_id_t root = nullpid, std::uint32_t next_rowid = 0
     ) {
         auto bp_tree = std::make_unique<BPlusTree>(
-            fm_, schema->primary().size, schema->row_size(), root
+            &fm_, schema->primary().size, schema->row_size(), root
         );
         tables_.emplace(
-            name, Table{std::move(bp_tree), std::move(schema), next_rowid}
+            std::piecewise_construct,
+            std::forward_as_tuple(name),
+            std::forward_as_tuple(std::move(bp_tree), std::move(schema), next_rowid)
         );
     }
 

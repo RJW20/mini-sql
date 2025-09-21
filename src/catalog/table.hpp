@@ -10,6 +10,11 @@
 namespace minisql {
 
 struct Table {
+    Table(
+        std::unique_ptr<BPlusTree> bp_tree, std::unique_ptr<Schema> schema,
+        std::uint32_t next_rowid
+    ) : bp_tree{std::move(bp_tree)}, schema{std::move(schema)}, next_rowid{next_rowid} {}
+    
     std::unique_ptr<BPlusTree> bp_tree;
     const std::unique_ptr<Schema> schema;
     std::uint32_t next_rowid;
