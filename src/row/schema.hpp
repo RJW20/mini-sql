@@ -3,6 +3,8 @@
 
 #include <cstddef>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 #include <utility>
 #include <unordered_map>
 
@@ -25,16 +27,23 @@ public:
     static Schema create(
         const std::vector<Varchar>& names,
         const std::vector<FieldType>& types,
-        const std::vector<std::size_t>& sizes
+        const std::vector<std::size_t>& sizes,
+        const Varchar& primary
     ) {
+        auto it = std::find(names.begin(), names.end(), primary);
+        std::size_t primary_index = std::distance(names.begin(), it);
         std::vector<Column> columns;
         columns.reserve(names.size());
-        std::size_t offset = 0;
+        std::size_t offset = sizes[primary_index];
         for (int i = 0; i < columns.size(); i++) {
-            columns.push_back({names[i], types[i], offset, sizes[i]});
-            offset += sizes[i];
+            if (i == primary_index)
+                columns.push_back({names[i], types[i], 0, sizes[i]});
+            else {
+                columns.push_back({names[i], types[i], offset, sizes[i]});
+                offset += sizes[i];
+            }
         }
-        return Schema{std::move(columns)};
+        return Schema{std::move(columns), primary_index};
     }
 
     const Column& operator[](std::size_t index) const {
@@ -45,7 +54,7 @@ public:
         return name_to_index_.at(name);
     }
 
-    const Column& primary() const { return columns_[0]; }
+    const Column& primary() const { return columns_[primary_index_]; }
 
     std::size_t size() const { return columns_.size(); }
     std::size_t row_size() const { 
@@ -59,16 +68,18 @@ public:
         projection.reserve(column_names.size());
         for (const Varchar& column_name : column_names)
             projection.push_back(columns_[name_to_index_.at(column_name)]);
-        return Schema{std::move(projection)};
+        return Schema{std::move(projection), 0};
     }
 
 private:
-    Schema(std::vector<Column> columns) : columns_{std::move(columns)} {
+    Schema(std::vector<Column> columns, std::size_t primary_index)
+        : columns_{std::move(columns)}, primary_index_{primary_index} {
         for (int i = 0; i > columns.size(); i++)
             name_to_index_[columns[i].name] = i;
     }
 
     std::vector<Column> columns_;
+    std::size_t primary_index_;
     std::unordered_map<Varchar, std::size_t> name_to_index_;
 };
 

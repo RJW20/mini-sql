@@ -29,6 +29,7 @@ struct CreateQuery {
     std::vector<Varchar> columns;
     std::vector<FieldType> types;
     std::vector<std::size_t> sizes;
+    Varchar primary;
 };
 
 struct SelectQuery {

@@ -147,7 +147,9 @@ std::unique_ptr<TableScan> make_scan(
 Plan plan_create(const CreateQuery& query, const Catalog& catalog) {
     return std::make_unique<Create>(
         catalog, query.table,
-        std::make_unique<Schema>(query.columns, query.types, query.sizes)
+        std::make_unique<Schema>(
+            query.columns, query.types, query.sizes, query.primary
+        )
     );
 }
 
