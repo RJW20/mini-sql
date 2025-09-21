@@ -34,7 +34,7 @@ public:
         );
     }
 
-    Table* find(const Varchar& name) {
+    const Table* find(const Varchar& name) const {
         auto it = tables_.find(name);
         if (it != tables_.end()) return &(it->second);
         return nullptr;
