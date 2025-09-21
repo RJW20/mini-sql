@@ -2,7 +2,7 @@
 #define MINISQL_FRAME_MANAGER_HPP
 
 #include <cstddef>
-#include <filesystem>
+#include <fstream>
 
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "frame_manager/cache/frame_view.hpp"
@@ -18,10 +18,10 @@ namespace minisql {
 class FrameManager {
 public:
     FrameManager(
-        const std::filesystem::path& path, std::streamoff base_offset,
+        std::fstream& file, std::streamoff base_offset,
         std::size_t page_size, page_id_t page_count,
         std::size_t cache_capacity, page_id_t first_free_list_block = nullpid
-    ) : disk_{path, base_offset, page_size, page_count},
+    ) : disk_{file, base_offset, page_size, page_count},
         cache_{disk_, cache_capacity},
         free_list_{cache_, first_free_list_block} {}
     ~FrameManager() = default;

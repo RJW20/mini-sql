@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <cstddef>
+#include <fstream>
 #include <vector>
 
 #include "frame_manager/disk_manager/disk_manager.hpp"
@@ -17,8 +18,9 @@ using namespace minisql;
 void test_constructor() {
     std::filesystem::path path = make_temp_path();
     create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     {
-        DiskManager disk{path, 0, 2048, 0};
+        DiskManager disk{file, 0, 2048, 0};
         Cache cache{disk, 2000};
         FreeList free_list{cache, nullpid};
         assert(free_list.empty());
@@ -30,8 +32,9 @@ void test_constructor() {
 void test_push_pop() {
     std::filesystem::path path = make_temp_path();
     create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     {
-        DiskManager disk{path, 0, 2048, 0};
+        DiskManager disk{file, 0, 2048, 0};
         Cache cache{disk, 2000};
         FreeList free_list{cache, nullpid};
         

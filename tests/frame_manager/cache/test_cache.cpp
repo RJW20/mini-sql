@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstddef>
 #include <filesystem>
+#include <fstream>
 #include <vector>
 #include <stdexcept>
 
@@ -17,9 +18,10 @@ using namespace minisql;
 void test_constructor() {
     std::filesystem::path path = make_temp_path();
     create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     const std::size_t capacity = 2000;
     {
-        DiskManager disk{path, 0, 2048, 0};
+        DiskManager disk{file, 0, 2048, 0};
         Cache cache{disk, capacity};
         assert(cache.capacity() == capacity);
     }
@@ -34,9 +36,10 @@ void test_constructor() {
 void test_pin() {
     std::filesystem::path path = make_temp_path();
     create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     const std::size_t capacity = 2000;
     {
-        DiskManager disk{path, 0, 2048, 0};
+        DiskManager disk{file, 0, 2048, 0};
         for (int i = 0; i < capacity * 2; i++) disk.extend();
         Cache cache{disk, capacity};
 
@@ -70,9 +73,10 @@ void test_pin() {
 void test_unpin() {
     std::filesystem::path path = make_temp_path();
     create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     const std::size_t capacity = 2000;
     {
-        DiskManager disk{path, 0, 2048, 0};
+        DiskManager disk{file, 0, 2048, 0};
         for (int i = 0; i < capacity * 2; i++) disk.extend();
         Cache cache{disk, capacity};
 

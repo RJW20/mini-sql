@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 #include <cmath>
 #include <typeinfo>
 
@@ -52,9 +53,10 @@ template <typename Key>
 void test_insert() {
     std::filesystem::path path = make_temp_path();
     create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     {
         const std::size_t page_size = 512;
-        FrameManager fm{path, 0, page_size, 0, 1000};
+        FrameManager fm{file, 0, page_size, 0, 1000};
         const Node::key_size_t key_size_ = key_size<Key>();
         const Node::size_t internal_max_slots =
             (page_size - InternalNodeHeader::SIZE) /
@@ -95,9 +97,10 @@ template <typename Key>
 void test_erase() {
     std::filesystem::path path = make_temp_path();
     create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     {
         const std::size_t page_size = 512;
-        FrameManager fm{path, 0, page_size, 0, 1000};
+        FrameManager fm{file, 0, page_size, 0, 1000};
         const Node::key_size_t key_size_ = key_size<Key>();
         const Node::size_t internal_max_slots =
             (page_size - InternalNodeHeader::SIZE) /

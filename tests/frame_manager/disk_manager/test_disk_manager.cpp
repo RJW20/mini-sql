@@ -22,18 +22,19 @@ void test_constructor() {
     const std::size_t page_size = 4096;
     const page_id_t page_count = 100;
     create_file(path, base_offset + page_size * page_count);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     {
-        DiskManager disk{path, base_offset, page_size, page_count};
+        DiskManager disk{file, base_offset, page_size, page_count};
         assert(disk.page_size() == page_size);
         assert(disk.page_count() == page_count);
     }
     try {
-        DiskManager disk{path, base_offset - 1, page_size, page_count};
+        DiskManager disk{file, base_offset - 1, page_size, page_count};
         assert(false);
     }
     catch (const DiskException&) {}
     try {
-        DiskManager disk{path, base_offset + 1, page_size, page_count};
+        DiskManager disk{file, base_offset + 1, page_size, page_count};
         assert(false);
     }
     catch (const DiskException&) {}
@@ -44,8 +45,9 @@ void test_constructor() {
 void test_extend() {
     std::filesystem::path path = make_temp_path();
     create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     {
-        DiskManager disk{path, 0, 4096, 0};
+        DiskManager disk{file, 0, 4096, 0};
         for (int i = 0; i < 100; i++) {
             assert(disk.page_count() == i);
             disk.extend();
@@ -59,8 +61,9 @@ void test_write_read() {
     std::filesystem::path path = make_temp_path();
     const std::size_t page_size = 4096;
     create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
     {
-        DiskManager disk{path, 0, page_size, 0};
+        DiskManager disk{file, 0, page_size, 0};
         disk.extend();
         std::vector<std::byte> src(page_size);
         std::size_t i = 0;

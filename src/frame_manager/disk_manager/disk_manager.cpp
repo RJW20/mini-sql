@@ -1,7 +1,6 @@
 #include "frame_manager/disk_manager/disk_manager.hpp"
 
 #include <cstddef>
-#include <filesystem>
 #include <fstream>
 #include <vector>
 
@@ -11,10 +10,10 @@
 namespace minisql {
 
 DiskManager::DiskManager(
-    const std::filesystem::path& path, std::streamoff base_offset,
+    std::fstream& file, std::streamoff base_offset,
     std::size_t page_size, page_id_t page_count
-) : file_{path, std::ios::binary | std::ios::in | std::ios::out},
-    base_offset_{base_offset}, page_size_{page_size}, page_count_{page_count} {
+) : file_{file}, base_offset_{base_offset}, page_size_{page_size},
+    page_count_{page_count} {
     file_.seekg(0, std::ios::end);
     if (file_.tellg() != page_offset(page_count))
         throw DiskException(page_offset(page_count), file_.tellg());

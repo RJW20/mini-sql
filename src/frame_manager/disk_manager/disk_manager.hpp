@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <cstddef>
-#include <filesystem>
 #include <fstream>
 
 #include "frame_manager/disk_manager/page_id_t.hpp"
@@ -16,7 +15,7 @@ namespace minisql {
 class DiskManager {
 public:
     DiskManager(
-        const std::filesystem::path& path, std::streamoff base_offset,
+        std::fstream& file, std::streamoff base_offset,
         std::size_t page_size, page_id_t page_count
     );
     ~DiskManager() = default;
@@ -32,7 +31,7 @@ public:
     page_id_t page_count() const noexcept { return page_count_; }
 
 private:
-    std::fstream file_;
+    std::fstream& file_;
     const std::streamoff base_offset_;
     const std::size_t page_size_;
     page_id_t page_count_;
