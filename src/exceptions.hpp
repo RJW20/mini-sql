@@ -62,6 +62,22 @@ public:
     DBConstraintViolation(const std::string& arg) : std::runtime_error(arg) {}
 };
 
+// UnrecognisedSQLException for unsupported or invalid SQL tokens.
+class UnrecognisedSQLException : public std::runtime_error {
+public:
+    UnrecognisedSQLException(const std::string& sql) : std::runtime_error(
+        "Unsupported or invalid SQL token: " + sql + "."
+    ) {}
+};
+
+// InvalidSQLException for invalid SQL statements.
+class InvalidSQLException : public std::runtime_error {
+public:
+    InvalidSQLException(const std::string& sql) : std::runtime_error(
+        "Invalid SQL statement: " + sql + "."
+    ) {}
+};
+
 } // namespace minisql
 
 #endif // MINISQL_EXCEPTIONS_HPP
