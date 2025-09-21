@@ -5,12 +5,12 @@
 
 #include "planner/iterators/iterator.hpp"
 #include "parser/query.hpp"
-#include "table.hpp"
+#include "catalog/catalog.hpp"
 
 namespace minisql::planner {
 
 using Plan = std::unique_ptr<Iterator>;
-Plan plan(const Query&, TableCatalog&);
+Plan plan(const Query&, const Catalog&);
 
 } // namespace minisql::planner
 
