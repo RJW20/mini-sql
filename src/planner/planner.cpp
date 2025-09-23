@@ -156,7 +156,7 @@ Plan plan_create(const CreateQuery& query, Catalog& catalog) {
  * Project. */
 Plan plan_select(const SelectQuery& query, const Catalog& catalog) {
 
-    const Table* table = catalog.find(query.table);
+    const Table* table = catalog.find_table(query.table);
     auto cursor = std::make_unique<Cursor>(
         table->bp_tree.get(), table->schema.get()
     );
@@ -183,7 +183,7 @@ Plan plan_select(const SelectQuery& query, const Catalog& catalog) {
  * Chains together a Values and an Insert. */
 Plan plan_insert(const InsertQuery& query, const Catalog& catalog) {
 
-    const Table* table = catalog.find(query.table);
+    const Table* table = catalog.find_table(query.table);
     auto cursor = std::make_unique<Cursor>(
         table->bp_tree.get(), table->schema.get()
     );
@@ -205,7 +205,7 @@ Plan plan_insert(const InsertQuery& query, const Catalog& catalog) {
  */
 Plan plan_update(const UpdateQuery& query, const Catalog& catalog) {
 
-    const Table* table = catalog.find(query.table);
+    const Table* table = catalog.find_table(query.table);
     auto cursor = std::make_unique<Cursor>(
         table->bp_tree.get(), table->schema.get()
     );
@@ -230,7 +230,7 @@ Plan plan_update(const UpdateQuery& query, const Catalog& catalog) {
  */
 Plan plan_delete(const DeleteQuery& query, const Catalog& catalog) {
 
-    const Table* table = catalog.find(query.table);
+    const Table* table = catalog.find_table(query.table);
     auto cursor = std::make_unique<Cursor>(
         table->bp_tree.get(), table->schema.get()
     );

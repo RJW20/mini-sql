@@ -1,15 +1,21 @@
 #include "database.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <vector>
 #include <memory>
+#include <utility>
+#include <tuple>
 
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "headers.hpp"
 #include "byte_io.hpp"
 #include "frame_manager/frame_manager.hpp"
-#include "catalog/catalog.hpp"
+#include "varchar.hpp"
+#include "row/schema.hpp"
+#include "bplus_tree/bplus_tree.hpp"
+#include "catalog/table.hpp"
 
 namespace minisql {
 
@@ -49,7 +55,6 @@ Database::Database(const std::filesystem::path& path) {
         file_, DatabaseHeader::SIZE, PAGE_SIZE_, page_count, CACHE_CAPACITY_,
         first_free_list_block
     );
-    catalog_ = std::make_unique<Catalog>(*fm_);
 }
 
 // Flush any dirty pages and update the DatabaseHeader.
@@ -71,6 +76,29 @@ Database::~Database() {
         reinterpret_cast<const char*>(db_header.data()), DatabaseHeader::SIZE
     );
     file_.flush();
+}
+
+// Construct a Table in the Catalog with given name.
+void Database::add_table(
+    const Varchar& name, std::unique_ptr<Schema> schema, page_id_t root,
+    std::uint32_t next_rowid
+) {
+    auto bp_tree = std::make_unique<BPlusTree>(
+        fm_.get(), schema->primary().size, schema->row_size(), root
+    );
+    tables_.emplace(
+        std::piecewise_construct,
+        std::forward_as_tuple(name),
+        std::forward_as_tuple(std::move(bp_tree), std::move(schema), next_rowid)
+    );
+}
+
+/* Return a pointer to the Table in the Catalog with given name.
+ * Returns nullptr if not found. */
+const Table* Database::find_table(const Varchar& name) const {
+    auto it = tables_.find(name);
+    if (it != tables_.end()) return &(it->second);
+    return nullptr;
 }
 
 } // namespace minisql
