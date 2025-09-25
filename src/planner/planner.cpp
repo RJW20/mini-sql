@@ -1,6 +1,5 @@
 #include "planner/planner.hpp"
 
-#include <cstddef>
 #include <memory>
 #include <vector>
 #include <utility>
@@ -140,11 +139,11 @@ std::unique_ptr<TableScan> make_scan(
         }
     }
 
-    return std::move(scan);
+    return scan;
 }
 
 // Return a Create iterator corresponding to a CreateQuery.
-Plan plan_create(const CreateQuery& query, Catalog& catalog) {
+Plan plan(const CreateQuery& query, Catalog& catalog) {
     return std::make_unique<Create>(
         catalog, query.table,
         Schema::create(query.columns, query.types, query.sizes, query.primary)
@@ -154,7 +153,7 @@ Plan plan_create(const CreateQuery& query, Catalog& catalog) {
 /* Return an iterator tree corresponding to a SelectQuery.
  * Chains together a TableScan or IndexScan, and possibly a Filter and/or a
  * Project. */
-Plan plan_select(const SelectQuery& query, const Catalog& catalog) {
+Plan plan(const SelectQuery& query, const Catalog& catalog) {
 
     const Table* table = catalog.find_table(query.table);
     auto cursor = std::make_unique<Cursor>(
@@ -176,12 +175,12 @@ Plan plan_select(const SelectQuery& query, const Catalog& catalog) {
         std::make_shared<Schema>(table->schema->project(query.columns))
     );
 
-    return std::move(plan);
+    return plan;
 }
 
 /* Return an iterator tree corresponding to an InsertQuery.
  * Chains together a Values and an Insert. */
-Plan plan_insert(const InsertQuery& query, const Catalog& catalog) {
+Plan plan(const InsertQuery& query, const Catalog& catalog) {
 
     const Table* table = catalog.find_table(query.table);
     auto cursor = std::make_unique<Cursor>(
@@ -203,7 +202,7 @@ Plan plan_insert(const InsertQuery& query, const Catalog& catalog) {
 /* Return an iterator tree corresponding to an UpdateQuery.
  * Chains together a TableScan or IndexScan, possibly a Filter, and an Update.
  */
-Plan plan_update(const UpdateQuery& query, const Catalog& catalog) {
+Plan plan(const UpdateQuery& query, const Catalog& catalog) {
 
     const Table* table = catalog.find_table(query.table);
     auto cursor = std::make_unique<Cursor>(
@@ -228,7 +227,7 @@ Plan plan_update(const UpdateQuery& query, const Catalog& catalog) {
 /* Return an iterator tree corresponding to a DeleteQuery.
  * Chains together a TableScan or IndexScan, possibly a Filter, and an Erase.
  */
-Plan plan_delete(const DeleteQuery& query, const Catalog& catalog) {
+Plan plan(const DeleteQuery& query, const Catalog& catalog) {
 
     const Table* table = catalog.find_table(query.table);
     auto cursor = std::make_unique<Cursor>(
@@ -253,11 +252,11 @@ Plan plan_delete(const DeleteQuery& query, const Catalog& catalog) {
 struct Planner {
     Catalog& c;
 
-    Plan operator()(const CreateQuery& q) const { return plan_create(q, c); }
-    Plan operator()(const SelectQuery& q) const { return plan_select(q, c); }
-    Plan operator()(const InsertQuery& q) const { return plan_insert(q, c); }
-    Plan operator()(const UpdateQuery& q) const { return plan_update(q, c); }
-    Plan operator()(const DeleteQuery& q) const { return plan_delete(q, c); }
+    Plan operator()(const CreateQuery& q) const { return plan(q, c); }
+    Plan operator()(const SelectQuery& q) const { return plan(q, c); }
+    Plan operator()(const InsertQuery& q) const { return plan(q, c); }
+    Plan operator()(const UpdateQuery& q) const { return plan(q, c); }
+    Plan operator()(const DeleteQuery& q) const { return plan(q, c); }
 };
 
 } // namespace
