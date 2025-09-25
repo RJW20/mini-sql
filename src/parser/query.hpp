@@ -46,8 +46,8 @@ struct InsertQuery {
 
 struct UpdateQuery {
     Varchar table;
-    std::vector<Condition> conditions;
     std::vector<Modification> modifications;
+    std::vector<Condition> conditions;
 };
 
 struct DeleteQuery {
