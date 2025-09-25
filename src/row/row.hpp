@@ -24,7 +24,7 @@ public:
 
     const Field& operator[](std::size_t index) const { return fields_[index]; }
 
-    const Field& operator[](Varchar name) const {
+    const Field& operator[](const Varchar& name) const {
         return (*this)[schema_->index_of(name)];
     }
 

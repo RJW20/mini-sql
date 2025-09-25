@@ -53,6 +53,10 @@ public:
         return columns_[index];
     }
 
+    const Column& operator[](const Varchar& name) const {
+        return columns_[name_to_index_.at(name)];
+    }
+
     std::size_t index_of(const Varchar& name) const {
         return name_to_index_.at(name);
     }
