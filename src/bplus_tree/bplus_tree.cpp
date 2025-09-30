@@ -13,7 +13,7 @@
 #include "frame_manager/cache/frame_view.hpp"
 #include "headers.hpp"
 #include "exceptions.hpp"
-#include "varchar.hpp"
+#include "field/instantiator.hpp"
 
 namespace minisql {
 
@@ -330,46 +330,35 @@ std::unique_ptr<Node> BPlusTree::open_node(page_id_t pid) const {
     }
 }
 
-template BPlusTree::size_t BPlusTree::seek_slot<int>(Node*, const int&);
-template BPlusTree::size_t BPlusTree::seek_slot<double>(Node*, const double&);
-template BPlusTree::size_t BPlusTree::seek_slot<Varchar>(
-    Node*, const Varchar&
+// Wrapper for all templated methods.
+template <typename T>
+struct Wrapper {
+    static void instantiate() {
+        T* dummy = nullptr;
+        BPlusTree::seek_slot<T>(nullptr, *dummy);
+        BPlusTree bp_tree{nullptr, 0, 0};
+        bp_tree.seek_leaf<T>(*dummy);
+        LeafNode* dummy_leaf = nullptr;
+        bp_tree.insert_into<T>(dummy_leaf, 0, {});
+        bp_tree.erase_from<T>(dummy_leaf, 0);
+        std::unique_ptr<InternalNode> dummy_internal;
+        bp_tree.insert_into<T>(
+            static_cast<std::unique_ptr<InternalNode>&&>(dummy_internal), 0,
+            *dummy, 0
+        );
+        bp_tree.erase_from<T>(
+            static_cast<std::unique_ptr<InternalNode>&&>(dummy_internal), 0
+        );
+    }
+};
+
+namespace {
+
+// Explicitly instantiate templated methods for all Field types.
+[[maybe_unused]] const auto _ = (
+    InstantiateForField<Wrapper>::instantiate(), true
 );
 
-template std::unique_ptr<LeafNode> BPlusTree::seek_leaf<int>(const int&) const;
-template std::unique_ptr<LeafNode> BPlusTree::seek_leaf<double>(
-    const double&
-) const;
-template std::unique_ptr<LeafNode> BPlusTree::seek_leaf<Varchar>(
-    const Varchar&
-) const;
-
-template void BPlusTree::insert_into<int>(LeafNode*, size_t, span<std::byte>);
-template void BPlusTree::insert_into<double>(LeafNode*, size_t, span<std::byte>);
-template void BPlusTree::insert_into<Varchar>(LeafNode*, size_t, span<std::byte>);
-
-template void BPlusTree::erase_from<int>(LeafNode*, size_t);
-template void BPlusTree::erase_from<double>(LeafNode*, size_t);
-template void BPlusTree::erase_from<Varchar>(LeafNode*, size_t);
-
-template void BPlusTree::insert_into<int>(
-    std::unique_ptr<InternalNode>, size_t, const int&, page_id_t
-);
-template void BPlusTree::insert_into<double>(
-    std::unique_ptr<InternalNode>, size_t, const double&, page_id_t
-);
-template void BPlusTree::insert_into<Varchar>(
-    std::unique_ptr<InternalNode>, size_t, const Varchar&, page_id_t
-);
-
-template void BPlusTree::erase_from<int>(
-    std::unique_ptr<InternalNode>, size_t
-);
-template void BPlusTree::erase_from<double>(
-    std::unique_ptr<InternalNode>, size_t
-);
-template void BPlusTree::erase_from<Varchar>(
-    std::unique_ptr<InternalNode>, size_t
-);
+} // namespace
 
 } // namespace minisql

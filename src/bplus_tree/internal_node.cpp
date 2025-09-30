@@ -5,7 +5,7 @@
 #include "frame_manager/cache/frame_view.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "headers.hpp"
-#include "varchar.hpp"
+#include "field/instantiator.hpp"
 
 namespace minisql {
 
@@ -75,38 +75,25 @@ Key InternalNode::take_front(
     return new_separator;
 }
 
-template int InternalNode::split<int>(InternalNode*, InternalNode*);
-template double InternalNode::split<double>(InternalNode*, InternalNode*);
-template Varchar InternalNode::split<Varchar>(InternalNode*, InternalNode*);
+// Wrapper for all templated methods.
+template <typename T>
+struct Wrapper {
+    static void instantiate() {
+        T* dummy = nullptr;
+        InternalNode::split<T>(nullptr, nullptr);
+        InternalNode::merge<T>(nullptr, nullptr, *dummy);
+        InternalNode::take_back<T>(nullptr, nullptr, *dummy);
+        InternalNode::take_front<T>(nullptr, nullptr, *dummy);
+    }
+};
 
-template void InternalNode::merge<int>(
-    InternalNode*, InternalNode*, const int&
-);
-template void InternalNode::merge<double>(
-    InternalNode*, InternalNode*, const double&
-);
-template void InternalNode::merge<Varchar>(
-    InternalNode*, InternalNode*, const Varchar&
-);
+namespace {
 
-template int InternalNode::take_back<int>(
-    InternalNode*, InternalNode*, const int&
-);
-template double InternalNode::take_back<double>(
-    InternalNode*, InternalNode*, const double&
-);
-template Varchar InternalNode::take_back<Varchar>(
-    InternalNode*, InternalNode*, const Varchar&
+// Explicitly instantiate templated methods for all Field types.  
+[[maybe_unused]] const auto _ = (
+    InstantiateForField<Wrapper>::instantiate(), true
 );
 
-template int InternalNode::take_front<int>(
-    InternalNode*, InternalNode*, const int&
-);
-template double InternalNode::take_front<double>(
-    InternalNode*, InternalNode*, const double&
-);
-template Varchar InternalNode::take_front<Varchar>(
-    InternalNode*, InternalNode*, const Varchar&
-);
+} // namespace
 
 } // namespace minisql

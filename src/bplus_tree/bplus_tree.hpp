@@ -57,6 +57,9 @@ private:
 
     std::unique_ptr<InternalNode> open_internal(page_id_t pid) const;
     std::unique_ptr<Node> open_node(page_id_t pid) const;
+
+    template <typename T>
+    friend struct Wrapper;
 };
 
 } // namespace minisql
