@@ -5,7 +5,7 @@
 #include <variant>
 #include <type_traits>
 
-#include "varchar.hpp"
+#include "field/varchar.hpp"
 
 namespace minisql {
 
