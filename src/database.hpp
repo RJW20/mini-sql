@@ -4,12 +4,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <string>
 #include <memory>
 #include <fstream>
 
 #include "catalog/catalog.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
-#include "varchar.hpp"
 #include "row/schema.hpp"
 #include "catalog/table.hpp"
 #include "frame_manager/frame_manager.hpp"
@@ -28,11 +28,11 @@ public:
     void set_master_root(page_id_t pid) { master_root_ = pid; }
 
     void add_table(
-        const Varchar& name, std::unique_ptr<Schema> schema,
+        const std::string& name, std::unique_ptr<Schema> schema,
         page_id_t root = nullpid, std::uint32_t next_rowid = 0
     ) override;
 
-    const Table* find_table(const Varchar& name) const override;
+    const Table* find_table(const std::string& name) const override;
 
 private:
     std::fstream file_;

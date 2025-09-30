@@ -5,14 +5,15 @@
 #include <filesystem>
 #include <vector>
 #include <memory>
+#include <string>
 #include <utility>
 #include <tuple>
 
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "headers.hpp"
 #include "byte_io.hpp"
+#include "exceptions.hpp"
 #include "frame_manager/frame_manager.hpp"
-#include "varchar.hpp"
 #include "row/schema.hpp"
 #include "bplus_tree/bplus_tree.hpp"
 #include "catalog/table.hpp"
@@ -41,6 +42,11 @@ Database::Database(const std::filesystem::path& path) {
         file_.read(
             reinterpret_cast<char*>(db_header.data()), DatabaseHeader::SIZE
         );
+        Magic magic = byte_io::view<Magic>(
+            db_header, DatabaseHeader::MAGIC_OFFSET
+        );
+        if (magic != Magic::DATABASE)
+            throw InvalidMagicException(magic);
         page_count = byte_io::view<page_id_t>(
             db_header, DatabaseHeader::PAGE_COUNT_OFFSET
         );
@@ -61,6 +67,9 @@ Database::Database(const std::filesystem::path& path) {
 Database::~Database() {
     fm_->flush_all();
     std::vector<std::byte> db_header{DatabaseHeader::SIZE};
+    byte_io::write<Magic>(
+        db_header, DatabaseHeader::MAGIC_OFFSET, Magic::DATABASE
+    );
     byte_io::write<page_id_t>(
         db_header, DatabaseHeader::PAGE_COUNT_OFFSET, fm_->page_count()
     );
@@ -80,7 +89,7 @@ Database::~Database() {
 
 // Construct a Table in the Catalog with given name.
 void Database::add_table(
-    const Varchar& name, std::unique_ptr<Schema> schema, page_id_t root,
+    const std::string& name, std::unique_ptr<Schema> schema, page_id_t root,
     std::uint32_t next_rowid
 ) {
     auto bp_tree = std::make_unique<BPlusTree>(
@@ -95,7 +104,7 @@ void Database::add_table(
 
 /* Return a pointer to the Table in the Catalog with given name.
  * Returns nullptr if not found. */
-const Table* Database::find_table(const Varchar& name) const {
+const Table* Database::find_table(const std::string& name) const {
     auto it = tables_.find(name);
     if (it != tables_.end()) return &(it->second);
     return nullptr;
