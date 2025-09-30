@@ -9,7 +9,7 @@
 #include "planner/iterators/table_scan.hpp"
 #include "cursor.hpp"
 #include "row/schema.hpp"
-#include "field.hpp"
+#include "field/field.hpp"
 #include "planner/compiler.hpp"
 
 namespace minisql::planner {
@@ -25,6 +25,7 @@ public:
         inclusive_lb_{inclusive_lb}, ub_{std::move(ub)},
         inclusive_ub_{inclusive_ub},
         less_than_{compile_less_than(schema_->primary().type)} {}
+        
     void open() override {
         if (lb_) cursor_->open(*lb_);
         else TableScan::open();

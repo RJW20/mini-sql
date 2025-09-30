@@ -7,7 +7,7 @@
 #include <utility>
 #include <string>
 
-#include "field.hpp"
+#include "field/field.hpp"
 #include "row/schema.hpp"
 
 namespace minisql {

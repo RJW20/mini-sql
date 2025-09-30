@@ -6,7 +6,7 @@
 #include <limits>
 
 #include "planner/iterators/iterator.hpp"
-#include "field.hpp"
+#include "field/field.hpp"
 #include "row/schema.hpp"
 #include "row/row_view.hpp"
 

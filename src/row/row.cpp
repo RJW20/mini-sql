@@ -9,7 +9,7 @@
 #include "row/row_view.hpp"
 #include "span.hpp"
 #include "row/schema.hpp"
-#include "field.hpp"
+#include "field/field.hpp"
 #include "byte_io.hpp"
 #include "varchar.hpp"
 
