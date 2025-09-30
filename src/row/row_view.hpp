@@ -11,7 +11,7 @@
 #include "row/schema.hpp"
 #include "field/field.hpp"
 #include "byte_io.hpp"
-#include "varchar.hpp"
+#include "field/varchar.hpp"
 #include "row.hpp"
 
 namespace minisql {
