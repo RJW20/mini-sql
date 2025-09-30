@@ -5,7 +5,7 @@
 #include "bplus_tree/bplus_tree.hpp"
 #include "row/schema.hpp"
 #include "field/field.hpp"
-#include "varchar.hpp"
+#include "field/varchar.hpp"
 #include "row/row_view.hpp"
 #include "exceptions.hpp"
 
