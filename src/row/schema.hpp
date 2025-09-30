@@ -2,6 +2,7 @@
 #define MINISQL_SCHEMA_HPP
 
 #include <cstddef>
+#include <string>
 #include <memory>
 #include <vector>
 #include <algorithm>
@@ -9,7 +10,6 @@
 #include <utility>
 #include <unordered_map>
 
-#include "varchar.hpp"
 #include "field.hpp"
 
 namespace minisql {
@@ -19,17 +19,17 @@ namespace minisql {
 class Schema {
 public:
     struct Column {
-        Varchar name;
+        std::string name;
         FieldType type;
         std::size_t offset;
         std::size_t size;
     };
 
     static std::unique_ptr<Schema> create(
-        const std::vector<Varchar>& names,
+        const std::vector<std::string>& names,
         const std::vector<FieldType>& types,
         const std::vector<std::size_t>& sizes,
-        const Varchar& primary
+        const std::string& primary
     ) {
         auto it = std::find(names.begin(), names.end(), primary);
         std::size_t primary_index = std::distance(names.begin(), it);
@@ -53,11 +53,11 @@ public:
         return columns_[index];
     }
 
-    const Column& operator[](const Varchar& name) const {
+    const Column& operator[](const std::string& name) const {
         return columns_[name_to_index_.at(name)];
     }
 
-    std::size_t index_of(const Varchar& name) const {
+    std::size_t index_of(const std::string& name) const {
         return name_to_index_.at(name);
     }
 
@@ -70,10 +70,10 @@ public:
         return row_size;
     }
 
-    Schema project(const std::vector<Varchar>& column_names) const {
+    Schema project(const std::vector<std::string>& column_names) const {
         std::vector<Column> projection;
         projection.reserve(column_names.size());
-        for (const Varchar& column_name : column_names)
+        for (const std::string& column_name : column_names)
             projection.push_back(columns_[name_to_index_.at(column_name)]);
         return Schema{std::move(projection), 0};
     }
@@ -87,7 +87,7 @@ private:
 
     std::vector<Column> columns_;
     std::size_t primary_index_;
-    std::unordered_map<Varchar, std::size_t> name_to_index_;
+    std::unordered_map<std::string, std::size_t> name_to_index_;
 };
 
 } // namespace minisql

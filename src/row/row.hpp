@@ -2,14 +2,13 @@
 #define MINISQL_ROW_HPP
 
 #include <cstddef>
-#include <variant>
 #include <vector>
 #include <memory>
 #include <utility>
+#include <string>
 
 #include "field.hpp"
 #include "row/schema.hpp"
-#include "varchar.hpp"
 
 namespace minisql {
 
@@ -24,7 +23,7 @@ public:
 
     const Field& operator[](std::size_t index) const { return fields_[index]; }
 
-    const Field& operator[](const Varchar& name) const {
+    const Field& operator[](const std::string& name) const {
         return (*this)[schema_->index_of(name)];
     }
 

@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <utility>
+#include <string>
 
 #include "span.hpp"
 #include "row/schema.hpp"
@@ -41,7 +42,7 @@ public:
         __builtin_unreachable();
     }
 
-    Field operator[](const Varchar& name) const {
+    Field operator[](const std::string& name) const {
         return (*this)[schema_->index_of(name)];
     }
 
@@ -68,7 +69,7 @@ public:
         }
     }
 
-    void set_field(const Varchar& name, const Field& field) {
+    void set_field(const std::string& name, const Field& field) {
         set_field(schema_->index_of(name), field);
     }
 
