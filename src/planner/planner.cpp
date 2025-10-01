@@ -16,6 +16,7 @@
 #include "planner/iterators/create.hpp"
 #include "catalog/table.hpp"
 #include "planner/iterators/filter.hpp"
+#include "validator/defaults.hpp"
 #include "planner/iterators/project.hpp"
 #include "planner/iterators/values.hpp"
 #include "planner/iterators/insert.hpp"
@@ -168,10 +169,11 @@ Plan plan(const validator::SelectQuery& query, const Catalog& catalog) {
         std::move(plan), compile(filter_conditions, *(table->schema))
     );
 
-    if (query.columns[0] != "*") plan = std::make_unique<Project>(
-        std::move(plan),
-        std::make_shared<Schema>(table->schema->project(query.columns))
-    );
+    if (query.columns[0] != validator::defaults::ALL_COLUMNS)
+        plan = std::make_unique<Project>(
+            std::move(plan),
+            std::make_shared<Schema>(table->schema->project(query.columns))
+        );
 
     return plan;
 }
@@ -188,7 +190,7 @@ Plan plan(const validator::InsertQuery& query, const Catalog& catalog) {
     Plan plan = std::make_unique<Values>(
         query.values,
         std::make_shared<Schema>(
-            query.columns[0] != "*" ?
+            query.columns[0] != validator::defaults::ALL_COLUMNS ?
             table->schema->project(query.columns) :
             *(table->schema)
         )
