@@ -24,7 +24,7 @@ public:
     ) : TableScan{std::move(cursor), schema}, lb_{std::move(lb)},
         inclusive_lb_{inclusive_lb}, ub_{std::move(ub)},
         inclusive_ub_{inclusive_ub},
-        less_than_{compile_less_than(schema_->primary().type)} {}
+        less_than_{compile_less_than(schema_.primary().type)} {}
         
     void open() override {
         if (lb_) cursor_->open(*lb_);
