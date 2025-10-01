@@ -84,9 +84,7 @@ std::function<Field(const Field&, const Field&)> compile_division(
 
 Predicate compile(const validator::Condition& condition, const Schema& schema)
 {
-    auto less_than = compile_less_than(
-        schema[schema.index_of(condition.column)].type
-    );
+    auto less_than = compile_less_than(schema[condition.column]->type);
 
     switch (condition.op) {
         case validator::Condition::Operator::EQ:
@@ -134,9 +132,7 @@ Modifier compile(
                         col2 = std::get<std::string>(modification.value)]
                         (RowView& rv) { rv.set_field(col1, rv[col2]); };
         case validator::Modification::Operator::ADD: {
-            auto add = compile_addition(
-                schema[schema.index_of(modification.column)].type
-            );
+            auto add = compile_addition(schema[modification.column]->type);
             if (std::holds_alternative<Field>(modification.value))
                 return [col = modification.column,
                         value = std::get<Field>(modification.value),
@@ -153,9 +149,7 @@ Modifier compile(
                 };
             }
         case validator::Modification::Operator::SUB: {
-            auto sub = compile_subtraction(
-                schema[schema.index_of(modification.column)].type
-            );
+            auto sub = compile_subtraction(schema[modification.column]->type);
             if (std::holds_alternative<Field>(modification.value))
                 return [col = modification.column,
                         value = std::get<Field>(modification.value),
@@ -173,7 +167,7 @@ Modifier compile(
             }
         case validator::Modification::Operator::MUL: {
             auto mul = compile_multiplication(
-                schema[schema.index_of(modification.column)].type
+                schema[modification.column]->type
             );
             if (std::holds_alternative<Field>(modification.value))
                 return [col = modification.column,
@@ -191,9 +185,7 @@ Modifier compile(
                 };
             }
         case validator::Modification::Operator::DIV: {
-            auto div = compile_division(
-                schema[schema.index_of(modification.column)].type
-            );
+            auto div = compile_division(schema[modification.column]->type);
             if (std::holds_alternative<Field>(modification.value))
                 return [col = modification.column,
                         value = std::get<Field>(modification.value),

@@ -60,9 +60,7 @@ std::unique_ptr<TableScan> make_scan(
             continue;
         }
 
-        auto less_than = compile_less_than(
-            schema[schema.index_of(condition.column)].type
-        );
+        auto less_than = compile_less_than(schema[condition.column]->type);
 
         if (condition.op == validator::Condition::Operator::GT) {
             if (!lower_bound) {

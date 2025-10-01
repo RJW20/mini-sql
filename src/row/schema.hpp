@@ -49,12 +49,15 @@ public:
         );
     }
 
-    const Column& operator[](std::size_t index) const {
-        return columns_[index];
+    const Column* operator[](std::size_t index) const {
+        if (index > columns_.size()) return nullptr;
+        return &(columns_[index]);
     }
 
-    const Column& operator[](const std::string& name) const {
-        return columns_[name_to_index_.at(name)];
+    const Column* operator[](const std::string& name) const {
+        auto it = name_to_index_.find(name);
+        if (it == name_to_index_.end()) return nullptr;
+        return &(columns_[it->second]);
     }
 
     std::size_t index_of(const std::string& name) const {

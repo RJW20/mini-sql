@@ -28,15 +28,15 @@ public:
     ) : data_{data}, schema_{std::move(schema)}, owned_{std::move(owned)} {}
 
     Field operator[](std::size_t index) const {
-        const Schema::Column& column = (*schema_)[index];
-        switch (column.type) {
+        const Schema::Column* column = (*schema_)[index];
+        switch (column->type) {
             case FieldType::INT:
-                return byte_io::view<int>(data_, column.offset);
+                return byte_io::view<int>(data_, column->offset);
             case FieldType::REAL:
-                return byte_io::view<double>(data_, column.offset);
+                return byte_io::view<double>(data_, column->offset);
             case FieldType::TEXT:
                 return byte_io::view<Varchar>(
-                    data_, column.offset, column.size
+                    data_, column->offset, column->size
                 );
         }
         __builtin_unreachable();
@@ -49,21 +49,21 @@ public:
     Field primary() const { return (*this)[0]; }
 
     void set_field(std::size_t index, const Field& field) {
-        const Schema::Column& column = (*schema_)[index];
-        switch (column.type) {
+        const Schema::Column* column = (*schema_)[index];
+        switch (column->type) {
             case FieldType::INT:
                 byte_io::write<int>(
-                    data_, column.offset, std::get<int>(field)
+                    data_, column->offset, std::get<int>(field)
                 );
                 break;
             case FieldType::REAL:
                 byte_io::write<double>(
-                    data_, column.offset, std::get<double>(field)
+                    data_, column->offset, std::get<double>(field)
                 );
                 break;
             case FieldType::TEXT:
                 byte_io::write<Varchar>(
-                    data_, column.offset, std::get<Varchar>(field)
+                    data_, column->offset, std::get<Varchar>(field)
                 );
                 break;
         }
@@ -77,19 +77,21 @@ public:
         std::vector<Field> fields;
         fields.reserve(schema_->size());
         for (int i = 0; i < schema_->size(); i++) {
-            const Schema::Column& column = (*schema_)[i];
-            switch (column.type) {
+            const Schema::Column* column = (*schema_)[i];
+            switch (column->type) {
                 case FieldType::INT:
-                    fields.push_back(byte_io::copy<int>(data_, column.offset));
+                    fields.push_back(
+                        byte_io::copy<int>(data_, column->offset)
+                    );
                     break;
                 case FieldType::REAL:
                     fields.push_back(
-                        byte_io::copy<double>(data_, column.offset)
+                        byte_io::copy<double>(data_, column->offset)
                     );
                     break;
                 case FieldType::TEXT:
                     fields.push_back(byte_io::copy<Varchar>(
-                        data_, column.offset, column.size
+                        data_, column->offset, column->size
                     ));
                     break;
             }
