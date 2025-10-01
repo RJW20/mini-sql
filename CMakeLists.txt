@@ -16,6 +16,7 @@ set(SOURCES
     src/cursor.cpp
     src/planner/compiler.cpp
     src/planner/planner.cpp
+    src/validator/validator.cpp
     src/parser/parser.cpp
     src/database.cpp
 )
