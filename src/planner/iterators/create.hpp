@@ -16,7 +16,8 @@ namespace minisql::planner {
 class Create : public Iterator {
 public:
     Create(
-        Catalog& catalog, std::string& table, std::unique_ptr<Schema> schema
+        Catalog& catalog, const std::string& table,
+        std::unique_ptr<Schema> schema
     ) : catalog_{catalog}, table_{table}, schema_{std::move(schema)}
         {}
 

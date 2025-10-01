@@ -3,12 +3,13 @@
 #include <functional>
 #include <utility>
 #include <variant>
+#include <string>
 #include <vector>
 
-#include "field.hpp"
-#include "varchar.hpp"
+#include "field/field.hpp"
+#include "field/varchar.hpp"
 #include "exceptions.hpp"
-#include "parser/query.hpp"
+#include "validator/query.hpp"
 #include "row/schema.hpp"
 #include "row/row_view.hpp"
 
@@ -81,34 +82,34 @@ std::function<Field(const Field&, const Field&)> compile_division(
     __builtin_unreachable();
 }
 
-Predicate compile(const Condition& condition, const Schema* schema) {
-
+Predicate compile(const validator::Condition& condition, const Schema& schema)
+{
     auto less_than = compile_less_than(
-        (*schema)[schema->index_of(condition.column)].type
+        schema[schema.index_of(condition.column)].type
     );
 
     switch (condition.op) {
-        case Condition::Operator::EQ:
+        case validator::Condition::Operator::EQ:
             return [col = condition.column, rhs = condition.value]
                     (const RowView& rv) { return rv[col] == rhs; };
-        case Condition::Operator::NEQ:
+        case validator::Condition::Operator::NEQ:
             return [col = condition.column, rhs = condition.value]
                     (const RowView& rv) { return rv[col] != rhs; };
-        case Condition::Operator::GT:
+        case validator::Condition::Operator::GT:
             return [col = condition.column, lhs = condition.value,
                     lt = std::move(less_than)]
                     (const RowView& rv) { return lt(lhs, rv[col]); };
-        case Condition::Operator::GTE:
+        case validator::Condition::Operator::GTE:
             return [col = condition.column, lhs = condition.value,
                     lt = std::move(less_than)]
                     (const RowView& rv) {
                 return lt(lhs, rv[col]) || lhs == rv[col];
             };
-        case Condition::Operator::LT:
+        case validator::Condition::Operator::LT:
             return [col = condition.column, rhs = condition.value,
                     lt = std::move(less_than)]
                     (const RowView& rv) { return lt(rv[col], rhs); };
-        case Condition::Operator::LTE:
+        case validator::Condition::Operator::LTE:
             return [col = condition.column, rhs = condition.value,
                     lt = std::move(less_than)]
                     (const RowView& rv) {
@@ -119,21 +120,22 @@ Predicate compile(const Condition& condition, const Schema* schema) {
     __builtin_unreachable();
 }
 
-Modifier compile(const Modification& modification, const Schema* schema) {
-
+Modifier compile(
+    const validator::Modification& modification, const Schema& schema
+) {
     switch (modification.op) {
-        case Modification::Operator::EQ:
+        case validator::Modification::Operator::EQ:
             if (std::holds_alternative<Field>(modification.value))
                 return [col = modification.column,
                         value = std::get<Field>(modification.value)]
                         (RowView& rv) { rv.set_field(col, value); };
             else
                 return [col1 = modification.column,
-                        col2 = std::get<Varchar>(modification.value)]
+                        col2 = std::get<std::string>(modification.value)]
                         (RowView& rv) { rv.set_field(col1, rv[col2]); };
-        case Modification::Operator::ADD: {
+        case validator::Modification::Operator::ADD: {
             auto add = compile_addition(
-                (*schema)[schema->index_of(modification.column)].type
+                schema[schema.index_of(modification.column)].type
             );
             if (std::holds_alternative<Field>(modification.value))
                 return [col = modification.column,
@@ -144,15 +146,15 @@ Modifier compile(const Modification& modification, const Schema* schema) {
                 };
             else
                 return [col1 = modification.column,
-                        col2 = std::get<Varchar>(modification.value),
+                        col2 = std::get<std::string>(modification.value),
                         add = std::move(add)]
                         (RowView& rv) {
                     rv.set_field(col1, add(rv[col1], rv[col2]));
                 };
             }
-        case Modification::Operator::SUB: {
+        case validator::Modification::Operator::SUB: {
             auto sub = compile_subtraction(
-                (*schema)[schema->index_of(modification.column)].type
+                schema[schema.index_of(modification.column)].type
             );
             if (std::holds_alternative<Field>(modification.value))
                 return [col = modification.column,
@@ -163,15 +165,15 @@ Modifier compile(const Modification& modification, const Schema* schema) {
                 };
             else
                 return [col1 = modification.column,
-                        col2 = std::get<Varchar>(modification.value),
+                        col2 = std::get<std::string>(modification.value),
                         sub = std::move(sub)]
                         (RowView& rv) {
                     rv.set_field(col1, sub(rv[col1], rv[col2]));
                 };
             }
-        case Modification::Operator::MUL: {
+        case validator::Modification::Operator::MUL: {
             auto mul = compile_multiplication(
-                (*schema)[schema->index_of(modification.column)].type
+                schema[schema.index_of(modification.column)].type
             );
             if (std::holds_alternative<Field>(modification.value))
                 return [col = modification.column,
@@ -182,15 +184,15 @@ Modifier compile(const Modification& modification, const Schema* schema) {
                 };
             else
                 return [col1 = modification.column,
-                        col2 = std::get<Varchar>(modification.value),
+                        col2 = std::get<std::string>(modification.value),
                         mul = std::move(mul)]
                         (RowView& rv) {
                     rv.set_field(col1, mul(rv[col1], rv[col2]));
                 };
             }
-        case Modification::Operator::DIV: {
+        case validator::Modification::Operator::DIV: {
             auto div = compile_division(
-                (*schema)[schema->index_of(modification.column)].type
+                schema[schema.index_of(modification.column)].type
             );
             if (std::holds_alternative<Field>(modification.value))
                 return [col = modification.column,
@@ -201,7 +203,7 @@ Modifier compile(const Modification& modification, const Schema* schema) {
                 };
             else
                 return [col1 = modification.column,
-                        col2 = std::get<Varchar>(modification.value),
+                        col2 = std::get<std::string>(modification.value),
                         div = std::move(div)]
                         (RowView& rv) {
                     rv.set_field(col1, div(rv[col1], rv[col2]));
@@ -216,10 +218,10 @@ Modifier compile(const Modification& modification, const Schema* schema) {
 
 // Compile conditions into one function that returns true when all are met.
 Predicate compile(
-    const std::vector<Condition>& conditions, const Schema* schema
+    const std::vector<validator::Condition>& conditions, const Schema& schema
 ) {
     Predicate predicate = [](const RowView&){ return true; };
-    for (const Condition& condition : conditions)
+    for (const validator::Condition& condition : conditions)
         predicate = [previous = std::move(predicate),
                      current = compile(condition, schema)]
                      (const RowView& rv) {
@@ -230,10 +232,11 @@ Predicate compile(
 
 // Compile modifications into one function that modifies a RowView.
 Modifier compile(
-    const std::vector<Modification>& modifications, const Schema* schema
+    const std::vector<validator::Modification>& modifications,
+    const Schema& schema
 ) {
     Modifier modifier = [](RowView&){ return; };
-    for (const Modification& modification : modifications)
+    for (const validator::Modification& modification : modifications)
         modifier = [previous = std::move(modifier),
                     current = compile(modification, schema)]
                     (RowView& rv) { previous(rv); current(rv); };

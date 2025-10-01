@@ -10,7 +10,7 @@
 #include "cursor.hpp"
 #include "row/schema.hpp"
 #include "field/field.hpp"
-#include "varchar.hpp"
+#include "field/varchar.hpp"
 #include "row/row_view.hpp"
 
 namespace minisql::planner {
