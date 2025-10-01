@@ -1,12 +1,12 @@
 #ifndef MINISQL_PLANNER_CREATE_HPP
 #define MINISQL_PLANNER_CREATE_HPP
 
+#include <string>
 #include <memory>
 #include <utility>
 
 #include "planner/iterators/iterator.hpp"
 #include "catalog/table.hpp"
-#include "varchar.hpp"
 #include "row/schema.hpp"
 #include "row/row_view.hpp"
 
@@ -16,8 +16,8 @@ namespace minisql::planner {
 class Create : public Iterator {
 public:
     Create(
-        Catalog& catalog, Varchar table, std::unique_ptr<Schema> schema
-    ) : catalog_{catalog}, table_{std::move(table)}, schema_{std::move(schema)}
+        Catalog& catalog, std::string& table, std::unique_ptr<Schema> schema
+    ) : catalog_{catalog}, table_{table}, schema_{std::move(schema)}
         {}
 
     void open() override {}
@@ -35,7 +35,7 @@ public:
 
 private:
     Catalog& catalog_;
-    Varchar table_;
+    std::string table_;
     std::unique_ptr<Schema> schema_;
 };
 
