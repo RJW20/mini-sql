@@ -1,7 +1,6 @@
 #include "database.hpp"
 
 #include <cstddef>
-#include <cstdint>
 #include <filesystem>
 #include <vector>
 #include <memory>
@@ -15,8 +14,8 @@
 #include "exceptions.hpp"
 #include "frame_manager/frame_manager.hpp"
 #include "row/schema.hpp"
-#include "bplus_tree/bplus_tree.hpp"
 #include "catalog/table.hpp"
+#include "bplus_tree/bplus_tree.hpp"
 
 namespace minisql {
 
@@ -90,7 +89,7 @@ Database::~Database() {
 // Construct a Table in the Catalog with given name.
 void Database::add_table(
     const std::string& name, std::unique_ptr<Schema> schema, page_id_t root,
-    std::uint32_t next_rowid
+    rowid_t next_rowid
 ) {
     auto bp_tree = std::make_unique<BPlusTree>(
         fm_.get(), schema->primary().size, schema->row_size(), root

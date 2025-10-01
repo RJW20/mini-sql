@@ -1,7 +1,6 @@
 #ifndef MINISQL_CATALOG_HPP
 #define MINISQL_CATALOG_HPP
 
-#include <cstdint>
 #include <string>
 #include <memory>
 #include <unordered_map>
@@ -20,7 +19,7 @@ public:
 
     virtual void add_table(
         const std::string& name, std::unique_ptr<Schema> schema,
-        page_id_t root = nullpid, std::uint32_t next_rowid = 0
+        page_id_t root = nullpid, rowid_t next_rowid = 0
     ) = 0;
 
     virtual Table* find_table(const std::string& name) = 0;

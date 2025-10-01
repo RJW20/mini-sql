@@ -2,7 +2,6 @@
 #define MINISQL_DATABASE_HPP
 
 #include <cstddef>
-#include <cstdint>
 #include <filesystem>
 #include <string>
 #include <memory>
@@ -29,7 +28,7 @@ public:
 
     void add_table(
         const std::string& name, std::unique_ptr<Schema> schema,
-        page_id_t root = nullpid, std::uint32_t next_rowid = 0
+        page_id_t root = nullpid, rowid_t next_rowid = 0
     ) override;
 
     Table* find_table(const std::string& name) override;
