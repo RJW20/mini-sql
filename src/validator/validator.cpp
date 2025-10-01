@@ -210,7 +210,8 @@ InsertQuery validate(
                     validate(row[i], column->type, column->size)
                 );
             }
-            if (use_rowid) validated_row.push_back(table->next_rowid++);
+            if (use_rowid)
+                validated_row.push_back(static_cast<int>(table->next_rowid++));
             query.values.push_back(validated_row);
             validated_row.clear();
         }
@@ -229,7 +230,8 @@ InsertQuery validate(
                     validate(row[i], column->type, column->size)
                 );
             }
-            if (use_rowid) validated_row.push_back(table->next_rowid++);
+            if (use_rowid)
+                validated_row.push_back(static_cast<int>(table->next_rowid++));
             query.values.push_back(validated_row);
             validated_row.clear();
         }

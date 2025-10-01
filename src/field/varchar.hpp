@@ -27,13 +27,6 @@ public:
         data_[size_] = '\0';
     }
 
-    // Constructor: copy single char
-    Varchar(const char c)
-        : owned_{std::make_unique<char[]>(2)}, data_{owned_.get()}, size_{1} {
-        data_[0] = c;
-        data_[1] = '\0';
-    }
-
     // Constructor: view-only
     Varchar(char* external, std::size_t size)
         : owned_{nullptr}, data_{external}, size_{size} {}
@@ -152,22 +145,5 @@ inline void byte_io::write<Varchar>(
 }
 
 } // namespace minisql
-
-namespace std {
-
-/* Template specialisation for std::hash.
- * Two Varchars are considered equal if they are the same size and all
- * all characters in data_ are the same (regardless of whether one owns its
- * characters and the other doesn't) so the hash function reflects this. */
-template <>
-struct hash<minisql::Varchar> {
-    std::size_t operator()(const minisql::Varchar& v) const {
-        std::size_t h1 = std::hash<std::string_view>()(v.data());
-        std::size_t h2 = std::hash<std::size_t>()(v.size());
-        return h1 ^ (h2 << 1);
-    }
-};
-
-} // namespace std
 
 #endif // MINISQL_VARCHAR_HPP
