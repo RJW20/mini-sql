@@ -1,11 +1,10 @@
-#ifndef MINISQL_TOKEN_HPP
-#define MINISQL_TOKEN_HPP
+#ifndef MINISQL_PARSER_TOKEN_HPP
+#define MINISQL_PARSER_TOKEN_HPP
 
 #include <cstdint>
+#include <string>
 
-#include "varchar.hpp"
-
-namespace minisql {
+namespace minisql::parser {
 
 enum class TokenType : std::uint8_t {
     LPAREN, RPAREN, STAR, COMMA, SEMICOLON,
@@ -17,9 +16,9 @@ enum class TokenType : std::uint8_t {
 
 struct Token {
     TokenType type;
-    Varchar text;
+    std::string text;
 };
 
-} // namespace minisql
+} // namespace minisql::parser
 
-#endif // MINISQL_TOKEN_HPP
+#endif // MINISQL_PARSER_TOKEN_HPP

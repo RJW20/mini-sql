@@ -2,31 +2,91 @@
 
 #include <cstddef>
 #include <string_view>
+#include <vector>
 #include <string>
 #include <cctype>
 #include <utility>
-#include <vector>
 
-#include "parser/query.hpp"
+#include "parser/ast.hpp"
 #include "parser/token.hpp"
+#include "field/field.hpp"
 #include "exceptions.hpp"
-#include "varchar.hpp"
-#include "field.hpp"
+#include "validator/defaults.hpp"
 
-namespace minisql {
+namespace minisql::parser {
 
-// Return a Query built from sql.
-Query Parser::parse(std::string_view sql) {
-    Parser parser{sql};
-    switch (parser.peek().type) {
-        case TokenType::CREATE: return parser.parse_create();
-        case TokenType::SELECT: return parser.parse_select();
-        case TokenType::INSERT: return parser.parse_insert();
-        case TokenType::UPDATE: return parser.parse_update();
-        case TokenType::DELETE: return parser.parse_delete();
-        default: throw InvalidSQLException(std::string(sql));
+namespace {
+
+/* Parser
+ * Builds an AST corresponding to the input sql by tokenising. */
+class Parser {
+public:
+    Parser(std::string_view sql) : sql_{sql} { tokenise(sql); }
+
+    AST parse() {
+        pos_ = 0;
+        switch (peek().type) {
+            case TokenType::CREATE: return parse_create();
+            case TokenType::SELECT: return parse_select();
+            case TokenType::INSERT: return parse_insert();
+            case TokenType::UPDATE: return parse_update();
+            case TokenType::DELETE: return parse_delete();
+            default: raise_exception();
+        }
+        __builtin_unreachable();
     }
-}
+
+private:
+    std::string_view sql_;
+    std::vector<Token> tokens_;
+    std::size_t pos_;
+
+    void tokenise(std::string_view sql);
+
+    // Token access
+    const Token& peek() const { return tokens_[pos_]; }
+    Token& advance() { return tokens_[pos_++]; }
+    bool match(TokenType t) {
+        if (peek().type != t) return false;  
+        advance();
+        return true;
+    }
+    Token& expect(TokenType t) {
+        if (peek().type != t) raise_exception();
+        return advance();
+    }
+
+    // Small object parsing
+    std::string parse_identifier() {
+        return expect(TokenType::IDENTIFIER).text;
+    }
+    FieldType parse_type() {
+        Token& t = advance();
+        if (t.type == TokenType::INT) return FieldType::INT;
+        if (t.type == TokenType::REAL) return FieldType::REAL;
+        if (t.type == TokenType::TEXT) return FieldType::TEXT;
+        raise_exception();
+        __builtin_unreachable();
+    }
+    Value parse_value() {
+        Token& t = advance();
+        if (t.type == TokenType::NUMBER) return std::stod(t.text);
+        if (t.type == TokenType::STRING) return t.text;
+        raise_exception();
+        __builtin_unreachable();
+    }
+
+    Condition parse_condition();
+    Modification parse_modification();
+    
+    CreateAST parse_create();
+    SelectAST parse_select();
+    InsertAST parse_insert();
+    UpdateAST parse_update();
+    DeleteAST parse_delete();
+
+    void raise_exception() { throw InvalidSQLException(std::string(sql_)); }
+};
 
 // Populate tokens with a sequence of Tokens formed from sql.
 void Parser::tokenise(std::string_view sql) {
@@ -41,23 +101,23 @@ void Parser::tokenise(std::string_view sql) {
         }
 
         if (c == '(') {
-            tokens_.push_back({TokenType::LPAREN, '('});
+            tokens_.push_back({TokenType::LPAREN, "("});
             i++;
         }
         else if (c == ')') {
-            tokens_.push_back({TokenType::RPAREN, ')'});
+            tokens_.push_back({TokenType::RPAREN, ")"});
             i++;
         }
         else if (c == '*') {
-            tokens_.push_back({TokenType::STAR, '*'});
+            tokens_.push_back({TokenType::STAR, "*"});
             i++;
         }
         else if (c == ',') {
-            tokens_.push_back({TokenType::COMMA, ','});
+            tokens_.push_back({TokenType::COMMA, ","});
             i++;
         }
         else if (c == ';') {
-            tokens_.push_back({TokenType::SEMICOLON, ';'});
+            tokens_.push_back({TokenType::SEMICOLON, ";"});
             i++;
         }
 
@@ -88,7 +148,7 @@ void Parser::tokenise(std::string_view sql) {
             else if (text == "WHERE") type = TokenType::WHERE;
             else if (text == "AND") type = TokenType::AND;
             else type = TokenType::IDENTIFIER;
-            tokens_.push_back({type, {text.data(), text.size()}});
+            tokens_.push_back({type, std::string(text)});
         }
 
         else if (std::isdigit(c)) {
@@ -102,26 +162,27 @@ void Parser::tokenise(std::string_view sql) {
             std::string clean_number;
             for (char d : number) if (d != ',') clean_number.push_back(c);
             tokens_.push_back(
-                {TokenType::NUMBER, {clean_number.data(), clean_number.size()}}
+                {TokenType::NUMBER, std::move(clean_number)}
             );
         }
 
         else if (c == '\'' || c == '"') {
             std::size_t start = ++i;
             while (i < sql.size() && sql[i] != c) i++;
-            std::string_view text = sql.substr(start, i - start);
-            tokens_.push_back({TokenType::STRING, {text.data(), text.size()}});
+            tokens_.push_back(
+                {TokenType::STRING, std::string{sql.substr(start, i - start)}}
+            );
             i++;
         }
 
         else if (std::string("=!><+-/").find(c) != std::string::npos) {
-            tokens_.push_back({TokenType::OPERATOR, c});
+            tokens_.push_back(
+                {TokenType::OPERATOR, std::string{static_cast<char>(c)}}
+            );
             i++;
         }
 
-        else throw UnrecognisedSQLException(
-            std::string(1, static_cast<char>(c))
-        );
+        else throw UnrecognisedSQLException(std::string{static_cast<char>(c)});
     }
 }
 
@@ -131,24 +192,24 @@ Condition Parser::parse_condition() {
     Condition condition = {parse_identifier()};
 
     Token& t = expect(TokenType::OPERATOR);
-    if (t.text == '=') condition.op = Condition::Operator::EQ;
-    else if (t.text == '!') {
-        if (expect(TokenType::OPERATOR).text != '=') raise_exception();
+    if (t.text == "=") condition.op = Condition::Operator::EQ;
+    else if (t.text == "!") {
+        if (expect(TokenType::OPERATOR).text != "=") raise_exception();
         condition.op = Condition::Operator::NEQ;
     }
-    else if (t.text == '>') {
+    else if (t.text == ">") {
         if (!match(TokenType::OPERATOR))
             condition.op = Condition::Operator::GT;
         else {
-            if (peek().text != '=') raise_exception();
+            if (peek().text != "=") raise_exception();
             condition.op = Condition::Operator::GTE;
         }
     }
-    else if (t.text == '<') {
+    else if (t.text == "<") {
         if (!match(TokenType::OPERATOR))
             condition.op = Condition::Operator::LT;
         else {
-            if (peek().text != '=') raise_exception();
+            if (peek().text != "=") raise_exception();
             condition.op = Condition::Operator::LTE;
         }
     }
@@ -162,18 +223,18 @@ Condition Parser::parse_condition() {
 Modification Parser::parse_modification() {
     
     Modification modification = {parse_identifier()};
-    if (expect(TokenType::OPERATOR).text != '=') raise_exception();
+    if (expect(TokenType::OPERATOR).text != "=") raise_exception();
 
     if (peek().type == TokenType::IDENTIFIER) {
-        Varchar column = parse_identifier();
+        std::string column = parse_identifier();
         if (column == modification.column) {
             Token& t = advance();
             if (t.type == TokenType::OPERATOR) {
-                if (t.text == '+')
+                if (t.text == "+")
                     modification.op = Modification::Operator::ADD;
-                else if (t.text == '-')
+                else if (t.text == "-")
                     modification.op = Modification::Operator::SUB;
-                else if (t.text == '/')
+                else if (t.text == "/")
                     modification.op = Modification::Operator::DIV;
                 else raise_exception();
             }
@@ -195,29 +256,27 @@ Modification Parser::parse_modification() {
     return modification;
 }
 
-// Return a CreateQuery built from tokens.
-CreateQuery Parser::parse_create() {
+// Return a CreateAST built from tokens.
+CreateAST Parser::parse_create() {
 
     expect(TokenType::CREATE);
     expect(TokenType::TABLE);
-    CreateQuery query = {parse_identifier(), {}, {}, {}, {"rowid", 5}};
+    CreateAST ast = {parse_identifier()};
 
     expect(TokenType::LPAREN);
-    query.columns.push_back(parse_identifier());
+    ast.columns.push_back(parse_identifier());
     FieldType type = parse_type();
-    query.types.push_back(type);
+    ast.types.push_back(type);
     switch (type) {
         case FieldType::INT:
-            query.sizes.push_back(sizeof(int));
+            ast.sizes.push_back(sizeof(int));
             break;
         case FieldType::REAL:
-            query.sizes.push_back(sizeof(double));
+            ast.sizes.push_back(sizeof(double));
             break;
         case FieldType::TEXT:
             expect(TokenType::LPAREN);
-            query.sizes.push_back(
-                std::stoi(expect(TokenType::NUMBER).text.data())
-            );
+            ast.sizes.push_back(std::stoi(expect(TokenType::NUMBER).text));
             expect(TokenType::RPAREN);
             break;
     }
@@ -225,24 +284,24 @@ CreateQuery Parser::parse_create() {
         if (match(TokenType::PRIMARY)) {
             expect(TokenType::KEY);
             expect(TokenType::LPAREN);
-            query.primary = parse_identifier();
+            ast.primary = parse_identifier();
             expect(TokenType::RPAREN);
         }
         else {
-            query.columns.push_back(parse_identifier());
+            ast.columns.push_back(parse_identifier());
             type = parse_type();
-            query.types.push_back(type);
+            ast.types.push_back(type);
             switch (type) {
                 case FieldType::INT:
-                    query.sizes.push_back(sizeof(int));
+                    ast.sizes.push_back(sizeof(int));
                     break;
                 case FieldType::REAL:
-                    query.sizes.push_back(sizeof(double));
+                    ast.sizes.push_back(sizeof(double));
                     break;
                 case FieldType::TEXT:
                     expect(TokenType::LPAREN);
-                    query.sizes.push_back(
-                        std::stoi(expect(TokenType::NUMBER).text.data())
+                    ast.sizes.push_back(
+                        std::stoi(expect(TokenType::NUMBER).text)
                     );
                     expect(TokenType::RPAREN);
                     break;
@@ -252,106 +311,113 @@ CreateQuery Parser::parse_create() {
     expect(TokenType::RPAREN);
     
     expect(TokenType::SEMICOLON);
-    return query;
+    return ast;
 }
 
-// Return a SelectQuery built from tokens.
-SelectQuery Parser::parse_select() {
+// Return a SelectAST built from tokens.
+SelectAST Parser::parse_select() {
 
     expect(TokenType::SELECT);
 
-    std::vector<Varchar> columns;
-    if (match(TokenType::STAR)) columns.push_back('*');
+    std::vector<std::string> columns;
+    if (match(TokenType::STAR))
+        columns.push_back(validator::defaults::ALL_COLUMNS);
     else {
         columns.push_back(parse_identifier());
         while (match(TokenType::COMMA)) columns.push_back(parse_identifier());
     }
 
     expect(TokenType::FROM);
-    SelectQuery query = {parse_identifier(), std::move(columns)};
+    SelectAST ast = {parse_identifier(), std::move(columns)};
 
     if (match(TokenType::WHERE)) {
-        query.conditions.push_back(parse_condition());
+        ast.conditions.push_back(parse_condition());
         while (match(TokenType::AND))
-            query.conditions.push_back(parse_condition());
+            ast.conditions.push_back(parse_condition());
     }
 
     expect(TokenType::SEMICOLON);
-    return query;
+    return ast;
 }
 
-// Return an InsertQuery built from tokens.
-InsertQuery Parser::parse_insert() {
+// Return an InsertASTbuilt from tokens.
+InsertAST Parser::parse_insert() {
 
     expect(TokenType::INSERT);
     expect(TokenType::INTO);
-    InsertQuery query = {parse_identifier()};
+    InsertAST ast = {parse_identifier()};
 
     if (match(TokenType::LPAREN)) {
-        query.columns.push_back(parse_identifier());
+        ast.columns.push_back(parse_identifier());
         while (match(TokenType::COMMA))
-            query.columns.push_back(parse_identifier());
+            ast.columns.push_back(parse_identifier());
         expect(TokenType::RPAREN);
     }
-    else query.columns.push_back('*');
+    else ast.columns.push_back(validator::defaults::ALL_COLUMNS);
     
     expect(TokenType::VALUES);
 
     expect(TokenType::LPAREN);
-    std::vector<Field> values;
+    std::vector<Value> values;
     values.push_back(parse_value());
     while (match(TokenType::COMMA)) values.push_back(parse_value());
     expect(TokenType::RPAREN);
-    query.values.push_back(std::move(values));
+    ast.values.push_back(std::move(values));
     while (match(TokenType::COMMA)) {
         expect(TokenType::LPAREN);
         values.clear();
         values.push_back(parse_value());
         while (match(TokenType::COMMA)) values.push_back(parse_value());
         expect(TokenType::RPAREN);
-        query.values.push_back(std::move(values));
+        ast.values.push_back(std::move(values));
     }
 
     expect(TokenType::SEMICOLON);
-    return query;
+    return ast;
 }
 
-// Return an UpdateQuery built from tokens.
-UpdateQuery Parser::parse_update() {
+// Return an UpdateAST built from tokens.
+UpdateAST Parser::parse_update() {
 
     expect(TokenType::UPDATE);
-    UpdateQuery query = {parse_identifier()};
+    UpdateAST ast = {parse_identifier()};
     expect(TokenType::SET);
 
-    query.modifications.push_back(parse_modification());
+    ast.modifications.push_back(parse_modification());
     while (match(TokenType::COMMA))
-        query.modifications.push_back(parse_modification());
+        ast.modifications.push_back(parse_modification());
 
     if (match(TokenType::WHERE)) {
-        query.conditions.push_back(parse_condition());
+        ast.conditions.push_back(parse_condition());
         while (match(TokenType::AND))
-            query.conditions.push_back(parse_condition());
+            ast.conditions.push_back(parse_condition());
     }
 
     expect(TokenType::SEMICOLON);
-    return query;
+    return ast;
 }
 
-// Return a DeleteQuery built from tokens.
-DeleteQuery Parser::parse_delete() {
+// Return a DeleteAST built from tokens.
+DeleteAST Parser::parse_delete() {
 
     expect(TokenType::DELETE);
     expect(TokenType::FROM);
-    DeleteQuery query = {parse_identifier()};
+    DeleteAST ast = {parse_identifier()};
 
     if (match(TokenType::WHERE)) {
-        query.conditions.push_back(parse_condition());
+        ast.conditions.push_back(parse_condition());
         while (match(TokenType::AND))
-            query.conditions.push_back(parse_condition());
+            ast.conditions.push_back(parse_condition());
     }
 
     expect(TokenType::SEMICOLON);
-    return query;
+    return ast;
 }
 
-} // namespace minisql
+} // namespace
+
+AST parse(std::string_view sql) {
+    return Parser{sql}.parse();
+}
+
+} // namespace minisql::parser
