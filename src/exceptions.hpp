@@ -7,6 +7,7 @@
 #include <type_traits>
 
 #include "headers.hpp"
+#include "field/field.hpp"
 
 namespace minisql {
 
@@ -46,20 +47,83 @@ public:
     ) {}
 };
 
-// FieldTypeException for valid Field types in invalid locations.
-class FieldTypeException : public std::runtime_error {
-public:
-    FieldTypeException(const std::string& expected, const std::string& actual)
-        : std::runtime_error(
-            "Invalid Field type: expected " + expected + ", got " + actual +
-            "."
-        ) {}
-};
-
 // DBConstraintViolation for failed DDL/DML instructions.
 class DBConstraintViolation : public std::runtime_error {
 public:
     DBConstraintViolation(const std::string& arg) : std::runtime_error(arg) {}
+};
+
+// Base class for an invalid Query.
+class InvalidQueryException : public std::runtime_error {
+public:
+    InvalidQueryException(const std::string& s) : std::runtime_error(s) {}
+    virtual ~InvalidQueryException() = default;
+};
+
+/* TableNameException for table names that already exist and cannot be used
+ * again or that cannot be found. */
+class TableNameException : public InvalidQueryException {
+public:
+    TableNameException(const std::string& name, bool exists)
+        : InvalidQueryException(
+            "Invalid table name: " + name +
+            (exists ? "already exists." : "does not exist.")
+        ) {}
+};
+
+/* ColumnNameException for the following scenarios:
+ * - Column names that don't exist in a table.
+ * - Disallowed column names.
+ * - Incomplete list of column names.
+ * - Attempted modifications to a constant column. */
+class ColumnNameException : public InvalidQueryException {
+public:
+    enum class Reason { EXISTENCE, DISALLOWED, INCOMPLETE, CONSTANT };
+
+    ColumnNameException(const std::string& name, Reason reason)
+        : InvalidQueryException(generate_message(name, reason)) {}
+
+private:
+    static std::string generate_message(const std::string& name, Reason reason)
+    {
+        switch (reason) {
+            case Reason::EXISTENCE:
+                return "Invalid column name: " + name + " does not exist.";
+            case Reason::DISALLOWED:
+                return "Invalid column name: " + name + " is reserved.";
+            case Reason::INCOMPLETE:
+                return "Incomplete column list.";
+            case Reason::CONSTANT:
+                return "Column " + name + " cannot be modified.";
+        }
+        __builtin_unreachable();
+    }
+};
+
+// FieldTypeException for valid Field types in invalid locations.
+class FieldTypeException : public InvalidQueryException {
+public:
+    FieldTypeException(const std::string& expected, const std::string& actual)
+        : InvalidQueryException(
+            "Invalid Field type: expected " + expected + ", got " + actual +
+            "."
+        ) {}
+
+    FieldTypeException(FieldType expected, FieldType actual)
+        : InvalidQueryException(
+            "Invalid Field type: expected " + to_string(expected) + ", got" +
+            to_string(actual) + "."
+        ) {}
+
+private:
+    static std::string to_string(FieldType type) {
+        switch (type) {
+            case FieldType::INT: return "INT";
+            case FieldType::REAL: return "REAL";
+            case FieldType::TEXT: return "TEXT";
+        }
+        __builtin_unreachable();
+    }
 };
 
 // UnrecognisedSQLException for unsupported or invalid SQL tokens.
