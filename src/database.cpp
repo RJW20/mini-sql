@@ -104,10 +104,18 @@ void Database::add_table(
 
 /* Return a pointer to the Table in the Catalog with given name.
  * Returns nullptr if not found. */
-const Table* Database::find_table(const std::string& name) const {
+Table* Database::find_table(const std::string& name) {
     auto it = tables_.find(name);
     if (it != tables_.end()) return &(it->second);
     return nullptr;
+}
+
+/* Return a pointer to the const Table in the const Catalog with given name.
+ * Returns nullptr if not found. */
+const Table* Database::find_table(const std::string& name) const {
+    auto it = tables_.find(name);
+    if (it != tables_.end()) return &(it->second);
+    return nullptr; 
 }
 
 } // namespace minisql
