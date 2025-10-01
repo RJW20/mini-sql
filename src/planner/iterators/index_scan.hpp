@@ -18,7 +18,7 @@ namespace minisql::planner {
 class IndexScan : public TableScan {
 public:
     IndexScan(
-        std::unique_ptr<Cursor> cursor, const Schema* schema,
+        std::unique_ptr<Cursor> cursor, const Schema& schema,
         std::optional<Field> lb, bool inclusive_lb, std::optional<Field> ub,
         bool inclusive_ub 
     ) : TableScan{std::move(cursor), schema}, lb_{std::move(lb)},

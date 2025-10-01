@@ -18,11 +18,11 @@ namespace minisql::planner {
 // Outputs every Row in a B+ Tree.
 class TableScan : public Iterator {
 public:
-    TableScan(std::unique_ptr<Cursor> cursor, const Schema* schema)
+    TableScan(std::unique_ptr<Cursor> cursor, const Schema& schema)
         : cursor_{std::move(cursor)}, schema_{schema} {}
 
     void open() override {
-        switch (schema_->primary().type) {
+        switch (schema_.primary().type) {
             case FieldType::INT:
                 cursor_->open(INT_MIN);
                 break;
@@ -47,7 +47,7 @@ public:
 
 protected:
     std::unique_ptr<Cursor> cursor_;
-    const Schema* schema_;
+    const Schema& schema_;
 };
 
 } // namespace minisql::planner

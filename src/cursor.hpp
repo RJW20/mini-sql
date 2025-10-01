@@ -18,7 +18,7 @@ namespace minisql {
  * Tree. */
 class Cursor {
 public:
-    Cursor(BPlusTree* bp_tree, const Schema* schema);
+    Cursor(BPlusTree* bp_tree, const Schema& schema);
 
     void open(const Field& origin = 0);
     void seek(const Field& key) { (this->*seek_)(key); }

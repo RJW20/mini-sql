@@ -12,8 +12,8 @@
 namespace minisql {
 
 // Intitialise the Cursor to read slots from bp_tree using schema.
-Cursor::Cursor(BPlusTree* bp_tree, const Schema* schema)
-    : bp_tree_{bp_tree}, schema_{std::make_shared<Schema>(*schema)} {
+Cursor::Cursor(BPlusTree* bp_tree, const Schema& schema)
+    : bp_tree_{bp_tree}, schema_{std::make_shared<Schema>(schema)} {
     switch (schema_->primary().type) {
         case FieldType::INT:
             seek_ = &Cursor::seek__<int>;
