@@ -5,20 +5,26 @@
 #include <filesystem>
 #include <string_view>
 
+#include "row_set/row_set.hpp"
+#include "engine/engine.hpp"
+
 namespace minisql {
 
 /* */
 class Connection {
 public:
-    explicit Connection(const std::filesystem::path& path);     // fetch or create db_
+    explicit Connection(const std::filesystem::path& path)
+        : dbh_{engine_.open_database(path)} {}
 
-    std::size_t exec(std::string_view sql);     // DDL / DML
-    Cursor query(std::string_view sql);         // SELECT
-    Statement prepare(std::string_view sql);    // bind and step
+    // DDL / DML
+    std::size_t exec(std::string_view sql) { return engine_.exec(sql, *dbh_); }
+
+    // SELECT
+    RowSet query(std::string_view sql) { return engine_.query(sql, *dbh_); }
 
 private:
-    Database* db_; // maybe a shared or weak ptr, need some kind of ref counting so can close it
-
+    static Engine engine_;
+    DatabaseHandle dbh_;
 };
 
 } // namespace minisql
