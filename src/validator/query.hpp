@@ -1,57 +1,58 @@
-#ifndef MINISQL_QUERY_HPP
-#define MINISQL_QUERY_HPP
+#ifndef MINISQL_VALIDATOR_QUERY_HPP
+#define MINISQL_VALIDATOR_QUERY_HPP
 
 #include <cstddef>
+#include <string>
 #include <variant>
 #include <vector>
 
-#include "varchar.hpp"
-#include "field.hpp"
+#include "field/field.hpp"
+#include "validator/defaults.hpp"
 
-namespace minisql {
+namespace minisql::validator {
 
-// AST for 1 condition of a WHERE clause.
+// 1 condition of a WHERE clause.
 struct Condition {
-    Varchar column;
+    std::string column;
     enum class Operator { EQ, NEQ, GT, GTE, LT, LTE } op;
     Field value;
 };
 
-// AST for 1 modification of a SET clause.
+// 1 modification of a SET clause.
 struct Modification {
-    Varchar column;
+    std::string column;
     enum class Operator { EQ, ADD, SUB, MUL, DIV } op;
-    std::variant<Field, Varchar> value;
+    std::variant<Field, std::string> value;
 };
 
 struct CreateQuery {
-    Varchar table;
-    std::vector<Varchar> columns;
+    std::string table;
+    std::vector<std::string> columns;
     std::vector<FieldType> types;
     std::vector<std::size_t> sizes;
-    Varchar primary;
+    std::string primary;
 };
 
 struct SelectQuery {
-    Varchar table;
-    std::vector<Varchar> columns;
+    std::string table;
+    std::vector<std::string> columns;
     std::vector<Condition> conditions;
 };
 
 struct InsertQuery {
-    Varchar table;
-    std::vector<Varchar> columns;
+    std::string table;
+    std::vector<std::string> columns;
     std::vector<std::vector<Field>> values;
 };
 
 struct UpdateQuery {
-    Varchar table;
+    std::string table;
     std::vector<Modification> modifications;
     std::vector<Condition> conditions;
 };
 
 struct DeleteQuery {
-    Varchar table;
+    std::string table;
     std::vector<Condition> conditions;
 };
 
@@ -59,6 +60,6 @@ using Query = std::variant<
     CreateQuery, SelectQuery, InsertQuery, UpdateQuery, DeleteQuery
 >;
 
-} // namespace minisql
+} // namespace minisql::validator
 
 #endif // MINISQL_QUERY_HPP
