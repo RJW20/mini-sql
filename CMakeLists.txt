@@ -19,6 +19,8 @@ set(SOURCES
     src/validator/validator.cpp
     src/parser/parser.cpp
     src/database.cpp
+    src/engine/database_handle.cpp
+    src/engine/engine.cpp
 )
 add_library(mini-sql STATIC ${SOURCES})
 
