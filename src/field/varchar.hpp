@@ -4,10 +4,9 @@
 #include <cstddef>
 #include <cstring>
 #include <memory>
+#include <utility>
 #include <algorithm>
 #include <stdexcept>
-#include <functional>
-#include <string_view>
 
 #include "byte_io.hpp"
 #include "span.hpp"
