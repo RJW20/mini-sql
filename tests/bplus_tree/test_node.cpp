@@ -10,7 +10,7 @@
 #include "frame_manager/cache/frame_view.hpp"
 #include "headers.hpp"
 #include "exceptions.hpp"
-#include "varchar.hpp"
+#include "field/varchar.hpp"
 
 #include "utils.hpp"
 #include "bplus_tree/test_node.hpp"

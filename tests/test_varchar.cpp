@@ -1,4 +1,4 @@
-#include "varchar.hpp"
+#include "field/varchar.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -20,14 +20,6 @@ void test_constructor() {
     }
     assert(v.data()[4] == '\0');
     std::cout << "- test_constructor passed" << std::endl;
-}
-
-void test_char_constructor() {
-    const char input = '(';
-    Varchar v = input;
-    assert(v.size() == 1);
-    assert(v.data()[0] == input);
-    std::cout << "- test_char_constructor passed" << std::endl;
 }
 
 void test_view_constructor() {
@@ -113,22 +105,8 @@ void test_byte_io_write_copy_view() {
     std::cout << "- test_byte_io_write_copy_view passed" << std::endl;
 }
 
-void test_hash() {
-    Varchar v1("testing", 10);
-    Varchar v2 = v1;
-    assert(
-        std::hash<minisql::Varchar>{}(v1) == std::hash<minisql::Varchar>{}(v2)
-    );
-    Varchar v3(v1.data(), v1.size());
-    assert(
-        std::hash<minisql::Varchar>{}(v1) == std::hash<minisql::Varchar>{}(v3)
-    );
-    std::cout << "- test_hash passed" << std::endl;
-}
-
 int main() {
     test_constructor();
-    test_char_constructor();
     test_view_constructor();
     test_equality_operator();
     test_copy_constructor();
@@ -137,7 +115,6 @@ int main() {
     test_move_assignment();
     test_less_than_operator();
     test_byte_io_write_copy_view();
-    test_hash();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

@@ -15,7 +15,7 @@
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "frame_manager/frame_manager.hpp"
 #include "byte_io.hpp"
-#include "varchar.hpp"
+#include "field/varchar.hpp"
 
 #include "utils.hpp"
 #include "bplus_tree/test_node.hpp"
