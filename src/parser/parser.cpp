@@ -125,8 +125,7 @@ void Parser::tokenise(std::string_view sql) {
             std::size_t start = i;
             while (++i < sql.size()) {
                 c = static_cast<unsigned char>(sql[i]);
-                if (!(std::isalpha(c) || c == '_' || std::isdigit(c)))
-                    break;
+                if (!(std::isalpha(c) || c == '_' || std::isdigit(c))) break;
             }
             std::string_view text = sql.substr(start, i - start);
             TokenType type;
@@ -155,14 +154,10 @@ void Parser::tokenise(std::string_view sql) {
             std::size_t start = i;
             while (++i < sql.size()) {
                 c = static_cast<unsigned char>(sql[i]);
-                if (!(std::isdigit(c) || c == ','))
-                    break;
+                if (!(std::isdigit(c)) && c != '.') break;
             }
-            std::string_view number = sql.substr(start, i - start);
-            std::string clean_number;
-            for (char d : number) if (d != ',') clean_number.push_back(d);
             tokens_.push_back(
-                {TokenType::NUMBER, std::move(clean_number)}
+                {TokenType::NUMBER, std::string(sql.substr(start, i - start))}
             );
         }
 
