@@ -3,6 +3,7 @@
 #include <variant>
 #include <string>
 #include <utility>
+#include <algorithm>
 #include <vector>
 
 #include "field/field.hpp"
@@ -104,7 +105,8 @@ Modification validate(
 /* Return a validated CreateQuery from the given parser::CreateAST while:
  * - Verifying table doesn't exist.
  * - Asserting no column uses the reserved default primary name.
- * - Inserting a default primary column if none is provided. */
+ * - Verifying the primary column exists if it is provided, and inserting a
+ * default primary column otherwise. */
 CreateQuery validate(const parser::CreateAST& ast, const Catalog& catalog) {
 
     const Table* table = catalog.find_table(ast.table);
@@ -119,7 +121,15 @@ CreateQuery validate(const parser::CreateAST& ast, const Catalog& catalog) {
     query.types = ast.types;
     query.sizes = ast.sizes;
     
-    if (ast.primary) query.primary = *(ast.primary);
+    if (ast.primary) {
+        query.primary = *(ast.primary);
+        auto it = std::find(
+            query.columns.begin(), query.columns.end(), query.primary
+        );
+        if (it == query.columns.end()) throw ColumnNameException(
+            query.primary, ColumnNameException::Reason::EXISTENCE
+        );
+    }
     else {
         query.columns.push_back(defaults::primary::NAME);
         query.types.push_back(defaults::primary::TYPE);
