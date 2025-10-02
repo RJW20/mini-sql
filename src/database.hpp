@@ -39,7 +39,7 @@ private:
     page_id_t master_root_;
     std::unique_ptr<FrameManager> fm_;
 
-    void flush_header();
+    void flush_header(page_id_t page_count, page_id_t first_free_list_block);
 
     // FrameManager arguments.
     static constexpr std::size_t PAGE_SIZE_ = 4096;
