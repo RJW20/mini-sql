@@ -30,6 +30,7 @@ Database::Database(const std::filesystem::path& path) {
         file_.close();
         file_.open(path, std::ios::in | std::ios::out | std::ios::binary);
         master_root_ = nullpid;
+        flush_header();
     }
     else {
         file_.open(path, std::ios::in | std::ios::out | std::ios::binary);
@@ -65,25 +66,7 @@ Database::Database(const std::filesystem::path& path) {
 // Flush any dirty pages and update the DatabaseHeader.
 Database::~Database() {
     fm_->flush_all();
-    std::vector<std::byte> db_header{DatabaseHeader::SIZE};
-    byte_io::write<Magic>(
-        db_header, DatabaseHeader::MAGIC_OFFSET, Magic::DATABASE
-    );
-    byte_io::write<page_id_t>(
-        db_header, DatabaseHeader::PAGE_COUNT_OFFSET, fm_->page_count()
-    );
-    byte_io::write<page_id_t>(
-        db_header, DatabaseHeader::FIRST_FREE_LIST_BLOCK_OFFSET,
-        fm_->first_free_list_block()
-    );
-    byte_io::write<page_id_t>(
-        db_header, DatabaseHeader::MASTER_ROOT_OFFSET, master_root_
-    );
-    file_.seekp(0);
-    file_.write(
-        reinterpret_cast<const char*>(db_header.data()), DatabaseHeader::SIZE
-    );
-    file_.flush();
+    flush_header();
 }
 
 // Construct a Table in the Catalog with given name.
@@ -115,6 +98,29 @@ const Table* Database::find_table(const std::string& name) const {
     auto it = tables_.find(name);
     if (it != tables_.end()) return &(it->second);
     return nullptr; 
+}
+
+// Write the database header to the start of file_.
+void Database::flush_header() {
+    std::vector<std::byte> db_header{DatabaseHeader::SIZE};
+    byte_io::write<Magic>(
+        db_header, DatabaseHeader::MAGIC_OFFSET, Magic::DATABASE
+    );
+    byte_io::write<page_id_t>(
+        db_header, DatabaseHeader::PAGE_COUNT_OFFSET, fm_->page_count()
+    );
+    byte_io::write<page_id_t>(
+        db_header, DatabaseHeader::FIRST_FREE_LIST_BLOCK_OFFSET,
+        fm_->first_free_list_block()
+    );
+    byte_io::write<page_id_t>(
+        db_header, DatabaseHeader::MASTER_ROOT_OFFSET, master_root_
+    );
+    file_.seekp(0);
+    file_.write(
+        reinterpret_cast<const char*>(db_header.data()), DatabaseHeader::SIZE
+    );
+    file_.flush();
 }
 
 } // namespace minisql

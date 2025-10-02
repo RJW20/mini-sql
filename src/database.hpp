@@ -39,6 +39,8 @@ private:
     page_id_t master_root_;
     std::unique_ptr<FrameManager> fm_;
 
+    void flush_header();
+
     // FrameManager arguments.
     static constexpr std::size_t PAGE_SIZE_ = 4096;
     static constexpr std::size_t CACHE_CAPACITY_ = 2000;
