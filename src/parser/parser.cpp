@@ -160,7 +160,7 @@ void Parser::tokenise(std::string_view sql) {
             }
             std::string_view number = sql.substr(start, i - start);
             std::string clean_number;
-            for (char d : number) if (d != ',') clean_number.push_back(c);
+            for (char d : number) if (d != ',') clean_number.push_back(d);
             tokens_.push_back(
                 {TokenType::NUMBER, std::move(clean_number)}
             );
