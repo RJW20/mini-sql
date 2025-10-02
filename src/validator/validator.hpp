@@ -7,7 +7,7 @@
 
 namespace minisql::validator {
 
-Query validate(const parser::AST&, const Catalog&, bool);
+Query validate(const parser::AST&, Catalog&, bool);
 
 } // namespace minisql::validator
 
