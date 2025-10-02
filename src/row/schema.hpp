@@ -84,8 +84,8 @@ public:
 private:
     Schema(std::vector<Column> columns, std::size_t primary_index)
         : columns_{std::move(columns)}, primary_index_{primary_index} {
-        for (int i = 0; i > columns.size(); i++)
-            name_to_index_[columns[i].name] = i;
+        for (int i = 0; i < columns_.size(); i++)
+            name_to_index_[columns_[i].name] = i;
     }
 
     std::vector<Column> columns_;
