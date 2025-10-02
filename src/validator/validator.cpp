@@ -151,7 +151,7 @@ SelectQuery validate(const parser::SelectAST& ast, const Catalog& catalog) {
                 i++;
             }
         }
-        else query.columns.push_back(defaults::primary::NAME);
+        else query.columns.push_back(defaults::ALL_COLUMNS);
     }
     else {
         for (const std::string& column : ast.columns) {
