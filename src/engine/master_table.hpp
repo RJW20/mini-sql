@@ -62,8 +62,8 @@ inline std::string build_insert_statement(
     page_id_t root, rowid_t next_rowid
 ) {
     std::ostringstream sql;
-    sql << "INSERT * INTO " << master_table::NAME << " VALUES ("
-        << table_name << ", " << create_sql << ", " << root << ", "
+    sql << "INSERT INTO " << master_table::NAME << " VALUES ("
+        << "\"" << table_name << "\", \"" << create_sql << "\", " << root << ", "
         << next_rowid << ");";
     return sql.str();
 }
