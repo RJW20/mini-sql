@@ -334,21 +334,12 @@ std::unique_ptr<Node> BPlusTree::open_node(page_id_t pid) const {
 template <typename T>
 struct Wrapper {
     static void instantiate() {
-        T* dummy = nullptr;
-        BPlusTree::seek_slot<T>(nullptr, *dummy);
-        BPlusTree bp_tree{nullptr, 0, 0};
-        bp_tree.seek_leaf<T>(*dummy);
-        LeafNode* dummy_leaf = nullptr;
-        bp_tree.insert_into<T>(dummy_leaf, 0, {});
-        bp_tree.erase_from<T>(dummy_leaf, 0);
-        std::unique_ptr<InternalNode> dummy_internal;
-        bp_tree.insert_into<T>(
-            static_cast<std::unique_ptr<InternalNode>&&>(dummy_internal), 0,
-            *dummy, 0
-        );
-        bp_tree.erase_from<T>(
-            static_cast<std::unique_ptr<InternalNode>&&>(dummy_internal), 0
-        );
+        (void)&BPlusTree::seek_slot<T>;
+        (void)&BPlusTree::seek_leaf<T>;
+        (void)static_cast<void (BPlusTree::*)(LeafNode*, BPlusTree::size_t, span<std::byte>)>(&BPlusTree::template insert_into<T>);
+        (void)static_cast<void (BPlusTree::*)(LeafNode*, BPlusTree::size_t)>(&BPlusTree::template erase_from<T>);
+        (void)static_cast<void (BPlusTree::*)(std::unique_ptr<InternalNode>, BPlusTree::size_t, const T&, page_id_t)>(&BPlusTree::template insert_into<T>);
+        (void)static_cast<void (BPlusTree::*)(std::unique_ptr<InternalNode>, BPlusTree::size_t)>(&BPlusTree::template erase_from<T>);
     }
 };
 

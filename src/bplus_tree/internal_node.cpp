@@ -79,11 +79,10 @@ Key InternalNode::take_front(
 template <typename T>
 struct Wrapper {
     static void instantiate() {
-        T* dummy = nullptr;
-        InternalNode::split<T>(nullptr, nullptr);
-        InternalNode::merge<T>(nullptr, nullptr, *dummy);
-        InternalNode::take_back<T>(nullptr, nullptr, *dummy);
-        InternalNode::take_front<T>(nullptr, nullptr, *dummy);
+        (void)&InternalNode::split<T>;
+        (void)&InternalNode::merge<T>;
+        (void)&InternalNode::take_back<T>;
+        (void)&InternalNode::take_front<T>;
     }
 };
 
