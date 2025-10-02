@@ -36,7 +36,7 @@ public:
         std::vector<Column> columns;
         columns.reserve(names.size());
         std::size_t offset = sizes[primary_index];
-        for (int i = 0; i < columns.size(); i++) {
+        for (int i = 0; i < names.size(); i++) {
             if (i == primary_index)
                 columns.push_back({names[i], types[i], 0, sizes[i]});
             else {
