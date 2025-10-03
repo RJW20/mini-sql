@@ -27,6 +27,9 @@ public:
         return (*this)[schema_->index_of(name)];
     }
 
+    auto begin() const { return fields_.begin(); }
+    auto end() const { return fields_.end(); }
+
     RowView serialise() const;
 
 private:
