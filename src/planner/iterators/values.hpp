@@ -22,13 +22,14 @@ public:
     void open() override {}
 
     bool next() override {
-        if (!(++pos_ < values_.size())) return false;
+        if (pos_ + 1 == values_.size()) return false;
+        pos_++;
         count_++;
         return true;
     }
 
     RowView current() override {
-        return Row{std::move(values_[pos_]), schema_}.serialise();
+        return Row{values_[pos_], schema_}.serialise();
     }
 
     void close() override { values_.clear(); }
