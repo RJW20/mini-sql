@@ -4,6 +4,9 @@
 
 namespace minisql {
 
-DatabaseHandle::~DatabaseHandle() { engine_.release_database(path_); }
+DatabaseHandle::~DatabaseHandle() {
+    db_.reset();
+    engine_.release_database(path_);
+}
 
 } // namespace minisql
