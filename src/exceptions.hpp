@@ -67,7 +67,7 @@ public:
     TableNameException(const std::string& name, bool exists)
         : InvalidQueryException(
             "Invalid table name: " + name +
-            (exists ? "already exists." : "does not exist.")
+            (exists ? " already exists." : " does not exist.")
         ) {}
 };
 
