@@ -66,18 +66,18 @@ private:
         validate();
         if (eof_) throw DBConstraintViolation("Delete failed: at eof.");
         if (slot_ + 1 != leaf_node_->size()) {
-            Key next_key = leaf_node_->key<Key>(slot_ + 1);
+            origin_ = leaf_node_->key<Key>(slot_ + 1);
             bp_tree_->erase_from<Key>(leaf_node_.get(), slot_);
-            seek__<Key>(next_key);
+            leaf_node_ = nullptr;
             return;
         }
         if (!leaf_node_->is_rightmost()) {
             std::unique_ptr<LeafNode> next_leaf = bp_tree_->open_leaf(
                 leaf_node_->next_leaf()
             );
-            Key next_key = next_leaf->key<Key>(0);
+            origin_ = next_leaf->key<Key>(0);
             bp_tree_->erase_from<Key>(leaf_node_.get(), slot_);
-            seek__<Key>(next_key);
+            leaf_node_ = nullptr;
             return;
         }
         bp_tree_->erase_from<Key>(leaf_node_.get(), slot_);
