@@ -46,7 +46,7 @@ public:
         return (*this)[schema_->index_of(name)];
     }
 
-    Field primary() const { return (*this)[0]; }
+    Field primary() const { return (*this)[schema_->primary().name]; }
 
     void set_field(std::size_t index, const Field& field) {
         const Schema::Column* column = (*schema_)[index];

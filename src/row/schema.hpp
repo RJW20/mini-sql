@@ -75,10 +75,14 @@ public:
 
     Schema project(const std::vector<std::string>& column_names) const {
         std::vector<Column> projection;
+        std::size_t new_primary_index {0};
         projection.reserve(column_names.size());
-        for (const std::string& column_name : column_names)
+        for (int i = 0; i < column_names.size(); i++) {
+            const std::string& column_name = column_names[i];
             projection.push_back(columns_[name_to_index_.at(column_name)]);
-        return Schema{std::move(projection), 0};
+            if (column_name == primary().name) new_primary_index = i;
+        }     
+        return Schema{std::move(projection), new_primary_index};
     }
 
 private:
