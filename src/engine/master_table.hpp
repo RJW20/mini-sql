@@ -63,7 +63,7 @@ inline std::string build_insert_statement(
 ) {
     std::ostringstream sql;
     sql << "INSERT INTO " << master_table::NAME << " VALUES ("
-        << "\"" << table_name << "\", \"" << create_sql << "\", " << root << ", "
+        << "\'" << table_name << "\', \'" << create_sql << "\', " << root << ", "
         << next_rowid << ");";
     return sql.str();
 }
