@@ -161,7 +161,7 @@ void Parser::tokenise(std::string_view sql) {
             );
         }
 
-        else if (c == '\'' || c == '"') {
+        else if (c == '"') {
             std::size_t start = ++i;
             while (i < sql.size() && sql[i] != c) i++;
             tokens_.push_back(

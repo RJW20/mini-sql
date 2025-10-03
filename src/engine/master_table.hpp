@@ -63,7 +63,7 @@ inline std::string build_insert_statement(
 ) {
     std::ostringstream sql;
     sql << "INSERT INTO " << master_table::NAME << " VALUES ("
-        << "\'" << table_name << "\', \'" << create_sql << "\', " << root << ", "
+        << "\"" << table_name << "\", \"" << create_sql << "\", " << root << ", "
         << next_rowid << ");";
     return sql.str();
 }
@@ -83,8 +83,8 @@ inline std::string build_update_statement(
         sql << column << " = " << value;
         first = false;
     }
-    sql << " WHERE " << columns::TABLE_NAME.name << " = '" << table_name
-        << "';";
+    sql << " WHERE " << columns::TABLE_NAME.name << " = \"" << table_name
+        << "\";";
     return sql.str();
 }
 
