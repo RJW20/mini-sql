@@ -154,11 +154,10 @@ SelectQuery validate(const parser::SelectAST& ast, const Catalog& catalog) {
 
     if (ast.columns.size() == 1 && ast.columns[0] == defaults::ALL_COLUMNS) {
         if (table->schema->primary().name == defaults::primary::NAME) {
-            int i = 0;
-            while (const Schema::Column* column = (*(table->schema))[i]) {
+            for (int i = 0; i < table->schema->size(); i++) {
+            const Schema::Column* column = (*(table->schema))[i];
                 if (column->name != defaults::primary::NAME)
                     query.columns.push_back(column->name);
-                i++;
             }
         }
         else query.columns.push_back(defaults::ALL_COLUMNS);
@@ -195,7 +194,8 @@ InsertQuery validate(
     Schema* projected_schema;
     if (!(ast.columns.size() == 1 && ast.columns[0] == defaults::ALL_COLUMNS))
     {
-        if (ast.columns.size() != table->schema->size())
+        if (ast.columns.size() != table->schema->size() &&
+            table->schema->primary().name != defaults::primary::NAME)
             throw ColumnNameException(
                 "", ColumnNameException::Reason::INCOMPLETE
             );
