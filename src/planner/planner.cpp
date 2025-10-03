@@ -45,15 +45,20 @@ std::unique_ptr<TableScan> make_scan(
 
     for (const validator::Condition& condition : conditions) {
 
-        if (condition.column != schema.primary().name)
+        if (condition.column != schema.primary().name) {
             filter_conditions.push_back(condition);
+            continue;
+        }
 
         if (condition.op == validator::Condition::Operator::EQ) {
             if (!scan) scan = std::make_unique<IndexScan>(
                 std::move(cursor), schema, condition.value, true,
                 condition.value, true
             );
-            else filter_conditions.push_back(condition);
+            else {
+                filter_conditions.push_back(condition);
+                continue;
+            }
         }
 
         if (condition.op == validator::Condition::Operator::NEQ) {
