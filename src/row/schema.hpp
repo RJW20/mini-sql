@@ -68,7 +68,7 @@ public:
 
     std::size_t size() const { return columns_.size(); }
     std::size_t row_size() const { 
-        std::size_t row_size;
+        std::size_t row_size {0};
         for (const Column& column : columns_) row_size += column.size;
         return row_size;
     }
