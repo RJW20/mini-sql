@@ -193,18 +193,18 @@ Condition Parser::parse_condition() {
         condition.op = Condition::Operator::NEQ;
     }
     else if (t.text == ">") {
-        if (!match(TokenType::OPERATOR))
+        if (peek().type != TokenType::OPERATOR)
             condition.op = Condition::Operator::GT;
         else {
-            if (peek().text != "=") raise_exception();
+            if (advance().text != "=") raise_exception();
             condition.op = Condition::Operator::GTE;
         }
     }
     else if (t.text == "<") {
-        if (!match(TokenType::OPERATOR))
+        if (peek().type != TokenType::OPERATOR)
             condition.op = Condition::Operator::LT;
         else {
-            if (peek().text != "=") raise_exception();
+            if (advance().text != "=") raise_exception();
             condition.op = Condition::Operator::LTE;
         }
     }
