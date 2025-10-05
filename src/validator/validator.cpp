@@ -194,11 +194,18 @@ InsertQuery validate(
     Schema* projected_schema;
     if (!(ast.columns.size() == 1 && ast.columns[0] == defaults::ALL_COLUMNS))
     {
-        if (ast.columns.size() != table->schema->size() &&
-            table->schema->primary().name != defaults::primary::NAME)
-            throw ColumnNameException(
-                "", ColumnNameException::Reason::INCOMPLETE
-            );
+        if (table->schema->primary().name != defaults::primary::NAME) {
+            if (ast.columns.size() != table->schema->size())
+                throw ColumnNameException(
+                    "", ColumnNameException::Reason::INCOMPLETE
+                );
+        }
+        else {
+            if (ast.columns.size() != table->schema->size() - 1)
+                throw ColumnNameException(
+                    "", ColumnNameException::Reason::INCOMPLETE
+                );
+        }
         for (const std::string& column : ast.columns) {
             if (!(*(table->schema))[column]) throw ColumnNameException(
                 column, ColumnNameException::Reason::EXISTENCE
