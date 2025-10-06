@@ -1,0 +1,4 @@
+;;;
+;INSERT INTO t VALUES("1;2;3"); INSERT INTO t VALUES("1;", ";2");
+
+;
