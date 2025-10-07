@@ -1,0 +1,68 @@
+#ifndef EXECUTOR_HPP
+#define EXECUTOR_HPP
+
+#include <cstddef>
+#include <optional>
+#include <string>
+#include <memory>
+#include <stdexcept>
+#include <sstream>
+#include <variant>
+
+#include "script_reader.hpp"
+#include "connection.hpp"
+#include "row_set/row_set.hpp"
+#include "row/row.hpp"
+
+/* Executor
+ * Yields output from executing the given script on the given connection. */
+class Executor {
+public:
+    Executor(minisql::ScriptReader& script, minisql::Connection& conn)
+        : script_{script}, conn_{conn} {}
+
+    std::optional<std::string> next() {
+
+        if (row_set_ && row_set_->next())
+            return to_string(row_set_->current());
+            
+        auto statement = script_.next();
+        if (!statement) return std::nullopt;
+        try {
+            if (statement->size() >= 6 &&
+                !statement->compare(0, 6, "SELECT")) {
+                row_set_ = std::make_unique<minisql::RowSet>(
+                    conn_.query(*statement)
+                );
+                row_set_->next();
+                return to_string(row_set_->current());
+            }
+            else {
+                std::size_t affected = conn_.exec(*statement);
+                return std::to_string(affected) +
+                    (affected > 1 ? " rows" : " row") + " affected";
+            }
+        }
+        catch (const std::runtime_error& e) {
+            return std::string("ERROR: ") + e.what();
+        }
+    }
+
+private:
+    minisql::ScriptReader& script_;
+    minisql::Connection& conn_;
+    std::unique_ptr<minisql::RowSet> row_set_ {nullptr};
+
+    static std::string to_string(const minisql::Row& row) {
+        std::ostringstream out;
+        bool first {true};
+        for (const auto& field : row) {
+            if (!first) out << " | ";
+            std::visit([&out](auto&& arg){ out << arg; }, field);
+            first = false;
+        }
+        return out.str();
+    }
+};
+
+#endif // EXECUTOR_HPP
