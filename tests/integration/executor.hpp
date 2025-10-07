@@ -34,8 +34,7 @@ public:
                 row_set_ = std::make_unique<minisql::RowSet>(
                     conn_.query(*statement)
                 );
-                row_set_->next();
-                return to_string(row_set_->current());
+                return next();
             }
             else {
                 std::size_t affected = conn_.exec(*statement);
