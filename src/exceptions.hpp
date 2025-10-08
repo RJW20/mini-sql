@@ -111,7 +111,7 @@ public:
 
     FieldTypeException(FieldType expected, FieldType actual)
         : InvalidQueryException(
-            "Invalid Field type: expected " + to_string(expected) + ", got" +
+            "Invalid Field type: expected " + to_string(expected) + ", got " +
             to_string(actual) + "."
         ) {}
 
@@ -129,17 +129,18 @@ private:
 // UnrecognisedSQLException for unsupported or invalid SQL tokens.
 class UnrecognisedSQLException : public std::runtime_error {
 public:
-    UnrecognisedSQLException(const std::string& sql) : std::runtime_error(
-        "Unsupported or invalid SQL token: " + sql + "."
+    UnrecognisedSQLException(const std::string& token) : std::runtime_error(
+        "Unsupported or invalid SQL token: " + token + "."
     ) {}
 };
 
 // InvalidSQLException for invalid SQL statements.
 class InvalidSQLException : public std::runtime_error {
 public:
-    InvalidSQLException(const std::string& sql) : std::runtime_error(
-        "Invalid SQL statement: " + sql + "."
-    ) {}
+    InvalidSQLException(const std::string& sql, const std::string& token)
+        : std::runtime_error(
+            "Invalid SQL statement: " + sql + " near \'" + token + "\'."
+        ) {}
 };
 
 } // namespace minisql

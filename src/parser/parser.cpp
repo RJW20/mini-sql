@@ -85,7 +85,9 @@ private:
     UpdateAST parse_update();
     DeleteAST parse_delete();
 
-    void raise_exception() { throw InvalidSQLException(std::string(sql_)); }
+    void raise_exception() {
+        throw InvalidSQLException(std::string(sql_), peek().text);
+    }
 };
 
 // Populate tokens with a sequence of Tokens formed from sql.
@@ -216,7 +218,7 @@ Condition Parser::parse_condition() {
 
 // Return a Modification built from the immediate tokens.
 Modification Parser::parse_modification() {
-    
+
     Modification modification = {parse_identifier()};
     if (expect(TokenType::OPERATOR).text != "=") raise_exception();
 
@@ -236,7 +238,9 @@ Modification Parser::parse_modification() {
             else if (t.type == TokenType::STAR)
                 modification.op = Modification::Operator::MUL;
             else raise_exception();
-            modification.value = parse_value();
+            if (peek().type == TokenType::IDENTIFIER)
+                modification.value = parse_identifier();
+            else modification.value = parse_value();
         }
         else {
             modification.op = Modification::Operator::EQ;
