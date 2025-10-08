@@ -16,8 +16,6 @@ public:
     Project(std::unique_ptr<Iterator> child, std::shared_ptr<Schema> schema)
         : child_{std::move(child)}, projected_schema_{std::move(schema)} {}
 
-    void open() override { child_->open(); }
-
     bool next() override {
         if (!child_->next()) return false;
         count_++;
@@ -27,8 +25,6 @@ public:
     RowView current() override {
         return RowView{child_->current().data(), projected_schema_};
     }
-
-    void close() override { child_->close(); }
 
 private:
     std::unique_ptr<Iterator> child_;

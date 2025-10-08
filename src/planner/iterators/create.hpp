@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <utility>
+#include <optional>
 
 #include "planner/iterators/iterator.hpp"
 #include "catalog/table.hpp"
@@ -18,10 +19,7 @@ public:
     Create(
         Catalog& catalog, const std::string& table,
         std::unique_ptr<Schema> schema
-    ) : catalog_{catalog}, table_{table}, schema_{std::move(schema)}
-        {}
-
-    void open() override {}
+    ) : catalog_{catalog}, table_{table}, schema_{std::move(schema)} {}
 
     bool next() override {
         if (created_) return false;
@@ -31,8 +29,6 @@ public:
     }
 
     RowView current() override { return RowView{{}, nullptr}; }
-
-    void close() override {}
 
 private:
     Catalog& catalog_;

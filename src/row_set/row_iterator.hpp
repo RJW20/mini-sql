@@ -56,7 +56,6 @@ private:
             valid_ = true;
         }
         else {
-            if (it_) it_->close();
             it_ = nullptr;
             current_ = {{}, nullptr};
             valid_ = false;

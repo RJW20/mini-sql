@@ -19,8 +19,6 @@ public:
         std::vector<std::vector<Field>> values, std::shared_ptr<Schema> schema
     ) : values_{std::move(values)}, schema_{std::move(schema)} {}
 
-    void open() override {}
-
     bool next() override {
         if (pos_ + 1 == values_.size()) return false;
         pos_++;
@@ -31,8 +29,6 @@ public:
     RowView current() override {
         return Row{values_[pos_], schema_}.serialise();
     }
-
-    void close() override { values_.clear(); }
 
 private:
     std::vector<std::vector<Field>> values_;

@@ -16,8 +16,6 @@ public:
     Erase(std::unique_ptr<Iterator> child, Cursor* cursor)
         : child_{std::move(child)}, cursor_{cursor} {}
 
-    void open() override { child_->open(); }
-
     bool next() override {
         if (!child_->next()) return false;
         cursor_->erase();
@@ -26,8 +24,6 @@ public:
     }
 
     RowView current() override { return child_->current(); }
-
-    void close() override { child_->close(); }
 
 private:
     std::unique_ptr<Iterator> child_;

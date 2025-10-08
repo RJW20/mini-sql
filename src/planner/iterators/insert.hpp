@@ -17,11 +17,6 @@ public:
         std::unique_ptr<Iterator> child, std::unique_ptr<Cursor> cursor
     ) : child_{std::move(child)}, cursor_{std::move(cursor)} {}
 
-    void open() override {
-        child_->open();
-        cursor_->open();
-    }
-
     bool next() override {
         if (!child_->next()) return false;
         RowView rv = child_->current();
@@ -32,11 +27,6 @@ public:
     }
 
     RowView current() override { return cursor_->current(); }
-
-    void close() override {
-        child_->close();
-        cursor_->close();
-    }
 
 private:
     std::unique_ptr<Iterator> child_;

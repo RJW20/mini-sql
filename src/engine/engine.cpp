@@ -110,9 +110,7 @@ std::size_t Engine::exec(
     parser::AST ast = parser::parse(sql);
     validator::Query query = validator::validate(ast, db, master_enabled);
     planner::Plan plan = planner::plan(query, db);
-    plan->open();
     while (plan->next());
-    plan->close();
     if (std::holds_alternative<validator::CreateQuery>(query)) {
         std::string table_name = std::get<validator::CreateQuery>(query).table;
         const Table* table = db.find_table(table_name);

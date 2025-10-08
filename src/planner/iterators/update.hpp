@@ -16,8 +16,6 @@ public:
     Update(std::unique_ptr<Iterator> child, Modifier modifier)
         : child_{std::move(child)}, modifier_{std::move(modifier)} {}
 
-    void open() override { child_->open(); }
-
     bool next() override {
         if (!child_->next()) return false;
         RowView current = child_->current();
@@ -27,8 +25,6 @@ public:
     }
 
     RowView current() override { return child_->current(); }
-
-    void close() override { child_->close(); }
 
 private:
     std::unique_ptr<Iterator> child_;

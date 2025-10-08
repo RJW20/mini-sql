@@ -27,8 +27,6 @@ public:
     void insert(const RowView& rv) { (this->*insert_)(rv); }
     void erase() { (this->*erase_)(); }
 
-    void close();
-
 private:
     BPlusTree* bp_tree_;
     std::shared_ptr<Schema> schema_;

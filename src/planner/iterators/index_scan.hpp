@@ -4,32 +4,45 @@
 #include <memory>
 #include <optional>
 #include <utility>
+#include <climits>
+#include <cfloat>
 #include <functional>
 
-#include "planner/iterators/table_scan.hpp"
+#include "planner/iterators/iterator.hpp"
 #include "cursor.hpp"
 #include "row/schema.hpp"
 #include "field/field.hpp"
 #include "planner/compiler.hpp"
+#include "field/varchar.hpp"
 
 namespace minisql::planner {
 
 // Outputs Rows in a B+ Tree with primary index between bounds.
-class IndexScan : public TableScan {
+class IndexScan : public Iterator {
 public:
     IndexScan(
         std::unique_ptr<Cursor> cursor, const Schema& schema,
         std::optional<Field> lb, bool inclusive_lb, std::optional<Field> ub,
         bool inclusive_ub 
-    ) : TableScan{std::move(cursor), schema}, lb_{std::move(lb)},
-        inclusive_lb_{inclusive_lb}, ub_{std::move(ub)},
+    ) : cursor_{std::move(cursor)}, schema_{std::move(schema)},
+        lb_{std::move(lb)}, inclusive_lb_{inclusive_lb}, ub_{std::move(ub)},
         inclusive_ub_{inclusive_ub},
-        less_than_{compile_less_than(schema_.primary().type)} {}
-        
-    void open() override {
-        if (lb_) cursor_->open(*lb_);
-        else TableScan::open();
-     }
+        less_than_{compile_less_than(schema_.primary().type)} {
+            if (lb_) cursor_->seek(*lb_);
+            else {
+                switch (schema_.primary().type) {
+                    case FieldType::INT:
+                        cursor_->open(INT_MIN);
+                        break;
+                    case FieldType::REAL:
+                        cursor_->open(DBL_MIN);
+                        break;
+                    case FieldType::TEXT:
+                        cursor_->open(VCHR_MIN);
+                        break;
+                }
+            }
+        }
 
     bool next() override {
         if (!cursor_->next()) return false;
@@ -44,7 +57,11 @@ public:
         return true;
     }
 
+    RowView current() override { return cursor_->current(); }
+
 private:
+    std::unique_ptr<Cursor> cursor_;
+    const Schema& schema_;
     std::optional<Field> lb_;
     bool inclusive_lb_;
     std::optional<Field> ub_;

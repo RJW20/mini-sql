@@ -19,21 +19,19 @@ namespace minisql::planner {
 class TableScan : public Iterator {
 public:
     TableScan(std::unique_ptr<Cursor> cursor, const Schema& schema)
-        : cursor_{std::move(cursor)}, schema_{schema} {}
-
-    void open() override {
-        switch (schema_.primary().type) {
-            case FieldType::INT:
-                cursor_->open(INT_MIN);
-                break;
-            case FieldType::REAL:
-                cursor_->open(DBL_MIN);
-                break;
-            case FieldType::TEXT:
-                cursor_->open(VCHR_MIN);
-                break;
+        : cursor_{std::move(cursor)}, schema_{schema} {
+            switch (schema_.primary().type) {
+                case FieldType::INT:
+                    cursor_->open(INT_MIN);
+                    break;
+                case FieldType::REAL:
+                    cursor_->open(DBL_MIN);
+                    break;
+                case FieldType::TEXT:
+                    cursor_->open(VCHR_MIN);
+                    break;
+            }
         }
-    }
 
     bool next() override {
         if (!cursor_->next()) return false;
@@ -42,8 +40,6 @@ public:
     }
 
     RowView current() override { return cursor_->current(); }
-
-    void close() override { cursor_->close(); }
 
 protected:
     std::unique_ptr<Cursor> cursor_;

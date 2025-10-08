@@ -16,8 +16,6 @@ public:
     Filter(std::unique_ptr<Iterator> child, Predicate predicate)
         : child_{std::move(child)}, predicate_{std::move(predicate)} {}
 
-    void open() override { child_->open(); }
-
     bool next() override {
         while (child_->next())
             if (predicate_(child_->current())) {
@@ -28,8 +26,6 @@ public:
     }
 
     RowView current() override { return child_->current(); }
-
-    void close() override { child_->close(); }
 
 private:
     std::unique_ptr<Iterator> child_;

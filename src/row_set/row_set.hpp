@@ -12,11 +12,11 @@ namespace minisql {
  * Wrapper over a Plan. */
 class RowSet {
 public:
-    explicit RowSet(planner::Plan plan) : plan_{std::move(plan)} {
-        plan_->open();
-    }
+    explicit RowSet(planner::Plan plan) : plan_{std::move(plan)} {}
 
-    RowIterator begin() { return RowIterator{plan_.get()}; }
+    RowIterator begin() {
+        return plan_ ? RowIterator{plan_.get()} : RowIterator{};
+    }
     RowIterator end() { return RowIterator{}; }
 
     bool next() { return (plan_ && plan_->next()); }

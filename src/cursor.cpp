@@ -51,21 +51,11 @@ bool Cursor::next() {
 }
 
 /* Return the current slot as a RowView.
- * Validates the Cursor before reading from the current slot.*/
+ * Validates the Cursor before reading from the current slot. */
 RowView Cursor::current() {
     validate();
     if (eof_) throw DBConstraintViolation("Select failed: at eof.");
     return RowView{leaf_node_->slot(slot_), schema_};
-}
-
-
-// Remove access to bp_tree_ and close leaf_node_.
-void Cursor::close() {
-    bp_tree_ = nullptr;
-    schema_ = nullptr;
-    origin_ = 0;
-    eof_ = true;
-    if (leaf_node_) leaf_node_.reset();
 }
 
 /* Validate the current position of the Cursor.

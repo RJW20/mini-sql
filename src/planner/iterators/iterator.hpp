@@ -11,10 +11,8 @@ namespace minisql::planner {
 class Iterator {
 public:
     virtual ~Iterator() = default;
-    virtual void open() = 0;
     virtual bool next() = 0;
     virtual RowView current() = 0;
-    virtual void close() = 0;
     std::size_t count() const { return count_; }
     
 protected:

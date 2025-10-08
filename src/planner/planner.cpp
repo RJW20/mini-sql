@@ -31,7 +31,7 @@ namespace {
  * cursor corresponds to.
  * Iterates through conditions and applies them to the primary index directly
  * via an IndexScan or copies them into filter_conditions. */
-std::unique_ptr<TableScan> make_scan(
+Plan make_scan(
     std::unique_ptr<Cursor> cursor, const Schema& schema, 
     const std::vector<validator::Condition>& conditions,
     std::vector<validator::Condition>& filter_conditions
@@ -39,7 +39,7 @@ std::unique_ptr<TableScan> make_scan(
     if (conditions.empty())
         return std::make_unique<TableScan>(std::move(cursor), schema);
 
-    std::unique_ptr<TableScan> scan;
+    Plan scan;
     std::optional<validator::Condition> lower_bound;
     std::optional<validator::Condition> upper_bound;
 
