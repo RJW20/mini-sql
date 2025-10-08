@@ -24,9 +24,9 @@ public:
     void open() override {}
 
     bool next() override {
-        if (count_) return false;
+        if (created_) return false;
         catalog_.add_table(table_, std::move(schema_));
-        count_++;
+        created_ = true;
         return true;
     }
 
@@ -38,6 +38,7 @@ private:
     Catalog& catalog_;
     std::string table_;
     std::unique_ptr<Schema> schema_;
+    bool created_ {false};
 };
 
 } // namespace minisql::planner

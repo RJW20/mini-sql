@@ -39,7 +39,7 @@ public:
             else {
                 std::size_t affected = conn_.exec(*statement);
                 return std::to_string(affected) +
-                    (affected > 1 ? " rows" : " row") + " affected";
+                    (affected == 1 ? " row" : " rows") + " affected";
             }
         }
         catch (const std::runtime_error& e) {
