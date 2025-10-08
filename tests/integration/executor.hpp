@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <optional>
 #include <string>
-#include <memory>
 #include <stdexcept>
 #include <sstream>
 #include <variant>
@@ -23,17 +22,14 @@ public:
 
     std::optional<std::string> next() {
 
-        if (row_set_ && row_set_->next())
-            return to_string(row_set_->current());
+        if (row_set_.next()) return to_string(row_set_.current());
             
         auto statement = script_.next();
         if (!statement) return std::nullopt;
         try {
             if (statement->size() >= 6 &&
                 !statement->compare(0, 6, "SELECT")) {
-                row_set_ = std::make_unique<minisql::RowSet>(
-                    conn_.query(*statement)
-                );
+                row_set_ = conn_.query(*statement);
                 return next();
             }
             else {
@@ -50,7 +46,7 @@ public:
 private:
     minisql::ScriptReader& script_;
     minisql::Connection& conn_;
-    std::unique_ptr<minisql::RowSet> row_set_ {nullptr};
+    minisql::RowSet row_set_ {};
 
     static std::string to_string(const minisql::Row& row) {
         std::ostringstream out;
