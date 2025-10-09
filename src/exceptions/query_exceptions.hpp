@@ -55,8 +55,7 @@ public:
 // Thrown when a column or columns are not referenced.
 class MissingColumnException : public ColumnException {
 public:
-    explicit MissingColumnException()
-        : ColumnException("incomplete column list") {}
+    MissingColumnException() : ColumnException("incomplete column list") {}
 };
 
 // Thrown when a value is added to a column of non-matching type.
@@ -73,6 +72,12 @@ class ConstantColumnException : public ColumnException {
 public:
     explicit ConstantColumnException(const std::string& column)
         : ColumnException("column \"" + column + "\" cannot be modified") {}
+};
+
+// Thrown when not enough values are provided.
+class MissingValueException : public QueryException {
+public:
+    MissingValueException() : QueryException("incomplete values list") {}
 };
 
 } // namespace minisql

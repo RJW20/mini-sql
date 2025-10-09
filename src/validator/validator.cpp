@@ -178,6 +178,7 @@ SelectQuery validate(const parser::SelectAST& ast, const Catalog& catalog) {
 /* Return a validated InsertQuery from the given parser::InsertAST while:
  * - Verifying table's existence.
  * - Asserting table is not the master table if not enabled.
+ * - Asserting all values are present.
  * - Asserting all columns are present.
  * - Validating all values.
  * - Appending defualt values if the primary column is the default. */
@@ -189,24 +190,22 @@ InsertQuery validate(
         throw TableException(ast.table, false);
     InsertQuery query = {ast.table};
 
-    Schema* projected_schema;
+    bool use_rowid = table->schema->primary().name == defaults::primary::NAME;
+    std::size_t required_columns = use_rowid ?
+        table->schema->size() - 1 : table->schema->size();
     if (!(ast.columns.size() == 1 && ast.columns[0] == defaults::ALL_COLUMNS))
     {
-        if (table->schema->primary().name != defaults::primary::NAME) {
-            if (ast.columns.size() != table->schema->size())
-                throw MissingColumnException();
-        }
-        else {
-            if (ast.columns.size() != table->schema->size() - 1)
-                throw MissingColumnException();
-        }
+        if (ast.columns.size() != required_columns)
+            throw MissingColumnException();
         for (const std::string& column : ast.columns) {
             if (!(*(table->schema))[column])
                 throw ColumnNotFoundException(column);
             query.columns.push_back(column);
         }
-        bool use_rowid =
-            table->schema->primary().name == defaults::primary::NAME;
+        for (const std::vector<parser::Value>& row : ast.values)
+            if (row.size() != required_columns)
+                throw MissingValueException();
+        
         if (use_rowid) query.columns.push_back(defaults::primary::NAME);
 
         std::vector<Field> validated_row;
@@ -226,8 +225,9 @@ InsertQuery validate(
     }
     else {
         query.columns.push_back(defaults::ALL_COLUMNS);
-        bool use_rowid =
-            table->schema->primary().name == defaults::primary::NAME;
+        for (const std::vector<parser::Value>& row : ast.values)
+            if (row.size() != required_columns)
+                throw MissingValueException();
         
         std::vector<Field> validated_row;
         validated_row.reserve(table->schema->size());
