@@ -6,10 +6,10 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
-#include <stdexcept>
 
 #include "frame_manager/disk_manager/disk_manager.hpp"
 #include "frame_manager/cache/frame_view.hpp"
+#include "exceptions/engine_exceptions.hpp"
 
 #include "utils.hpp"
 
@@ -52,7 +52,7 @@ void test_pin() {
             cache.pin(cache.capacity());
             assert(false);
         }
-        catch (const std::runtime_error&) {}
+        catch (const CacheCapacityException&) {}
         fvs.clear();
         for (page_id_t pid = cache.capacity(); pid < disk.page_count(); pid++)
             assert(cache.pin(pid).pid() == pid);
@@ -84,14 +84,14 @@ void test_unpin() {
             cache.unpin(0, false);
             assert(false);
         }
-        catch (const std::logic_error&) {}
+        catch (const CacheUnpinException&) {}
 
         try {
             cache.pin(0);
             cache.unpin(0, false);
             assert(false);
         }
-        catch (const std::logic_error&) {}
+        catch (const CacheUnpinException&) {}
 
         std::vector<FrameView> fvs;
         for (page_id_t pid = 0; pid < cache.capacity(); pid++)

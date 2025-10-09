@@ -11,7 +11,7 @@
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "headers.hpp"
 #include "byte_io.hpp"
-#include "exceptions.hpp"
+#include "exceptions/engine_exceptions.hpp"
 #include "frame_manager/frame_manager.hpp"
 #include "row/schema.hpp"
 #include "catalog/table.hpp"
@@ -45,8 +45,7 @@ Database::Database(const std::filesystem::path& path) {
         Magic magic = byte_io::view<Magic>(
             db_header, DatabaseHeader::MAGIC_OFFSET
         );
-        if (magic != Magic::DATABASE)
-            throw InvalidMagicException(magic);
+        if (magic != Magic::DATABASE) throw MagicException(magic);
         page_count = byte_io::view<page_id_t>(
             db_header, DatabaseHeader::PAGE_COUNT_OFFSET
         );

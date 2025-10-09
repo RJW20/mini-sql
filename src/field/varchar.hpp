@@ -6,10 +6,10 @@
 #include <memory>
 #include <utility>
 #include <algorithm>
-#include <stdexcept>
 
 #include "byte_io.hpp"
 #include "span.hpp"
+#include "exceptions/engine_exceptions.hpp"
 
 namespace minisql {
 
@@ -116,21 +116,21 @@ const Varchar VCHR_MIN("", 0);
 // ----------------------------------------------------------------------------
 
 template <>
-inline const Varchar byte_io::view<Varchar>(
-    span<std::byte> bytes, std::size_t offset, std::size_t size
-) {
-    if (offset + size > bytes.size())
-        throw std::out_of_range("byte_io view error");
-    return Varchar(reinterpret_cast<char*>(bytes.data() + offset), size);
-}
-
-template <>
 inline Varchar byte_io::copy<Varchar>(
     span<std::byte> bytes, std::size_t offset, std::size_t size
 ) {
     if (offset + size > bytes.size())
-        throw std::out_of_range("byte_io copy error");
+        throw ByteIOException("copy", offset + size, bytes.size());
     return Varchar(reinterpret_cast<const char*>(bytes.data() + offset), size);
+}
+
+template <>
+inline const Varchar byte_io::view<Varchar>(
+    span<std::byte> bytes, std::size_t offset, std::size_t size
+) {
+    if (offset + size > bytes.size())
+        throw ByteIOException("view", offset + size, bytes.size());
+    return Varchar(reinterpret_cast<char*>(bytes.data() + offset), size);
 }
 
 template <>
@@ -139,9 +139,18 @@ inline void byte_io::write<Varchar>(
 ) {
     const std::size_t size = v.size();
     if (offset + size > bytes.size())
-        throw std::out_of_range("byte_io write error");
+        throw ByteIOException("write", offset + size, bytes.size());
     std::memcpy(bytes.data() + offset, v.data(), size);
 }
+
+template <>
+class DuplicateKeyException<Varchar> : public CursorException {
+public:
+    explicit DuplicateKeyException(const Varchar& key)
+        : CursorException(
+            "key + \"" + std::string(key.data()) + "\" already exists"
+        ) {}
+};
 
 } // namespace minisql
 

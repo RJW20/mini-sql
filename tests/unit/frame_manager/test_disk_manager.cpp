@@ -6,10 +6,9 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
-#include <stdexcept>
 
 #include "frame_manager/disk_manager/page_id_t.hpp"
-#include "exceptions.hpp"
+#include "exceptions/engine_exceptions.hpp"
 #include "byte_io.hpp"
 
 #include "utils.hpp"
@@ -72,7 +71,7 @@ void test_write_read() {
                 byte_io::write<double>(src, i, i);
                 i = i + sizeof(double);
             }
-            catch (const std::out_of_range&) { break; }
+            catch (const ByteIOException&) { break; }
         }
         disk.write(0, src.data());
         std::vector<std::byte> dst(page_size);

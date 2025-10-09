@@ -10,7 +10,7 @@
 #include "frame_manager/cache/frame_view.hpp"
 #include "byte_io.hpp"
 #include "headers.hpp"
-#include "exceptions.hpp"
+#include "exceptions/engine_exceptions.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
 
 using namespace minisql;
@@ -32,7 +32,7 @@ void test_constructor() {
         FreeListBlock block{FrameView{nullptr, &f}};
         assert(false);
     }
-    catch (const InvalidMagicException&) {}
+    catch (const MagicException&) {}
     std::cout << "- test_constructor passed" << std::endl;
 }
 

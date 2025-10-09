@@ -6,11 +6,11 @@
 #include <algorithm>
 #include <vector>
 
+#include "row/schema.hpp"
 #include "field/field.hpp"
 #include "parser/ast.hpp"
-#include "exceptions.hpp"
+#include "exceptions/query_exceptions.hpp"
 #include "validator/query.hpp"
-#include "row/schema.hpp"
 #include "catalog/catalog.hpp"
 #include "engine/master_table.hpp"
 
@@ -20,20 +20,20 @@ namespace {
 
 /* Return a Field of the required type and size obtained from value.
  * Throws a FieldTypeException if not possible. */
-Field validate(const parser::Value& value, FieldType type, std::size_t size) {
-    switch (type) {
+Field validate(const parser::Value& value, const Schema::Column* column) {
+    switch (column->type) {
         case FieldType::INT:
             if (!std::holds_alternative<double>(value))
-                throw FieldTypeException("REAL", "TEXT");
+                throw ColumnTypeException(column->name, "INT");
             return static_cast<int>(std::get<double>(value));
         case FieldType::REAL:
             if (!std::holds_alternative<double>(value))
-                throw FieldTypeException("REAL", "TEXT");
+                throw ColumnTypeException(column->name, "REAL");
             return std::get<double>(value);
         case FieldType::TEXT:
             if (!std::holds_alternative<std::string>(value))
-                throw FieldTypeException("TEXT", "REAL");
-            return Varchar{std::get<std::string>(value).data(), size};
+                throw ColumnTypeException(column->name, "TEXT");
+            return Varchar{std::get<std::string>(value).data(), column->size};
     }
     __builtin_unreachable();
 }
@@ -44,14 +44,12 @@ Field validate(const parser::Value& value, FieldType type, std::size_t size) {
 Condition validate(const parser::Condition& condition, const Schema& schema) {
 
     const Schema::Column* column = schema[condition.column];
-    if (!column) throw ColumnNameException(
-        condition.column, ColumnNameException::Reason::EXISTENCE
-    );
+    if (!column) throw ColumnNotFoundException(condition.column);
 
     return {
         condition.column,
         Condition::Operator(static_cast<int>(condition.op)),
-        validate(condition.value, column->type, column->size)
+        validate(condition.value, column)
     };
 }
 
@@ -64,34 +62,36 @@ Modification validate(
     const parser::Modification& modification, const Schema& schema
 ) {
     const Schema::Column* column = schema[modification.column];
-    if (!column) throw ColumnNameException(
-        modification.column, ColumnNameException::Reason::EXISTENCE
-    );
+    if (!column) throw ColumnNotFoundException(modification.column);
 
-    if (column->name == schema.primary().name) throw ColumnNameException(
-        column->name, ColumnNameException::Reason::CONSTANT
-    );
+    if (column->name == schema.primary().name)
+        throw ConstantColumnException(column->name);
 
     if (modification.op != parser::Modification::Operator::EQ &&
         column->type == FieldType::TEXT)
-        throw FieldTypeException("INT/REAL", "TEXT");
+        throw ColumnTypeException(column->name, "TEXT");
 
     std::variant<Field, std::string> value;
     if (std::holds_alternative<parser::Value>(modification.value))
-        value = validate(
-            std::get<parser::Value>(modification.value), column->type,
-            column->size
-        );
+        value = validate(std::get<parser::Value>(modification.value), column);
     else {
         const Schema::Column* value_column = schema[
             std::get<std::string>(modification.value)
         ];
-        if (!value_column) throw ColumnNameException(
-            std::get<std::string>(modification.value),
-            ColumnNameException::Reason::EXISTENCE
-        );
+        if (!value_column)
+            throw ColumnNotFoundException(
+                std::get<std::string>(modification.value)
+            );
         if (value_column->type != column->type)
-            throw FieldTypeException(column->type, value_column->type);
+            switch (column->type) {
+                case FieldType::INT:
+                    throw ColumnTypeException(column->name, "INT");
+                case FieldType::REAL:
+                    throw ColumnTypeException(column->name, "REAL");
+                case FieldType::TEXT:
+                    throw ColumnTypeException(column->name, "TEXT");
+            }
+            
         value = value_column->name;
     }
 
@@ -110,13 +110,13 @@ Modification validate(
 CreateQuery validate(const parser::CreateAST& ast, const Catalog& catalog) {
 
     const Table* table = catalog.find_table(ast.table);
-    if (table) throw TableNameException(ast.table, true);
+    if (table) throw TableException(ast.table, true);
     CreateQuery query = {ast.table};
 
     for (const std::string& column : ast.columns)
-        if (column == defaults::primary::NAME) throw ColumnNameException(
-            column, ColumnNameException::Reason::DISALLOWED
-        );
+        if (column == defaults::primary::NAME)
+            throw ReservedColumnException(column);
+
     query.columns = ast.columns;
     query.types = ast.types;
     query.sizes = ast.sizes;
@@ -126,9 +126,8 @@ CreateQuery validate(const parser::CreateAST& ast, const Catalog& catalog) {
         auto it = std::find(
             query.columns.begin(), query.columns.end(), query.primary
         );
-        if (it == query.columns.end()) throw ColumnNameException(
-            query.primary, ColumnNameException::Reason::EXISTENCE
-        );
+        if (it == query.columns.end())
+            throw ColumnNotFoundException(query.primary);
     }
     else {
         query.columns.push_back(defaults::primary::NAME);
@@ -149,7 +148,7 @@ CreateQuery validate(const parser::CreateAST& ast, const Catalog& catalog) {
 SelectQuery validate(const parser::SelectAST& ast, const Catalog& catalog) {
 
     const Table* table = catalog.find_table(ast.table);
-    if (!table) throw TableNameException(ast.table, false);
+    if (!table) throw TableException(ast.table, false);
     SelectQuery query = {ast.table};
 
     if (ast.columns.size() == 1 && ast.columns[0] == defaults::ALL_COLUMNS) {
@@ -164,9 +163,8 @@ SelectQuery validate(const parser::SelectAST& ast, const Catalog& catalog) {
     }
     else {
         for (const std::string& column : ast.columns) {
-            if (!(*(table->schema))[column]) throw ColumnNameException(
-                column, ColumnNameException::Reason::EXISTENCE
-            );
+            if (!(*(table->schema))[column])
+                throw ColumnNotFoundException(column);
             query.columns.push_back(column);
         }
     }
@@ -188,7 +186,7 @@ InsertQuery validate(
 ) {
     Table* table = catalog.find_table(ast.table);
     if (!table || !master_enabled && ast.table == master_table::NAME)
-        throw TableNameException(ast.table, false);
+        throw TableException(ast.table, false);
     InsertQuery query = {ast.table};
 
     Schema* projected_schema;
@@ -196,20 +194,15 @@ InsertQuery validate(
     {
         if (table->schema->primary().name != defaults::primary::NAME) {
             if (ast.columns.size() != table->schema->size())
-                throw ColumnNameException(
-                    "", ColumnNameException::Reason::INCOMPLETE
-                );
+                throw MissingColumnException();
         }
         else {
             if (ast.columns.size() != table->schema->size() - 1)
-                throw ColumnNameException(
-                    "", ColumnNameException::Reason::INCOMPLETE
-                );
+                throw MissingColumnException();
         }
         for (const std::string& column : ast.columns) {
-            if (!(*(table->schema))[column]) throw ColumnNameException(
-                column, ColumnNameException::Reason::EXISTENCE
-            );
+            if (!(*(table->schema))[column])
+                throw ColumnNotFoundException(column);
             query.columns.push_back(column);
         }
         bool use_rowid =
@@ -223,9 +216,7 @@ InsertQuery validate(
             for (int i = 0; i < row.size(); i++) {
                 const Schema::Column* column =
                     (*(table->schema))[query.columns[i]];
-                validated_row.push_back(
-                    validate(row[i], column->type, column->size)
-                );
+                validated_row.push_back(validate(row[i], column));
             }
             if (use_rowid)
                 validated_row.push_back(static_cast<int>(table->next_rowid++));
@@ -243,9 +234,7 @@ InsertQuery validate(
         for (const std::vector<parser::Value>& row : ast.values) {
             for (int i = 0; i < row.size(); i++) {
                 const Schema::Column* column = (*(table->schema))[i];
-                validated_row.push_back(
-                    validate(row[i], column->type, column->size)
-                );
+                validated_row.push_back(validate(row[i], column));
             }
             if (use_rowid)
                 validated_row.push_back(static_cast<int>(table->next_rowid++));
@@ -267,7 +256,7 @@ UpdateQuery validate(
 ) {
     const Table* table = catalog.find_table(ast.table);
     if (!table || !master_enabled && ast.table == master_table::NAME)
-        throw TableNameException(ast.table, false);
+        throw TableException(ast.table, false);
     UpdateQuery query = {ast.table};
 
     for (const parser::Modification& modification : ast.modifications)
@@ -290,7 +279,7 @@ DeleteQuery validate(
 ) {
     const Table* table = catalog.find_table(ast.table);
     if (!table || !master_enabled && ast.table == master_table::NAME)
-        throw TableNameException(ast.table, false);
+        throw TableException(ast.table, false);
     DeleteQuery query = {ast.table};
 
     for (const parser::Condition& condition : ast.conditions)

@@ -8,7 +8,7 @@
 
 #include "field/field.hpp"
 #include "field/varchar.hpp"
-#include "exceptions.hpp"
+#include "exceptions/engine_exceptions.hpp"
 #include "validator/query.hpp"
 #include "row/schema.hpp"
 #include "row/row_view.hpp"
@@ -38,7 +38,7 @@ std::function<Field(const Field&, const Field&)> compile_addition(
     switch (type) {
         case FieldType::INT: return field_addition<int>;
         case FieldType::REAL: return field_addition<double>;
-        case FieldType::TEXT: throw FieldTypeException("INT/REAL", "TEXT");
+        case FieldType::TEXT: throw CompilationException("addition");
     };
     __builtin_unreachable();
 }
@@ -51,7 +51,7 @@ std::function<Field(const Field&, const Field&)> compile_subtraction(
     switch (type) {
         case FieldType::INT: return field_subtraction<int>;
         case FieldType::REAL: return field_subtraction<double>;
-        case FieldType::TEXT: throw FieldTypeException("INT/REAL", "TEXT");
+        case FieldType::TEXT: throw CompilationException("subtraction");
     };
     __builtin_unreachable();
 }
@@ -64,7 +64,7 @@ std::function<Field(const Field&, const Field&)> compile_multiplication(
     switch (type) {
         case FieldType::INT: return field_multiplication<int>;
         case FieldType::REAL: return field_multiplication<double>;
-        case FieldType::TEXT: throw FieldTypeException("INT/REAL", "TEXT");
+        case FieldType::TEXT: throw CompilationException("multiplication");
     };
     __builtin_unreachable();
 }
@@ -77,7 +77,7 @@ std::function<Field(const Field&, const Field&)> compile_division(
     switch (type) {
         case FieldType::INT: return field_division<int>;
         case FieldType::REAL: return field_division<double>;
-        case FieldType::TEXT: throw FieldTypeException("INT/REAL", "TEXT");
+        case FieldType::TEXT: throw CompilationException("division");
     };
     __builtin_unreachable();
 }

@@ -4,12 +4,12 @@
 #include <cstddef>
 #include <optional>
 #include <string>
-#include <stdexcept>
 #include <sstream>
 #include <variant>
 
 #include "script_reader.hpp"
 #include "connection.hpp"
+#include "exceptions/exception.hpp"
 #include "row_set/row_set.hpp"
 #include "row/row.hpp"
 
@@ -38,7 +38,7 @@ public:
                     (affected == 1 ? " row" : " rows") + " affected";
             }
         }
-        catch (const std::runtime_error& e) {
+        catch (const minisql::Exception& e) {
             return std::string("ERROR: ") + e.what();
         }
     }

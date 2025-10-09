@@ -6,7 +6,7 @@
 #include "frame_manager/cache/frame_view.hpp"
 #include "headers.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
-#include "exceptions.hpp"
+#include "exceptions/engine_exceptions.hpp"
 
 namespace minisql {
 

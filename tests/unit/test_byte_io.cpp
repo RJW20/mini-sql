@@ -7,6 +7,8 @@
 #include <vector>
 #include <typeinfo>
 
+#include "exceptions/engine_exceptions.hpp"
+
 using namespace minisql;
 
 template <typename T>
@@ -26,12 +28,12 @@ void test_out_of_range(T t) {
         byte_io::write<T>(bytes, test_offset, t);
         assert(false);
     }
-    catch (const std::out_of_range&) {}
+    catch (const ByteIOException&) {}
     try {
         byte_io::copy<T>(bytes, test_offset);
         assert(false);
     }
-    catch (const std::out_of_range&) {}
+    catch (const ByteIOException&) {}
     std::cout << "- test_out_of_range passed" << std::endl;
 }
 

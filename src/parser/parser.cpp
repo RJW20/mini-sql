@@ -10,7 +10,7 @@
 #include "parser/ast.hpp"
 #include "parser/token.hpp"
 #include "field/field.hpp"
-#include "exceptions.hpp"
+#include "exceptions/query_exceptions.hpp"
 #include "validator/defaults.hpp"
 
 namespace minisql::parser {
@@ -21,7 +21,7 @@ namespace {
  * Builds an AST corresponding to the input sql by tokenising. */
 class Parser {
 public:
-    Parser(std::string_view sql) : sql_{sql} { tokenise(sql); }
+    Parser(std::string_view sql) { tokenise(sql); }
 
     AST parse() {
         pos_ = 0;
@@ -37,7 +37,6 @@ public:
     }
 
 private:
-    std::string_view sql_;
     std::vector<Token> tokens_;
     std::size_t pos_;
 
@@ -85,9 +84,7 @@ private:
     UpdateAST parse_update();
     DeleteAST parse_delete();
 
-    void raise_exception() {
-        throw InvalidSQLException(std::string(sql_), peek().text);
-    }
+    void raise_exception() { throw SyntaxException(peek().text); }
 };
 
 // Populate tokens with a sequence of Tokens formed from sql.
@@ -179,7 +176,7 @@ void Parser::tokenise(std::string_view sql) {
             i++;
         }
 
-        else throw UnrecognisedSQLException(std::string{static_cast<char>(c)});
+        else throw SyntaxException(std::string{static_cast<char>(c)});
     }
 }
 

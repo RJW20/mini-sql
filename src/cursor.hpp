@@ -9,7 +9,7 @@
 #include "row/row_view.hpp"
 #include "bplus_tree/leaf_node.hpp"
 #include "bplus_tree/node.hpp"
-#include "exceptions.hpp"
+#include "exceptions/engine_exceptions.hpp"
 
 namespace minisql {
 
@@ -31,7 +31,7 @@ private:
     BPlusTree* bp_tree_;
     std::shared_ptr<Schema> schema_;
     Field origin_ {0};
-    bool eof_ {true};
+    bool eot_ {true};
     std::unique_ptr<LeafNode> leaf_node_ {nullptr};
     Node::size_t slot_;
 
@@ -52,17 +52,15 @@ private:
     void insert__(const RowView& rv) {
         if (slot_ < leaf_node_->size() && 
             leaf_node_->key<Key>(slot_) == std::get<Key>(rv.primary()))
-            throw DBConstraintViolation(
-                "Insert failed: primary key already exists."
-            );
+            throw DuplicateKeyException(std::get<Key>(rv.primary()));
         bp_tree_->insert_into<Key>(leaf_node_.get(), slot_, rv.data());
-        if (eof_) eof_ = false;
+        if (eot_) eot_ = false;
     }
 
     template <typename Key>
     void erase__() {
         validate();
-        if (eof_) throw DBConstraintViolation("Delete failed: at eof.");
+        if (eot_) throw EndOfTreeException("erase");
         if (slot_ + 1 != leaf_node_->size()) {
             origin_ = leaf_node_->key<Key>(slot_ + 1);
             bp_tree_->erase_from<Key>(leaf_node_.get(), slot_);
@@ -79,7 +77,7 @@ private:
             return;
         }
         bp_tree_->erase_from<Key>(leaf_node_.get(), slot_);
-        eof_ = true;
+        eot_ = true;
     }
 };
 

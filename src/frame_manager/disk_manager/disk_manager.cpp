@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "frame_manager/disk_manager/page_id_t.hpp"
-#include "exceptions.hpp"
+#include "exceptions/engine_exceptions.hpp"
 
 namespace minisql {
 

@@ -1,11 +1,11 @@
 #include "frame_manager/cache/cache.hpp"
 
 #include <cstddef>
-#include <stdexcept>
 
-#include "frame_manager/disk_manager/page_id_t.hpp"
 #include "frame_manager/cache/frame_view.hpp"
+#include "frame_manager/disk_manager/page_id_t.hpp"
 #include "frame_manager/cache/frame.hpp"
+#include "exceptions/engine_exceptions.hpp"
 
 namespace minisql {
 
@@ -41,12 +41,10 @@ FrameView Cache::pin(page_id_t pid) {
 void Cache::unpin(page_id_t pid, bool dirty) {
 
     auto it = map_.find(pid);
-    if (it == map_.end())
-        throw std::logic_error("unpin: pid not in cache");
+    if (it == map_.end()) throw CacheUnpinException(pid, "not in cache");
 
     Frame& f = frames_[it->second];
-    if (!f.pin_count)
-        throw std::logic_error("unpin: pin_count already 0");
+    if (!f.pin_count) throw CacheUnpinException(pid, "pin_count already 0");
 
     f.dirty |= dirty;
     if (!(--f.pin_count)) {
@@ -62,8 +60,7 @@ std::size_t Cache::get_free_fid() {
 
     if (next_free_fid_ < capacity_) return next_free_fid_++;
 
-    if (lru_.empty())
-        throw std::runtime_error("All frames are pinned - cannot evict");
+    if (lru_.empty()) throw CacheCapacityException();
 
     std::size_t free_fid = lru_.back();
     lru_.pop_back();

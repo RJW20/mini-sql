@@ -12,7 +12,7 @@
 #include "bplus_tree/internal_node.hpp"
 #include "frame_manager/cache/frame_view.hpp"
 #include "headers.hpp"
-#include "exceptions.hpp"
+#include "exceptions/engine_exceptions.hpp"
 #include "field/instantiator.hpp"
 
 namespace minisql {
@@ -292,31 +292,31 @@ void BPlusTree::erase_from(std::unique_ptr<InternalNode> node, size_t slot) {
 }
 
 /* Return the LeafNode corresponding to the given page_id_t.
- * Throws an InvalidMagicException if the page corresponding to the page_id_t
- * does not have a LEAF_NODE magic. */
+ * Throws a MagicException if the page corresponding to the page_id_t does not
+ * have a LEAF_NODE magic. */
 std::unique_ptr<LeafNode> BPlusTree::open_leaf(page_id_t pid) const {
     FrameView fv = fm_->pin(pid);
     Magic magic = fv.view<Magic>(NodeHeader::MAGIC_OFFSET);
     if (magic == Magic::LEAF_NODE)
         return std::make_unique<LeafNode>(std::move(fv));
-    throw InvalidMagicException(magic);
+    throw MagicException(magic);
 }
 
 /* Return the InternalNode corresponding to the given page_id_t.
- * Throws an InvalidMagicException if the page corresponding to the page_id_t
- * does not have an INTERNAL_NODE magic. */
+ * Throws a MagicException if the page corresponding to the page_id_t does not
+ * have an INTERNAL_NODE magic. */
 std::unique_ptr<InternalNode> BPlusTree::open_internal(page_id_t pid) const {
     FrameView fv = fm_->pin(pid);
     Magic magic = fv.view<Magic>(NodeHeader::MAGIC_OFFSET);
     if (magic == Magic::INTERNAL_NODE)
         return std::make_unique<InternalNode>(std::move(fv));
-    throw InvalidMagicException(magic);
+    throw MagicException(magic);
 }
 
 /* Return the Node corresponding to the given page_id_t.
  * To be used when the type of Node pointed to by the page_id_t is unknown.
- * Throws an InvalidMagicException if the page corresponding to the page_id_t
- * does not have a valid node magic. */
+ * Throws a MagicException if the page corresponding to the page_id_t does not
+ * have a valid node magic. */
 std::unique_ptr<Node> BPlusTree::open_node(page_id_t pid) const {
     FrameView fv = fm_->pin(pid);
     Magic magic = fv.view<Magic>(NodeHeader::MAGIC_OFFSET);
@@ -326,7 +326,7 @@ std::unique_ptr<Node> BPlusTree::open_node(page_id_t pid) const {
         case Magic::LEAF_NODE:
             return std::make_unique<LeafNode>(std::move(fv));
         default:
-            throw InvalidMagicException(magic);
+            throw MagicException(magic);
     }
 }
 
