@@ -24,11 +24,11 @@ Field validate(const parser::Value& value, const Schema::Column* column) {
     switch (column->type) {
         case FieldType::INT:
             if (!std::holds_alternative<double>(value))
-                throw ColumnTypeException(column->name, "INT");
+                throw ColumnTypeException(column->name, "INT/REAL");
             return static_cast<int>(std::get<double>(value));
         case FieldType::REAL:
             if (!std::holds_alternative<double>(value))
-                throw ColumnTypeException(column->name, "REAL");
+                throw ColumnTypeException(column->name, "INT/REAL");
             return std::get<double>(value);
         case FieldType::TEXT:
             if (!std::holds_alternative<std::string>(value))
@@ -67,9 +67,22 @@ Modification validate(
     if (column->name == schema.primary().name)
         throw ConstantColumnException(column->name);
 
-    if (modification.op != parser::Modification::Operator::EQ &&
-        column->type == FieldType::TEXT)
-        throw ColumnTypeException(column->name, "TEXT");
+    if (column->type == FieldType::TEXT)
+        {
+        switch (modification.op) {
+            case parser::Modification::Operator::EQ:
+                break;
+            case parser::Modification::Operator::ADD:
+                throw ColumnOperationException(column->name, "+");
+            case parser::Modification::Operator::SUB:
+                throw ColumnOperationException(column->name, "-");
+            case parser::Modification::Operator::MUL:
+                throw ColumnOperationException(column->name, "*");
+            case parser::Modification::Operator::DIV:
+                throw ColumnOperationException(column->name, "/");  
+        }
+        
+    }
 
     std::variant<Field, std::string> value;
     if (std::holds_alternative<parser::Value>(modification.value))
@@ -178,10 +191,10 @@ SelectQuery validate(const parser::SelectAST& ast, const Catalog& catalog) {
 /* Return a validated InsertQuery from the given parser::InsertAST while:
  * - Verifying table's existence.
  * - Asserting table is not the master table if not enabled.
- * - Asserting all values are present.
  * - Asserting all columns are present.
+ * - Asserting all values are present.
  * - Validating all values.
- * - Appending defualt values if the primary column is the default. */
+ * - Appending default values if the primary column is the default. */
 InsertQuery validate(
     const parser::InsertAST& ast, Catalog& catalog, bool master_enabled
 ) {
@@ -195,16 +208,16 @@ InsertQuery validate(
         table->schema->size() - 1 : table->schema->size();
     if (!(ast.columns.size() == 1 && ast.columns[0] == defaults::ALL_COLUMNS))
     {
-        if (ast.columns.size() != required_columns)
-            throw MissingColumnException();
         for (const std::string& column : ast.columns) {
             if (!(*(table->schema))[column])
                 throw ColumnNotFoundException(column);
             query.columns.push_back(column);
         }
+        if (ast.columns.size() != required_columns)
+            throw MissingColumnException();
         for (const std::vector<parser::Value>& row : ast.values)
             if (row.size() != required_columns)
-                throw MissingValueException();
+                throw ValueCountException(row.size() < required_columns);
         
         if (use_rowid) query.columns.push_back(defaults::primary::NAME);
 
@@ -227,7 +240,7 @@ InsertQuery validate(
         query.columns.push_back(defaults::ALL_COLUMNS);
         for (const std::vector<parser::Value>& row : ast.values)
             if (row.size() != required_columns)
-                throw MissingValueException();
+                throw ValueCountException(row.size() < required_columns);
         
         std::vector<Field> validated_row;
         validated_row.reserve(table->schema->size());

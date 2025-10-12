@@ -58,12 +58,21 @@ public:
     MissingColumnException() : ColumnException("incomplete column list") {}
 };
 
-// Thrown when a value is added to a column of non-matching type.
+// Thrown when a column is prescribed a value of non-matching type.
 class ColumnTypeException : public ColumnException {
 public:
     ColumnTypeException(const std::string& column, const std::string& type)
         : ColumnException(
             "column \"" + column + "\" only accepts values of type " + type
+        ) {}
+};
+
+// Thrown when a column does not support an operation.
+class ColumnOperationException : public ColumnException {
+public:
+    ColumnOperationException(const std::string& column, const std::string& op)
+        : ColumnException(
+            "column \"" + column + "\" does not support the operator " + op
         ) {}
 };
 
@@ -74,10 +83,14 @@ public:
         : ColumnException("column \"" + column + "\" cannot be modified") {}
 };
 
-// Thrown when not enough values are provided.
-class MissingValueException : public QueryException {
+// Thrown when an incorrect number of values are provided.
+class ValueCountException : public QueryException {
 public:
-    MissingValueException() : QueryException("incomplete values list") {}
+    ValueCountException(bool fewer)
+        : QueryException(
+            std::string("invalid values list - too ") +
+            (fewer ? "few" : "many") + " values provided"
+        ) {}
 };
 
 } // namespace minisql
