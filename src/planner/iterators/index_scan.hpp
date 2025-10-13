@@ -24,11 +24,11 @@ public:
         std::unique_ptr<Cursor> cursor, const Schema& schema,
         std::optional<Field> lb, bool inclusive_lb, std::optional<Field> ub,
         bool inclusive_ub 
-    ) : cursor_{std::move(cursor)}, schema_{std::move(schema)},
-        lb_{std::move(lb)}, inclusive_lb_{inclusive_lb}, ub_{std::move(ub)},
+    ) : cursor_{std::move(cursor)}, schema_{schema}, lb_{std::move(lb)},
+        inclusive_lb_{inclusive_lb}, ub_{std::move(ub)},
         inclusive_ub_{inclusive_ub},
         less_than_{compile_less_than(schema_.primary().type)} {
-            if (lb_) cursor_->seek(*lb_);
+            if (lb_) cursor_->open(*lb_);
             else {
                 switch (schema_.primary().type) {
                     case FieldType::INT:
@@ -51,7 +51,7 @@ public:
             if (!cursor_->next()) return false;
             key = cursor_->current().primary();
         }
-        if (ub_ && (!less_than_(key, *ub_) || !inclusive_ub_ && key == *ub_))
+        if (ub_ && !(less_than_(key, *ub_) || inclusive_ub_ && key == *ub_))
             return false;
         count_++;
         return true;
