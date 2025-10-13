@@ -148,7 +148,7 @@ class DuplicateKeyException<Varchar> : public CursorException {
 public:
     explicit DuplicateKeyException(const Varchar& key)
         : CursorException(
-            "key + \"" + std::string(key.data()) + "\" already exists"
+            "key \"" + std::string(key.data()) + "\" already exists"
         ) {}
 };
 
