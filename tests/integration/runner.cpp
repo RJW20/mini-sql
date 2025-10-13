@@ -88,10 +88,10 @@ int main(int argc, char* argv[]) {
         else {
             fail_count++;
             std::cout << COLOR_RED << "[FAIL]" << COLOR_RESET << " " << r.name
-                << " at output line " << r.line << "\n";
-            std::cout << "  " << COLOR_YELLOW << "Expected:\t" << COLOR_RESET
+                << " on output line " << r.line << "\n";
+            std::cout << "  " << COLOR_YELLOW << "Expected: " << COLOR_RESET
                 << r.expected << "\n";
-            std::cout << "  " << COLOR_YELLOW << "Got:\t\t" << COLOR_RESET
+            std::cout << "  " << COLOR_YELLOW << "Got:      " << COLOR_RESET
                 << r.got << "\n";
         }
     }

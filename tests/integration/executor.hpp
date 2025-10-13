@@ -39,7 +39,7 @@ public:
             }
         }
         catch (const minisql::Exception& e) {
-            return std::string("ERROR: ") + e.what();
+            return e.what();
         }
     }
 
