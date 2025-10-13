@@ -52,10 +52,14 @@ public:
         : ColumnException("column \"" + column + "\" is reserved") {}
 };
 
-// Thrown when a column or columns are not referenced.
-class MissingColumnException : public ColumnException {
+// Thrown when an incorrect number of columns are provided.
+class ColumnCountException : public ColumnException {
 public:
-    MissingColumnException() : ColumnException("incomplete column list") {}
+    ColumnCountException(bool fewer)
+        : ColumnException(
+            std::string("invalid columns list - too ") +
+            (fewer ? "few" : "many") + " columns provided"
+        ) {}
 };
 
 // Thrown when a column is prescribed a value of non-matching type.

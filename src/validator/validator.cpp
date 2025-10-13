@@ -209,12 +209,13 @@ InsertQuery validate(
     if (!(ast.columns.size() == 1 && ast.columns[0] == defaults::ALL_COLUMNS))
     {
         for (const std::string& column : ast.columns) {
-            if (!(*(table->schema))[column])
+            if (!(*(table->schema))[column] ||
+                use_rowid && column == defaults::primary::NAME)
                 throw ColumnNotFoundException(column);
             query.columns.push_back(column);
         }
         if (ast.columns.size() != required_columns)
-            throw MissingColumnException();
+            throw ColumnCountException(ast.columns.size() < required_columns);
         for (const std::vector<parser::Value>& row : ast.values)
             if (row.size() != required_columns)
                 throw ValueCountException(row.size() < required_columns);
