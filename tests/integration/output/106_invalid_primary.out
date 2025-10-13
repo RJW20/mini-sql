@@ -1,0 +1,11 @@
+Query error: syntax error near ")"
+Query error: column "fake_col" does not exist
+0 rows affected
+0 rows affected
+0 rows affected
+Engine error: key 1 already exists
+Engine error: key 0.100000 already exists
+Engine error: key "one" already exists
+Query error: column "int" cannot be modified
+Query error: column "real" cannot be modified
+Query error: column "text" cannot be modified

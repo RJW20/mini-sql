@@ -1,0 +1,11 @@
+0 rows affected
+Query error: syntax error near "VALUES"
+Query error: table "fake_t" does not exist
+Query error: invalid columns list - too few columns provided
+Query error: invalid columns list - too many columns provided
+Query error: column "fake_col" does not exist
+Query error: invalid values list - too few values provided
+Query error: invalid values list - too many values provided
+Query error: column "int" only accepts values of type INT/REAL
+Query error: column "real" only accepts values of type INT/REAL
+Query error: column "text" only accepts values of type TEXT

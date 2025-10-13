@@ -1,0 +1,64 @@
+0 rows affected
+Query error: syntax error near "SET"
+Query error: table "fake_t" does not exist
+Query error: syntax error near "="
+Query error: column "fake_col" does not exist
+Query error: column "fake_col" does not exist
+Query error: syntax error near ";"
+Query error: column "int" only accepts values of type INT/REAL
+Query error: column "int" only accepts values of type INT/REAL
+Query error: column "int" only accepts values of type INT/REAL
+Query error: column "int" only accepts values of type INT/REAL
+Query error: column "int" only accepts values of type INT/REAL
+Query error: column "real" only accepts values of type INT/REAL
+Query error: column "real" only accepts values of type INT/REAL
+Query error: column "real" only accepts values of type INT/REAL
+Query error: column "real" only accepts values of type INT/REAL
+Query error: column "real" only accepts values of type INT/REAL
+Query error: column "text" only accepts values of type TEXT
+Query error: column "int" only accepts values of type INT
+Query error: column "int" only accepts values of type INT
+Query error: column "int" only accepts values of type INT
+Query error: column "int" only accepts values of type INT
+Query error: column "int" only accepts values of type INT
+Query error: column "int" only accepts values of type INT
+Query error: column "int" only accepts values of type INT
+Query error: column "int" only accepts values of type INT
+Query error: column "int" only accepts values of type INT
+Query error: column "int" only accepts values of type INT
+Query error: column "real" only accepts values of type REAL
+Query error: column "real" only accepts values of type REAL
+Query error: column "real" only accepts values of type REAL
+Query error: column "real" only accepts values of type REAL
+Query error: column "real" only accepts values of type REAL
+Query error: column "real" only accepts values of type REAL
+Query error: column "real" only accepts values of type REAL
+Query error: column "real" only accepts values of type REAL
+Query error: column "real" only accepts values of type REAL
+Query error: column "real" only accepts values of type REAL
+Query error: column "text" only accepts values of type TEXT
+Query error: column "text" only accepts values of type TEXT
+Query error: column "text" does not support the operator +
+Query error: column "text" does not support the operator -
+Query error: column "text" does not support the operator *
+Query error: column "text" does not support the operator /
+Query error: column "text" does not support the operator +
+Query error: column "text" does not support the operator -
+Query error: column "text" does not support the operator *
+Query error: column "text" does not support the operator /
+Query error: syntax error near "+"
+Query error: syntax error near "-"
+Query error: syntax error near "*"
+Query error: syntax error near "/"
+Query error: syntax error near "+"
+Query error: syntax error near "-"
+Query error: syntax error near "*"
+Query error: syntax error near "/"
+Query error: syntax error near "+"
+Query error: syntax error near "-"
+Query error: syntax error near "*"
+Query error: syntax error near "/"
+Query error: syntax error near "+"
+Query error: syntax error near "-"
+Query error: syntax error near "*"
+Query error: syntax error near "/"

@@ -1,0 +1,68 @@
+0 rows affected
+2 rows affected
+2 rows affected
+3 | 0.1 | one
+3 | 0.2 | two
+2 rows affected
+3 | 0.3 | one
+3 | 0.3 | two
+2 rows affected
+3 | 0.3 | three
+3 | 0.3 | three
+0 rows affected
+2 rows affected
+2 rows affected
+2 | 10
+3 | 20
+2 rows affected
+1 | 10
+2 | 20
+2 rows affected
+2 | 10
+4 | 20
+2 rows affected
+1 | 10
+2 | 20
+2 rows affected
+1 | 11
+2 | 22
+2 rows affected
+1 | 10
+2 | 20
+2 rows affected
+1 | 10
+2 | 40
+2 rows affected
+1 | 10
+2 | 20
+0 rows affected
+2 rows affected
+2 rows affected
+0.2 | 0.01
+0.3 | 0.02
+2 rows affected
+0.1 | 0.01
+0.2 | 0.02
+2 rows affected
+0.02 | 0.01
+0.04 | 0.02
+2 rows affected
+0.1 | 0.01
+0.2 | 0.02
+2 rows affected
+0.1 | 0.11
+0.2 | 0.22
+2 rows affected
+0.1 | 0.01
+0.2 | 0.02
+2 rows affected
+0.1 | 0.001
+0.2 | 0.004
+2 rows affected
+0.1 | 0.01
+0.2 | 0.02
+0 rows affected
+2 rows affected
+2 rows affected
+a | a
+c | c

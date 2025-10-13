@@ -1,0 +1,10 @@
+Query error: table "master" already exists
+0 rows affected
+0 rows affected
+0 rows affected
+t1 | CREATE TABLE t1 (int INT); | 1 | 0
+t2 | CREATE TABLE t2 (real REAL); | 2 | 0
+t3 | CREATE TABLE t3 (text TEXT(16)); | 3 | 0
+Query error: table "master" does not exist
+Query error: table "master" does not exist
+Query error: table "master" does not exist

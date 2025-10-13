@@ -1,0 +1,9 @@
+Query error: column "rowid" is reserved
+Query error: column "rowid" is reserved
+0 rows affected
+Query error: column "rowid" does not exist
+2 rows affected
+0
+1
+2
+Query error: column "rowid" cannot be modified
