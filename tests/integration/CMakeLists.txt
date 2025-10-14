@@ -2,27 +2,46 @@
 add_executable(runner runner.cpp)
 target_link_libraries(runner PRIVATE mini-sql)
 
-# Generator scripts
+# JSON generator script + stamp
+set(GEN_DATA_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/gen_data.py)
+set(GEN_DATA_STAMP ${CMAKE_CURRENT_BINARY_DIR}/gen_data.stamp)
+
+# Run JSON generator when script changes
+add_custom_command(
+    OUTPUT ${GEN_DATA_STAMP}
+    COMMAND ${CMAKE_COMMAND} -E echo "Regenerating JSON datasets for integration stress-tests..."
+    COMMAND ${Python3_EXECUTABLE} ${GEN_DATA_SCRIPT}
+    COMMAND ${CMAKE_COMMAND} -E touch ${GEN_DATA_STAMP}
+    DEPENDS ${GEN_DATA_SCRIPT}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Running gen_data.py to produce JSON files"
+)
+
+# Custom target for manual data regeneration
+add_custom_target(regen-data DEPENDS ${GEN_DATA_STAMP})
+
+# SQL/OUT generator script + stamp
 set(GEN_TEST_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/gen_tests.py)
-set(GEN_STAMP_FILE ${CMAKE_CURRENT_BINARY_DIR}/regen.stamp)
+set(GEN_TEST_STAMP ${CMAKE_CURRENT_BINARY_DIR}/gen_tests.stamp)
 
 # Gather dataset JSON files
 file(GLOB TEST_DATASETS ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json)
 
-# Custom command: run generator when JSON or script changes
+# Run generators when JSON datasets or script changes
 add_custom_command(
-    OUTPUT ${GEN_STAMP_FILE}
+    OUTPUT ${GEN_TEST_STAMP}
     COMMAND ${CMAKE_COMMAND} -E echo "Regenerating integration stress-tests from JSON datasets..."
     COMMAND ${Python3_EXECUTABLE} ${GEN_TEST_SCRIPT}
-    COMMAND ${CMAKE_COMMAND} -E touch ${GEN_STAMP_FILE}
-    DEPENDS ${GEN_TEST_SCRIPT} ${TEST_DATASETS}
+    COMMAND ${CMAKE_COMMAND} -E touch ${GEN_TEST_STAMP}
+    DEPENDS ${GEN_TEST_SCRIPT} ${GEN_DATA_STAMP} ${TEST_DATASETS}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMENT "Running gen_tests.py because inputs changed"
+    COMMENT "Running gen_tests.py to produce stress-tests"
 )
 
-# Custom target for manual regeneration
-add_custom_target(regen-tests
-    DEPENDS ${GEN_STAMP_FILE}
-)
+# Custom target for manual tests regeneration
+add_custom_target(regen-tests DEPENDS ${GEN_TEST_STAMP})
+
+# Custom target for manual total regeneration
+add_custom_target(regen-all DEPENDS gen-data regen-tests)
 
 add_dependencies(runner regen-tests)
