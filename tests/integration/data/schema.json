@@ -1,0 +1,8 @@
+{
+    "tables": {
+        "int_real_text": {
+            "columns": ["int", "real", "text"],
+            "types": ["INT", "REAL", "TEXT(16)"]
+        }
+    }
+}
