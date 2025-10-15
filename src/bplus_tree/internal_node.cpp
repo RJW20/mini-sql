@@ -79,10 +79,16 @@ Key InternalNode::take_front(
 template <typename T>
 struct Wrapper {
     static void instantiate() {
-        (void)&InternalNode::split<T>;
-        (void)&InternalNode::merge<T>;
-        (void)&InternalNode::take_back<T>;
-        (void)&InternalNode::take_front<T>;
+        auto fn1 = &InternalNode::split<T>;
+        auto fn2 = &InternalNode::merge<T>;
+        auto fn3 = &InternalNode::take_back<T>;
+        auto fn4 = &InternalNode::take_front<T>;
+
+        // Force ODR-use on all platforms
+        (void)fn1;
+        (void)fn2;
+        (void)fn3;
+        (void)fn4;
     }
 };
 
