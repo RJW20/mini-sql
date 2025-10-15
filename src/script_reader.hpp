@@ -9,7 +9,7 @@
 
 namespace minisql {
 
-/* ScriptReader
+/* Script Reader
  * Yields all ; separated statements from the given script.
  * Ignores all characters between any # and the next \n. */
 class ScriptReader {
