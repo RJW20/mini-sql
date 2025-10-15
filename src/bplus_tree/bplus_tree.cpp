@@ -15,6 +15,9 @@
 #include "exceptions/engine_exceptions.hpp"
 #include "field/instantiator.hpp"
 
+#include <iostream>
+#include <string>
+
 namespace minisql {
 
 /* Constructor for B+ Tree.
@@ -334,12 +337,33 @@ std::unique_ptr<Node> BPlusTree::open_node(page_id_t pid) const {
 template <typename T>
 struct Wrapper {
     static void instantiate() {
-        (void)&BPlusTree::seek_slot<T>;
-        (void)&BPlusTree::seek_leaf<T>;
-        (void)static_cast<void (BPlusTree::*)(LeafNode*, BPlusTree::size_t, span<std::byte>)>(&BPlusTree::template insert_into<T>);
-        (void)static_cast<void (BPlusTree::*)(LeafNode*, BPlusTree::size_t)>(&BPlusTree::template erase_from<T>);
-        (void)static_cast<void (BPlusTree::*)(std::unique_ptr<InternalNode>, BPlusTree::size_t, const T&, page_id_t)>(&BPlusTree::template insert_into<T>);
-        (void)static_cast<void (BPlusTree::*)(std::unique_ptr<InternalNode>, BPlusTree::size_t)>(&BPlusTree::template erase_from<T>);
+        auto fn1 = &BPlusTree::seek_slot<T>;
+        auto fn2 = &BPlusTree::seek_leaf<T>;
+        auto fn3 = static_cast<
+            void (BPlusTree::*)(LeafNode*, BPlusTree::size_t, span<std::byte>)
+        >(&BPlusTree::template insert_into<T>);
+        auto fn4 = static_cast<
+            void (BPlusTree::*)(LeafNode*, BPlusTree::size_t)
+        >(&BPlusTree::template erase_from<T>);
+        auto fn5 = static_cast<
+            void (BPlusTree::*)(
+                std::unique_ptr<InternalNode>, BPlusTree::size_t, const T&,
+                page_id_t
+            )
+        >(&BPlusTree::template insert_into<T>);
+        auto fn6 = static_cast<
+            void (BPlusTree::*)(
+                std::unique_ptr<InternalNode>, BPlusTree::size_t
+            )
+        >(&BPlusTree::template erase_from<T>);
+
+        // Force ODR-use on all platforms
+        (void)fn1;
+        (void)fn2;
+        (void)fn3;
+        (void)fn4;
+        (void)fn5;
+        (void)fn6;
     }
 };
 
