@@ -7,10 +7,12 @@
 
 #include "row_set/row_set.hpp"
 #include "engine/engine.hpp"
+#include "engine/database_handle.hpp"
 
 namespace minisql {
 
-/* */
+/* Connection.
+ * Provides access to a Database via sql commands. */
 class Connection {
 public:
     explicit Connection(const std::filesystem::path& path)
@@ -23,7 +25,7 @@ public:
     RowSet query(std::string_view sql) { return engine_.query(sql, *dbh_); }
 
 private:
-    static Engine engine_;
+    inline static Engine engine_;
     DatabaseHandle dbh_;
 };
 
