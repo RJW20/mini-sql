@@ -76,5 +76,5 @@ int main() {
     std::cout << "Finished with " << pass_count << '/' << pass_count + fail_count
         << " passes." << std::endl;
 
-    return fail_count == 0 ? 0 : 1;
+    return !fail_count ? 0 : 1;
 }
