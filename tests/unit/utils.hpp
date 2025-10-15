@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <filesystem>
 
-#include "field/varchar.hpp"
 #include "headers.hpp"
 
 // Temporary file management
@@ -17,7 +16,7 @@ static int global_seed = 0;
 inline constexpr std::size_t DEFAULT_VARCHAR_SIZE = 10;
 template <typename T>
 T generate(
-    int seed = global_seed, const minisql::Varchar& prefix = {"v", 1},
+    int seed = global_seed, const std::string& prefix = "v",
     std::size_t = DEFAULT_VARCHAR_SIZE
 );
 template <typename Key>

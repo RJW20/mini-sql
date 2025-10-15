@@ -7,8 +7,8 @@
 #include <vector>
 #include <string>
 
-#include "field/varchar.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
+#include "field/varchar.hpp"
 #include "headers.hpp"
 
 // ----------------------------------------------------------------------------
@@ -40,23 +40,25 @@ using namespace minisql;
 
 template <>
 page_id_t generate<page_id_t>(
-    int seed, const Varchar& prefix, std::size_t size
+    int seed, const std::string& prefix, std::size_t size
 ) { return seed; }
 
 template <>
-int generate<int>(int seed, const Varchar& prefix, std::size_t size) {
+int generate<int>(int seed, const std::string& prefix, std::size_t size) {
     return seed;
 }
 
 template <>
-double generate<double>(int seed, const Varchar& prefix, std::size_t size) {
+double generate<double>(int seed, const std::string& prefix, std::size_t size)
+{
     return seed + 0.5;
 }
 
 template <>
-Varchar generate<Varchar>(int seed, const Varchar& prefix, std::size_t size) {
-    std::string underlying = std::string(prefix.data()) + "_" +
-        std::to_string(seed);
+Varchar generate<Varchar>(
+    int seed, const std::string& prefix, std::size_t size
+) {
+    std::string underlying = prefix + "_" + std::to_string(seed);
     return Varchar{underlying.c_str(), size};
 }
 
