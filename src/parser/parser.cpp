@@ -11,7 +11,7 @@
 #include "parser/token.hpp"
 #include "field/field.hpp"
 #include "exceptions/query_exceptions.hpp"
-#include "validator/defaults.hpp"
+#include "validator/constants.hpp"
 
 namespace minisql::parser {
 

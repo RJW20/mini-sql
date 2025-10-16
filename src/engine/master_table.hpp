@@ -1,6 +1,7 @@
 #ifndef MINISQL_MASTER_TABLE_HPP
 #define MINISQL_MASTER_TABLE_HPP
 
+#include <cstddef>
 #include <string>
 #include <sstream>
 #include <initializer_list>
@@ -11,13 +12,15 @@
 namespace minisql::master_table {
 
 inline const std::string NAME = "master";
+inline const std::size_t MAX_TABLE_NAME_SIZE = 32;
+inline const std::size_t MAX_SQL_SIZE = 256;
 
 namespace columns {
 
 struct Column { std::string name; std::string type; };
 
-inline const Column TABLE_NAME = { "table_name", "TEXT(16)"  };
-inline const Column SQL        = { "sql",        "TEXT(256)" };
+inline const Column TABLE_NAME = { "table_name", "TEXT(" + std::to_string(MAX_TABLE_NAME_SIZE) + ")" };
+inline const Column SQL        = { "sql",        "TEXT(" + std::to_string(MAX_SQL_SIZE) + ")" };
 inline const Column ROOT       = { "root",       "INT"       };
 inline const Column NEXT_ROWID = { "next_rowid", "INT"       };
 
@@ -63,8 +66,8 @@ inline std::string build_insert_statement(
 ) {
     std::ostringstream sql;
     sql << "INSERT INTO " << master_table::NAME << " VALUES ("
-        << "\"" << table_name << "\", \"" << create_sql << "\", " << root << ", "
-        << next_rowid << ");";
+        << "\"" << table_name << "\", \"" << create_sql << "\", " << root
+        << ", " << next_rowid << ");";
     return sql.str();
 }
 

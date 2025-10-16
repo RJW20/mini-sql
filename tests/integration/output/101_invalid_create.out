@@ -1,6 +1,9 @@
+Query error: syntax error near "("
 0 rows affected
 Query error: table "t1" already exists
-Query error: syntax error near "("
+Query error: table name "t12345678912345678912345678912345" cannot exceed 32 characters
 Query error: syntax error near ";"
+Query error: column "int" already exists
 Query error: syntax error near ")"
 Query error: syntax error near ")"
+Query error: table "t2" is too wide (maximum width 512 bytes, got 513 bytes)
