@@ -1,8 +1,19 @@
 {
     "tables": {
         "int_real_text": {
-            "columns": ["int", "real", "text"],
-            "types": ["INT", "REAL", "TEXT(16)"]
+            "columns": [
+                {"name": "int", "type": "INT"},
+                {"name": "real", "type": "REAL"},
+                {"name": "text", "type": "TEXT(16)"}
+            ],
+            "tests": ["insert_small_seq"]
+        },
+        "wide": {
+            "columns": [
+                {"name": "text1", "type": "TEXT(64)"},
+                {"name": "text2", "type": "TEXT(128)"}
+            ],
+            "tests": []
         }
     }
 }

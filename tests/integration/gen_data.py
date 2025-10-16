@@ -7,6 +7,7 @@ from pathlib import Path
 
 random.seed(12345)
 DATA_DIR = Path("tests/integration/data")
+DATASET_SIZE = 10_000
 
 
 def unique_int_generator() -> Generator[int, None, None]:
@@ -51,7 +52,7 @@ def unique_string_generator(length: int) -> Generator[str, None, None]:
 
 
 def row_generator(
-    types: list[str], count: int
+    columns: list[dict[str, str]], count: int
 ) -> Generator[list[int | float | str], None, None]:
     """Yields lists of data of type int, float or string.
     
@@ -59,7 +60,8 @@ def row_generator(
     """
 
     generators = []
-    for type in types:
+    for column in columns:
+        type = column["type"]
         if type == "INT": generators.append(unique_int_generator())
         elif type == "REAL": generators.append(unique_float_generator())
         elif len(type) > 6 and type[:4] == "TEXT":
@@ -72,16 +74,16 @@ def row_generator(
 def main() -> None:
     """Create .csv datasets for all tables listed in data/schema.json.
     
-    Generates 10,000 rows of data for each table, in ascending order for every
-    column.
+    Generates DATASET_SIZE rows of data for each table, in ascending order for
+    every column.
     """
 
     with open(DATA_DIR / "schema.json") as f:
         tables = json.load(f)["tables"]
 
     for name, info in tables.items():
-        row_gen = row_generator(info["types"], 10_000)
-        with open(DATA_DIR / (name + ".csv"), 'w', newline='') as csvfile:
+        row_gen = row_generator(info["columns"], DATASET_SIZE)
+        with open(DATA_DIR / f"{name}.csv", 'w', newline='') as csvfile:
             writer = csv.writer(
                 csvfile, quotechar='"', quoting=csv.QUOTE_STRINGS
             )
