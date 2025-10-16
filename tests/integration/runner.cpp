@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <string>
 #include <fstream>
-#include <cstdio>
 
 #include "directory_iterable.hpp"
 #include "executor.hpp"
@@ -56,7 +55,7 @@ TestResult run_test(const fs::path& filename) {
         }
     }
 
-    std::remove(db_path.c_str());
+    std::filesystem::remove(db_path);
     return result;
 }
 
