@@ -16,7 +16,7 @@
 #include "planner/iterators/create.hpp"
 #include "catalog/table.hpp"
 #include "planner/iterators/filter.hpp"
-#include "validator/defaults.hpp"
+#include "validator/constants.hpp"
 #include "planner/iterators/project.hpp"
 #include "planner/iterators/values.hpp"
 #include "planner/iterators/insert.hpp"

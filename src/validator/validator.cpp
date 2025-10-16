@@ -1,18 +1,21 @@
 #include "validator/validator.hpp"
 
+#include <cstddef>
 #include <variant>
 #include <string>
 #include <utility>
-#include <algorithm>
+#include <unordered_set>
+#include <numeric>
 #include <vector>
 
-#include "row/schema.hpp"
 #include "field/field.hpp"
 #include "parser/ast.hpp"
+#include "row/schema.hpp"
 #include "exceptions/query_exceptions.hpp"
 #include "validator/query.hpp"
 #include "catalog/catalog.hpp"
 #include "engine/master_table.hpp"
+#include "validator/constants.hpp"
 
 namespace minisql::validator {
 
@@ -44,7 +47,7 @@ Field validate(const parser::Value& value, const Schema::Column* column) {
 Condition validate(const parser::Condition& condition, const Schema& schema) {
 
     const Schema::Column* column = schema[condition.column];
-    if (!column) throw ColumnNotFoundException(condition.column);
+    if (!column) throw ColumnExistenceException(condition.column, false);
 
     return {
         condition.column,
@@ -62,7 +65,7 @@ Modification validate(
     const parser::Modification& modification, const Schema& schema
 ) {
     const Schema::Column* column = schema[modification.column];
-    if (!column) throw ColumnNotFoundException(modification.column);
+    if (!column) throw ColumnExistenceException(modification.column, false);
 
     if (column->name == schema.primary().name)
         throw ConstantColumnException(column->name);
@@ -92,8 +95,8 @@ Modification validate(
             std::get<std::string>(modification.value)
         ];
         if (!value_column)
-            throw ColumnNotFoundException(
-                std::get<std::string>(modification.value)
+            throw ColumnExistenceException(
+                std::get<std::string>(modification.value), false
             );
         if (value_column->type != column->type)
             switch (column->type) {
@@ -116,31 +119,38 @@ Modification validate(
 }
 
 /* Return a validated CreateQuery from the given parser::CreateAST while:
+ * - Asserting table name is not too long.
  * - Verifying table doesn't exist.
+ * - Asserting no duplicate column names.
  * - Asserting no column uses the reserved default primary name.
  * - Verifying the primary column exists if it is provided, and inserting a
- * default primary column otherwise. */
+ * default primary column otherwise.
+ * - Asserting the total row width is not too long. */
 CreateQuery validate(const parser::CreateAST& ast, const Catalog& catalog) {
 
+    if (ast.table.size() > master_table::MAX_TABLE_NAME_SIZE)
+        throw TableNameException(ast.table, master_table::MAX_TABLE_NAME_SIZE);
+
     const Table* table = catalog.find_table(ast.table);
-    if (table) throw TableException(ast.table, true);
+    if (table) throw TableExistenceException(ast.table, true);
     CreateQuery query = {ast.table};
 
-    for (const std::string& column : ast.columns)
+    std::unordered_set<std::string> seen_columns;
+    for (const std::string& column : ast.columns) {
+        if (!seen_columns.insert(column).second)
+            throw ColumnExistenceException(column, true);
         if (column == defaults::primary::NAME)
             throw ReservedColumnException(column);
+    }
 
     query.columns = ast.columns;
     query.types = ast.types;
     query.sizes = ast.sizes;
     
     if (ast.primary) {
-        query.primary = *(ast.primary);
-        auto it = std::find(
-            query.columns.begin(), query.columns.end(), query.primary
-        );
-        if (it == query.columns.end())
-            throw ColumnNotFoundException(query.primary);
+        if (seen_columns.insert(*ast.primary).second)
+            throw ColumnExistenceException(*ast.primary, false);
+        query.primary = *ast.primary;
     }
     else {
         query.columns.push_back(defaults::primary::NAME);
@@ -148,6 +158,14 @@ CreateQuery validate(const parser::CreateAST& ast, const Catalog& catalog) {
         query.sizes.push_back(defaults::primary::SIZE);
         query.primary = defaults::primary::NAME;
     }
+
+    if (
+        std::size_t width = std::accumulate(
+            query.sizes.begin(), query.sizes.end(), 0
+        );
+        width > limits::MAX_TABLE_WIDTH
+    )
+        throw TableWidthException(ast.table, width, limits::MAX_TABLE_WIDTH);
 
     return query;
 }
@@ -161,7 +179,7 @@ CreateQuery validate(const parser::CreateAST& ast, const Catalog& catalog) {
 SelectQuery validate(const parser::SelectAST& ast, const Catalog& catalog) {
 
     const Table* table = catalog.find_table(ast.table);
-    if (!table) throw TableException(ast.table, false);
+    if (!table) throw TableExistenceException(ast.table, false);
     SelectQuery query = {ast.table};
 
     if (ast.columns.size() == 1 && ast.columns[0] == defaults::ALL_COLUMNS) {
@@ -177,7 +195,7 @@ SelectQuery validate(const parser::SelectAST& ast, const Catalog& catalog) {
     else {
         for (const std::string& column : ast.columns) {
             if (!(*(table->schema))[column])
-                throw ColumnNotFoundException(column);
+                throw ColumnExistenceException(column, false);
             query.columns.push_back(column);
         }
     }
@@ -200,7 +218,7 @@ InsertQuery validate(
 ) {
     Table* table = catalog.find_table(ast.table);
     if (!table || !master_enabled && ast.table == master_table::NAME)
-        throw TableException(ast.table, false);
+        throw TableExistenceException(ast.table, false);
     InsertQuery query = {ast.table};
 
     bool use_rowid = table->schema->primary().name == defaults::primary::NAME;
@@ -211,7 +229,7 @@ InsertQuery validate(
         for (const std::string& column : ast.columns) {
             if (!(*(table->schema))[column] ||
                 use_rowid && column == defaults::primary::NAME)
-                throw ColumnNotFoundException(column);
+                throw ColumnExistenceException(column, false);
             query.columns.push_back(column);
         }
         if (ast.columns.size() != required_columns)
@@ -270,7 +288,7 @@ UpdateQuery validate(
 ) {
     const Table* table = catalog.find_table(ast.table);
     if (!table || !master_enabled && ast.table == master_table::NAME)
-        throw TableException(ast.table, false);
+        throw TableExistenceException(ast.table, false);
     UpdateQuery query = {ast.table};
 
     for (const parser::Modification& modification : ast.modifications)
@@ -293,7 +311,7 @@ DeleteQuery validate(
 ) {
     const Table* table = catalog.find_table(ast.table);
     if (!table || !master_enabled && ast.table == master_table::NAME)
-        throw TableException(ast.table, false);
+        throw TableExistenceException(ast.table, false);
     DeleteQuery query = {ast.table};
 
     for (const parser::Condition& condition : ast.conditions)

@@ -1,6 +1,7 @@
 #ifndef MINISQL_QUERY_EXCEPTIONS_HPP
 #define MINISQL_QUERY_EXCEPTIONS_HPP
 
+#include <cstddef>
 #include <string>
 
 #include "exceptions/exception.hpp"
@@ -21,15 +22,44 @@ public:
         : QueryException("syntax error near \"" + token + "\"") {}
 };
 
-/* Thrown when a referenced table already exists or does not exist within a
- * database. */
+// Base class for exceptions related to tables in queries or statements.
 class TableException : public QueryException {
 public:
-    TableException(const std::string& table, bool exists)
-        : QueryException(
+    using QueryException::QueryException;
+};
+
+// Thrown when a table name is too large.
+class TableNameException : public TableException {
+public:
+    TableNameException(const std::string& table, std::size_t max_size)
+        : TableException(
+            "table name \"" + table + "\" cannot exceed " +
+            std::to_string(max_size) + " characters"
+        ) {}
+};
+
+/* Thrown when a referenced table already exists or does not exist within a
+ * database. */
+class TableExistenceException : public TableException {
+public:
+    TableExistenceException(const std::string& table, bool exists)
+        : TableException(
             "table \"" + table +
             (exists ? "\" already exists" : "\" does not exist")
         ) {}
+};
+
+// Thrown when a table's row width is too large.
+class TableWidthException : public TableException {
+public:
+    TableWidthException(
+        const std::string& table, std::size_t width, std::size_t max_width
+    ) : TableException(
+        "table \"" + table + "\" is too wide (maximum width " +
+        std::to_string(max_width) + " bytes, got " + std::to_string(width) +
+        " bytes)"
+    ) {}
+
 };
 
 // Base class for exceptions related to columns in queries or statements.
@@ -38,11 +68,15 @@ public:
     using QueryException::QueryException;
 };
 
-// Thrown when a referenced column does not exist within a table.
-class ColumnNotFoundException : public ColumnException {
+/* Thrown when a referenced column already exists or does not exist within a
+ * table. */
+class ColumnExistenceException : public ColumnException {
 public:
-    explicit ColumnNotFoundException(const std::string& column)
-        : ColumnException("column \"" + column + "\" does not exist") {}
+    explicit ColumnExistenceException(const std::string& column, bool exists)
+        : ColumnException(
+            "column \"" + column +
+            (exists ? "\" already exists" : "\" does not exist")
+        ) {}
 };
 
 // Thrown when a referenced column is reserved.
