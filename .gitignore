@@ -1,3 +1,4 @@
 .vscode/
 build/
 *.csv
+__pycache__/
