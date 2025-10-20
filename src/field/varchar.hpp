@@ -77,6 +77,15 @@ public:
         return *this;
     }
 
+    // Copy and thus become the owner of the data stored
+    void own_data() {
+        if (owned_) return;
+        owned_ = std::make_unique<char[]>(size_ + 1);
+        if (size_) std::strncpy(owned_.get(), data_, size_);
+        data_ = owned_.get();
+        data_[size_] = '\0';
+    }
+
     bool operator==(const Varchar& other) const {
         if (size_ != other.size_) return false;
         for (std::size_t i = 0; i < size_; i++) {

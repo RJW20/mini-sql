@@ -88,6 +88,17 @@ void test_move_assignment() {
     std::cout << "- test_move_assignment passed" << std::endl;
 }
 
+void test_own_data() {
+    Varchar v1("testing", 10);
+    Varchar v2 = v1;
+    {
+        Varchar v3 = std::move(v1);
+        v1.own_data();
+    }
+    assert(v1 == v2);
+    std::cout << "- test_own_data passed" << std::endl;
+}
+
 void test_less_than_operator() {
     assert(Varchar("a", 1) < Varchar("b", 1));
     assert(Varchar("a", 2) < Varchar("b", 1));
@@ -113,6 +124,7 @@ int main() {
     test_copy_assignment();
     test_move_constructor();
     test_move_assignment();
+    test_own_data();
     test_less_than_operator();
     test_byte_io_write_copy_view();
     std::cout << "All tests passed." << std::endl;
