@@ -1,4 +1,4 @@
-# 003_select
+# 002_select
 # Tests basic SELECT statements
 
 CREATE TABLE t (int INT, real REAL, text TEXT(5));

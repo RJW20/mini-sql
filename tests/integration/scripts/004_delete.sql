@@ -1,4 +1,4 @@
-# 005_delete
+# 004_delete
 # Tests basic DELETE statements
 
 CREATE TABLE t (int INT, real REAL, text TEXT(5));

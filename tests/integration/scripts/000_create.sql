@@ -1,4 +1,4 @@
-# 001_create
+# 000_create
 # Tests basic CREATE statements
 
 # supported types

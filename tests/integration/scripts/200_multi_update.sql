@@ -1,4 +1,4 @@
-# 201_multi_update
+# 200_multi_update
 # Tests compound UPDATE statements
 
 CREATE TABLE t (a INT, b INT, c INT);

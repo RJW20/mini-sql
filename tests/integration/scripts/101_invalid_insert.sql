@@ -1,4 +1,4 @@
-# 102_invalid_insert
+# 101_invalid_insert
 # Tests invalid INSERT statements
 
 CREATE TABLE t (int INT, real REAL, text TEXT(5));

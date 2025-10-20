@@ -1,4 +1,4 @@
-# 008_where_primary
+# 007_where_primary
 # Tests basic WHERE commands on PRIMARY KEY
 
 CREATE TABLE t (int INT, PRIMARY KEY(int));

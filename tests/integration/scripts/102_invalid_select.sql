@@ -1,4 +1,4 @@
-# 103_invalid_select
+# 102_invalid_select
 # Tests invalid SELECT statements
 
 CREATE TABLE t (int INT, real REAL, text TEXT(5));

@@ -1,4 +1,4 @@
-# 301_master
+# 300_master
 # Tests statements involving the reserved master table
 
 # CREATE

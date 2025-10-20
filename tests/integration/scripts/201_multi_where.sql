@@ -1,4 +1,4 @@
-# 202_multi_where
+# 201_multi_where
 # Tests compound WHERE commands
 
 CREATE TABLE t (a INT, b INT);

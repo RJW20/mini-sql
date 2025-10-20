@@ -1,4 +1,4 @@
-# 101_invalid_create
+# 100_invalid_create
 # Tests invalid CREATE statements
 
 # missing table name

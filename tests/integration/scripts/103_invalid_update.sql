@@ -1,4 +1,4 @@
-# 104_invalid_update
+# 103_invalid_update
 # Tests invalid UPDATE statements
 
 CREATE TABLE t (

@@ -1,4 +1,4 @@
-# 004_update
+# 003_update
 # Tests basic UPDATE statements
 
 # simple set

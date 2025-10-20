@@ -1,4 +1,4 @@
-# 107_invalid_where
+# 106_invalid_where
 # Tests invalid WHERE commands
 
 CREATE TABLE t (int INT, real REAL, text TEXT(5));

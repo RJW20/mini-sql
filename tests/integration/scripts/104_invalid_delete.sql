@@ -1,4 +1,4 @@
-# 105_invalid_delete
+# 104_invalid_delete
 # Tests invalid DELETE statements
 
 # missing table

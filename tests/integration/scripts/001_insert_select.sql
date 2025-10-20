@@ -1,4 +1,4 @@
-# 002_insert_select
+# 001_insert_select
 # Tests basic INSERT statements
 
 CREATE TABLE t (int INT, real REAL, text TEXT(5));

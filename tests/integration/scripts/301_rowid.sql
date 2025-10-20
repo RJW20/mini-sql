@@ -1,4 +1,4 @@
-# 302_rowid
+# 301_rowid
 # Tests statements involving the reserved rowid column
 
 # defining a rowid column
