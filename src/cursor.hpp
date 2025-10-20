@@ -2,6 +2,8 @@
 #define MINISQL_CURSOR_HPP
 
 #include <memory>
+#include <type_traits>
+#include <variant>
 
 #include "bplus_tree/bplus_tree.hpp"
 #include "row/schema.hpp"
@@ -63,6 +65,8 @@ private:
         if (eot_) throw EndOfTreeException("erase");
         if (slot_ + 1 != leaf_node_->size()) {
             origin_ = leaf_node_->key<Key>(slot_ + 1);
+            if constexpr (std::is_same_v<Key, Varchar>)
+                std::get<Varchar>(origin_).own_data();
             bp_tree_->erase_from<Key>(leaf_node_.get(), slot_);
             leaf_node_ = nullptr;
             return;
