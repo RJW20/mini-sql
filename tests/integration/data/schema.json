@@ -1,19 +1,18 @@
 {
     "tables": {
         "int_real_text": {
-            "columns": [
-                {"name": "int", "type": "INT"},
-                {"name": "real", "type": "REAL"},
-                {"name": "text", "type": "TEXT(16)"}
-            ],
-            "tests": ["insert_small_seq"]
+            "columns": { "int": "INT", "real": "REAL", "text": "TEXT(16)" },
+            "tests": [
+                "insert_small", "insert_large", "insert_update",
+                "insert_update_delete", "delete_cascade"
+            ]
         },
         "wide": {
-            "columns": [
-                {"name": "text1", "type": "TEXT(64)"},
-                {"name": "text2", "type": "TEXT(128)"}
-            ],
-            "tests": []
+            "columns": {
+                "text64": "TEXT(64)", "text128": "TEXT(128)",
+                "text256": "TEXT(256)"
+            },
+            "tests": ["insert_large", "update_texts"]
         }
     }
 }
