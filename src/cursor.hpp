@@ -76,6 +76,8 @@ private:
                 leaf_node_->next_leaf()
             );
             origin_ = next_leaf->key<Key>(0);
+            if constexpr (std::is_same_v<Key, Varchar>)
+                std::get<Varchar>(origin_).own_data();
             bp_tree_->erase_from<Key>(leaf_node_.get(), slot_);
             leaf_node_ = nullptr;
             return;
