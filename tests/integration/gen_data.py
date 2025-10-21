@@ -9,7 +9,7 @@ from typing import Callable
 
 random.seed(12345)
 DATA_DIR = Path("tests/integration/data")
-DATASET_SIZE = 10_000
+DATASET_SIZE = 500_000
 FLAG_RATES = [1/100, 1/200]
 
 

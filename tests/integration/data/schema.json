@@ -12,7 +12,7 @@
                 "text64": "TEXT(64)", "text128": "TEXT(128)",
                 "text256": "TEXT(256)"
             },
-            "tests": ["insert_large", "update_texts"]
+            "tests": ["insert_large_wide", "update_texts"]
         }
     }
 }
