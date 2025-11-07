@@ -41,6 +41,8 @@ public:
 
     page_id_t root() const noexcept { return root_; }
 
+    void destroy() { destroy(open_node(root_)); }
+
 private:
     FrameManager* fm_;
     key_size_t key_size_;
@@ -57,6 +59,8 @@ private:
 
     std::unique_ptr<InternalNode> open_internal(page_id_t pid) const;
     std::unique_ptr<Node> open_node(page_id_t pid) const;
+
+    void destroy(std::unique_ptr<Node> node);
 
     template <typename T>
     friend struct Wrapper;

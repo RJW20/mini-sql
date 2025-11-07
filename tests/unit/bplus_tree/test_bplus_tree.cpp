@@ -143,11 +143,65 @@ void test_erase() {
 }
 
 template <typename Key>
+void test_destroy() {
+    std::filesystem::path path = make_temp_path();
+    create_file(path);
+    std::fstream file{path, std::ios::binary | std::ios::in | std::ios::out};
+    {
+        const std::size_t page_size = 512;
+        FrameManager fm{file, 0, page_size, 0, 1000};
+        const Node::key_size_t key_size_ = key_size<Key>();
+        const Node::size_t internal_max_slots =
+            (page_size - InternalNodeHeader::SIZE) /
+            (key_size_ + sizeof(page_id_t));
+        const Node::size_t leaf_max_slots =
+            (page_size - LeafNodeHeader::SIZE) / key_size_;
+        const int depth = 4;
+        assert(depth > 2);  // Ensures full testing
+        const std::size_t max_slots =
+            (internal_max_slots + 1) *
+            std::pow(internal_max_slots, depth - 3) * leaf_max_slots;
+
+        BPlusTree bp_tree{&fm, key_size_, key_size_};
+
+        for (int i = 0; i < max_slots; i++) {
+            const Key key = generate<Key>(i);
+            auto leaf_node = bp_tree.seek_leaf<Key>(key);
+            Node::size_t slot =
+                BPlusTree::seek_slot<Key>(leaf_node.get(), key);
+            std::vector<std::byte> bytes{key_size_};
+            byte_io::write<Key>(bytes, 0, key);
+            bp_tree.insert_into<Key>(leaf_node.get(), slot, bytes);
+        }
+
+        page_id_t next_pid = fm.allocate().pid();
+        fm.deallocate(next_pid);
+        bp_tree.destroy();
+        bp_tree = BPlusTree{&fm, key_size_, key_size_};
+
+        for (int i = 0; i < max_slots; i++) {
+            const Key key = generate<Key>(i);
+            auto leaf_node = bp_tree.seek_leaf<Key>(key);
+            Node::size_t slot =
+                BPlusTree::seek_slot<Key>(leaf_node.get(), key);
+            std::vector<std::byte> bytes{key_size_};
+            byte_io::write<Key>(bytes, 0, key);
+            bp_tree.insert_into<Key>(leaf_node.get(), slot, bytes);
+        }
+
+        assert(next_pid == fm.allocate().pid());
+    }
+    delete_path(path);
+    std::cout << "- test_destroy passed" << std::endl;
+}
+
+template <typename Key>
 void run_tests() {
     std::cout << "Running tests for " << typeid(Key).name() << ":" << std::endl;
     test_seek_slot<Key>();
     test_insert<Key>();
     test_erase<Key>();
+    test_destroy<Key>();
 }
 
 int main() {

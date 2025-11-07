@@ -15,9 +15,6 @@
 #include "exceptions/engine_exceptions.hpp"
 #include "field/instantiator.hpp"
 
-#include <iostream>
-#include <string>
-
 namespace minisql {
 
 /* Constructor for B+ Tree.
@@ -331,6 +328,17 @@ std::unique_ptr<Node> BPlusTree::open_node(page_id_t pid) const {
         default:
             throw MagicException(magic);
     }
+}
+
+// Destroy node and the entire sub-tree it contains.
+void BPlusTree::destroy(std::unique_ptr<Node> node) {
+    if (!node->is_leaf()) {
+        InternalNode* internal = dynamic_cast<InternalNode*>(node.get());
+        destroy(open_node(internal->child(-1)));
+        for (size_t slot = 0; slot < internal->size(); slot++)
+            destroy(open_node(internal->child(slot)));
+    }
+    fm_->deallocate(node->pid());
 }
 
 // Wrapper for all templated methods.
