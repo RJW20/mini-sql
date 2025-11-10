@@ -91,6 +91,14 @@ inline std::string build_update_statement(
     return sql.str();
 }
 
+/* Return a string containing sql for removing the row with the given table
+ * name from the master_table. */
+inline std::string build_delete_statement(const std::string& table_name) {
+    std::ostringstream sql;
+    sql << "DELETE FROM " << master_table::NAME << " WHERE "
+        << columns::TABLE_NAME.name << " = \"" << table_name << "\";";
+    return sql.str();
+}
 
 } // namespace minisql::master_table
 

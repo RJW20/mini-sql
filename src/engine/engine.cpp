@@ -20,6 +20,8 @@
 #include "validator/validator.hpp"
 #include "field/varchar.hpp"
 
+#include <iostream>
+
 namespace minisql {
 
 /* Return a DatabaseHandle providing access to the database with given path.
@@ -120,6 +122,10 @@ std::size_t Engine::exec(
                 table->next_rowid
             ), db, true
         );
+    }
+    else if (std::holds_alternative<validator::DropQuery>(query)) {
+        std::string table_name = std::get<validator::DropQuery>(query).table;
+        exec(master_table::build_delete_statement(table_name), db, true);
     }
     return plan->count();
 }
