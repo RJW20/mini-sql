@@ -1,4 +1,4 @@
-# 006_where
+# 007_where
 # Tests basic WHERE commands
 
 CREATE TABLE t (int INT, real REAL, text TEXT(5));

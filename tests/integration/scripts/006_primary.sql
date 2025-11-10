@@ -1,4 +1,4 @@
-# 005_primary
+# 006_primary
 # Tests basic use of PRIMARY KEY declarations
 
 # supported types

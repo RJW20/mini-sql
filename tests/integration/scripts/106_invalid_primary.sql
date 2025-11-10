@@ -1,4 +1,4 @@
-# 105_invalid_primary
+# 106_invalid_primary
 # Tests invalid use of PRIMARY KEY declarations
 
 # missing column
