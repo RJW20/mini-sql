@@ -4,10 +4,9 @@
 #include <string>
 #include <memory>
 #include <utility>
-#include <optional>
 
 #include "planner/iterators/iterator.hpp"
-#include "catalog/table.hpp"
+#include "catalog/catalog.hpp"
 #include "row/schema.hpp"
 #include "row/row_view.hpp"
 
