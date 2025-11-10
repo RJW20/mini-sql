@@ -22,6 +22,8 @@ public:
         page_id_t root = nullpid, rowid_t next_rowid = 0
     ) = 0;
 
+    virtual void erase_table(const std::string& name) = 0;
+
     Table* find_table(const std::string& name) {
         auto it = tables_.find(name);
         if (it != tables_.end()) return &(it->second);
@@ -33,8 +35,6 @@ public:
         if (it != tables_.end()) return &(it->second);
         return nullptr; 
     }
-
-    void erase_table(const std::string& name) { tables_.erase(name); }
 
 protected:
     std::unordered_map<std::string, Table> tables_;

@@ -82,6 +82,15 @@ void Database::add_table(
     );
 }
 
+/* Remove the Table with given name from the Catalog.
+ * Does nothing if the Table does not exist. */
+void Database::erase_table(const std::string& name) {
+    auto it = tables_.find(name);
+    if (it == tables_.end()) return;
+    it->second.bp_tree->destroy();
+    tables_.erase(it);
+}
+
 // Write the database header to the start of file_.
 void Database::flush_header(
     page_id_t page_count, page_id_t first_free_list_block

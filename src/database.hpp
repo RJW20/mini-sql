@@ -30,6 +30,8 @@ public:
         page_id_t root = nullpid, rowid_t next_rowid = 0
     ) override;
 
+    void erase_table(const std::string& name) override;
+
 private:
     std::fstream file_;
     page_id_t master_root_;
