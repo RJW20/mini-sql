@@ -56,8 +56,12 @@ struct DeleteQuery {
     std::vector<Condition> conditions;
 };
 
+struct DropQuery {
+    std::string table;
+};
+
 using Query = std::variant<
-    CreateQuery, SelectQuery, InsertQuery, UpdateQuery, DeleteQuery
+    CreateQuery, SelectQuery, InsertQuery, UpdateQuery, DeleteQuery, DropQuery
 >;
 
 } // namespace minisql::validator

@@ -320,6 +320,16 @@ DeleteQuery validate(
     return query;
 }
 
+/* Return a validated DropQuery from the given parser::DropAST while:
+* - Verifying table's existence.
+* - Asserting table is not the master table. */
+DropQuery validate(const parser::DropAST& ast, const Catalog& catalog) {
+    const Table* table = catalog.find_table(ast.table);
+    if (!table || ast.table == master_table::NAME)
+        throw TableExistenceException(ast.table, false);
+    return {ast.table};
+}
+
 // Visitor struct for dispatching queries to correct validator.
 struct Validator {
     Catalog& catalog;
@@ -339,6 +349,9 @@ struct Validator {
     }
     Query operator()(const parser::DeleteAST& ast) const {
         return validate(ast, catalog, master_enabled);
+    }
+    Query operator()(const parser::DropAST& ast) const {
+        return validate(ast, catalog);
     }
 };
 
