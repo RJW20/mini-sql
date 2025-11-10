@@ -58,8 +58,12 @@ struct DeleteAST {
     std::vector<Condition> conditions;
 };
 
+struct DropAST {
+    std::string table;
+};
+
 using AST = std::variant<
-    CreateAST, SelectAST, InsertAST, UpdateAST, DeleteAST
+    CreateAST, SelectAST, InsertAST, UpdateAST, DeleteAST, DropAST
 >;
 
 } // namespace minisql::parser

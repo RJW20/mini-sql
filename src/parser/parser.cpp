@@ -31,6 +31,7 @@ public:
             case TokenType::INSERT: return parse_insert();
             case TokenType::UPDATE: return parse_update();
             case TokenType::DELETE: return parse_delete();
+            case TokenType::DROP: return parse_drop();
             default: raise_exception();
         }
         __builtin_unreachable();
@@ -83,6 +84,7 @@ private:
     InsertAST parse_insert();
     UpdateAST parse_update();
     DeleteAST parse_delete();
+    DropAST parse_drop();
 
     void raise_exception() { throw SyntaxException(peek().text); }
 };
@@ -133,6 +135,7 @@ void Parser::tokenise(std::string_view sql) {
             else if (text == "INSERT") type = TokenType::INSERT;
             else if (text == "UPDATE") type = TokenType::UPDATE;
             else if (text == "DELETE") type = TokenType::DELETE;
+            else if (text == "DROP") type = TokenType::DROP;
             else if (text == "TABLE") type = TokenType::TABLE;
             else if (text == "INT") type = TokenType::INT;
             else if (text == "REAL") type = TokenType::REAL;
@@ -405,6 +408,17 @@ DeleteAST Parser::parse_delete() {
         while (match(TokenType::AND))
             ast.conditions.push_back(parse_condition());
     }
+
+    expect(TokenType::SEMICOLON);
+    return ast;
+}
+
+// Return a DropAST build from tokens.
+DropAST Parser::parse_drop() {
+
+    expect(TokenType::DROP);
+    expect(TokenType::TABLE);
+    DropAST ast = {parse_identifier()};
 
     expect(TokenType::SEMICOLON);
     return ast;
