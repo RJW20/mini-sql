@@ -22,6 +22,7 @@
 #include "planner/iterators/insert.hpp"
 #include "planner/iterators/update.hpp"
 #include "planner/iterators/erase.hpp"
+#include "planner/iterators/drop.hpp"
 
 namespace minisql::planner {
 
@@ -253,6 +254,11 @@ Plan plan(const validator::DeleteQuery& query, const Catalog& catalog) {
     return std::make_unique<Erase>(std::move(plan), cursor_ptr);
 }
 
+// Return a Drop iterator corresponding to a DropQuery.
+Plan plan(const validator::DropQuery& query, Catalog& catalog) {
+    return std::make_unique<Drop>(catalog, query.table);
+}
+
 // Visitor struct for dispatching validated queries to correct planner.
 struct Planner {
     Catalog& catalog;
@@ -270,6 +276,9 @@ struct Planner {
         return plan(query, catalog);
     }
     Plan operator()(const validator::DeleteQuery& query) const {
+        return plan(query, catalog);
+    }
+    Plan operator()(const validator::DropQuery& query) const {
         return plan(query, catalog);
     }
 };
