@@ -10,7 +10,6 @@
 #include "catalog/catalog.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "row/schema.hpp"
-#include "catalog/table.hpp"
 #include "frame_manager/frame_manager.hpp"
 
 namespace minisql {
@@ -30,9 +29,6 @@ public:
         const std::string& name, std::unique_ptr<Schema> schema,
         page_id_t root = nullpid, rowid_t next_rowid = 0
     ) override;
-
-    Table* find_table(const std::string& name) override;
-    const Table* find_table(const std::string& name) const override;
 
 private:
     std::fstream file_;

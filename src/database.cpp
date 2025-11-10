@@ -14,7 +14,6 @@
 #include "exceptions/engine_exceptions.hpp"
 #include "frame_manager/frame_manager.hpp"
 #include "row/schema.hpp"
-#include "catalog/table.hpp"
 #include "bplus_tree/bplus_tree.hpp"
 
 namespace minisql {
@@ -81,22 +80,6 @@ void Database::add_table(
         std::forward_as_tuple(name),
         std::forward_as_tuple(std::move(bp_tree), std::move(schema), next_rowid)
     );
-}
-
-/* Return a pointer to the Table in the Catalog with given name.
- * Returns nullptr if not found. */
-Table* Database::find_table(const std::string& name) {
-    auto it = tables_.find(name);
-    if (it != tables_.end()) return &(it->second);
-    return nullptr;
-}
-
-/* Return a pointer to the const Table in the const Catalog with given name.
- * Returns nullptr if not found. */
-const Table* Database::find_table(const std::string& name) const {
-    auto it = tables_.find(name);
-    if (it != tables_.end()) return &(it->second);
-    return nullptr; 
 }
 
 // Write the database header to the start of file_.
