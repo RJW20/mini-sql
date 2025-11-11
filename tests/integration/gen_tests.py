@@ -95,7 +95,8 @@ def gen_insert(
     Depending on order type, the insertion of elements will be in ascending
     order or randomized.
     num_rows is the number of rows to insert into each table.
-    batch_size is the amount of rows to insert per INSERT statement."""
+    batch_size is the amount of rows to insert per INSERT statement.
+    """
 
     flags = [
         Column(
@@ -255,6 +256,35 @@ def gen_delete_cascade(
             output.write(f"{delete_count} rows affected\n")
 
 
+def gen_drop(
+    script: TextIO, output: TextIO, tables: Tables, order_type: Order,
+    num_rows: int, batch_size: int
+) -> None:
+    """Write to script and output SQL for creating, inserting into and dropping
+    tables alongside the expected results.
+    
+    Calls gen_insert first.
+    Drops all tables.
+    Calls gen_insert again.
+    """
+
+    gen_insert(script, output, tables, order_type, num_rows, batch_size)
+    
+    script.write('\n')
+    for name, info in tables.items():
+        columns = [
+            Column(name, type) for name, type in info["columns"].items()
+        ]
+        for primary in [None] + [name for name, type in columns]:
+            table_name = name
+            if primary: table_name += f"_pk_{primary}"
+            drop = f"DROP TABLE {table_name};"
+            print(drop, file=script)
+            output.write("0 rows affected\n")
+
+    gen_insert(script, output, tables, order_type, num_rows, batch_size)
+
+
 def run_gen_test(
     base_test_name: str, order_type: Order,
     test_generator: Callable[[TextIO, TextIO, Tables, Order], None],
@@ -301,6 +331,8 @@ def main() -> None:
     * insert_update_delete_random
     * delete_cascade_seq
     * delete_cascade_random
+    * drop_seq
+    * drop_random
     """
 
     with open(DATA_DIR / "schema.json") as f:
@@ -390,6 +422,13 @@ def main() -> None:
         partial(
             gen_delete_cascade, num_rows=TABLE_MEDIUM, batch_size=BATCH_LARGE
         ),
+        tables
+    )
+
+    # drop
+    run_gen_test(
+        "drop", Order.RANDOM,
+        partial(gen_drop, num_rows=TABLE_MEDIUM, batch_size=BATCH_LARGE),
         tables
     )
 
