@@ -99,7 +99,7 @@ The table below details the size and operations of each stress-test along with t
 | insert_update_random        | 4        | 1M             | 1K         | Random     | N/A        | Insert → update 10%             | Test updates that modify random records       |
 | update_random_texts         | 3        | 1M             | 1K         | Random     | N/A        | Insert → update TEXT fields     | Validate variable-length storage integrity    |
 | insert_update_delete_seq    | 4        | 1M             | 1K         | Sequential | Sequential | Insert → update 10% → delete 5% | Verify correctness with sequential row churn  |
-| insert_update_delete_random | 4        | 1M             | 1K         | Random     | Random     | Insert → update 10% → delete 5% | Stress free-space reuse and fragmentation     |
+| insert_update_delete_random | 4        | 1M             | 1K         | Random     | Random     | Insert → update 10% → delete 5% | Vefify correctness for scattered rows         |
 | delete_cascade_seq          | 4        | 1M             | 1K         | Sequential | Sequential | Insert → delete 90%             | Check large contiguous deletes                |
-| delete_cascade_random       | 4        | 1M             | 1K         | Random     | Random     | Insert → delete 90%             | Force scattered free space and page reuse     |
-
+| delete_cascade_random       | 4        | 1M             | 1K         | Random     | Random     | Insert → delete 90%             | Check many non-contiguous deletes             |
+| drop_random                 | 4        | 1M             | 1K         | Random     | N/A        | Insert → drop → insert          | Force scattered free space and page reuse     |
