@@ -7,7 +7,8 @@
 #include <sstream>
 #include <variant>
 
-#include "script_reader.hpp"
+#include <minisql/script_reader.hpp>
+
 #include "connection.hpp"
 #include "exceptions/exception.hpp"
 #include "row_set/row_set.hpp"

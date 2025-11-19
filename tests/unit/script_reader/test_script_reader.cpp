@@ -1,4 +1,4 @@
-#include "script_reader.hpp"
+#include <minisql/script_reader.hpp>
 
 #include <iostream>
 #include <filesystem>
