@@ -24,8 +24,8 @@ set(SOURCES
     src/engine/database_handle.cpp
     src/engine/engine.cpp
 )
-add_library(mini-sql STATIC ${SOURCES})
+add_library(minisql STATIC ${SOURCES})
 
-target_include_directories(mini-sql PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(minisql PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(tests)

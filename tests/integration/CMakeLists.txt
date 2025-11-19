@@ -1,6 +1,6 @@
 # Integration test executable
 add_executable(runner runner.cpp)
-target_link_libraries(runner PRIVATE mini-sql)
+target_link_libraries(runner PRIVATE minisql)
 
 # Dataset generator script + stamp
 set(GEN_DATA_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/gen_data.py)
