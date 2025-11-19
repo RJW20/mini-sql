@@ -26,6 +26,12 @@ set(SOURCES
 )
 add_library(minisql STATIC ${SOURCES})
 
-target_include_directories(minisql PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(minisql
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 
 add_subdirectory(tests)
