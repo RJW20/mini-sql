@@ -1,17 +1,17 @@
 #include "planner/compiler.hpp"
 
 #include <functional>
+#include <string>
 #include <utility>
 #include <variant>
-#include <string>
 #include <vector>
 
+#include "exceptions/engine_exceptions.hpp"
 #include "field/field.hpp"
 #include "field/varchar.hpp"
-#include "exceptions/engine_exceptions.hpp"
-#include "validator/query.hpp"
-#include "row/schema.hpp"
 #include "row/row_view.hpp"
+#include "row/schema.hpp"
+#include "validator/query.hpp"
 
 namespace minisql::planner {
 

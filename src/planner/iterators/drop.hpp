@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "planner/iterators/iterator.hpp"
 #include "catalog/catalog.hpp"
+#include "planner/iterators/iterator.hpp"
 #include "row/row_view.hpp"
 
 namespace minisql::planner {

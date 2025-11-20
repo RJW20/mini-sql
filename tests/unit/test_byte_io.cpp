@@ -1,11 +1,11 @@
 #include "byte_io.hpp"
 
 #include <cassert>
-#include <iostream>
 #include <cstddef>
 #include <cstdint>
-#include <vector>
+#include <iostream>
 #include <typeinfo>
+#include <vector>
 
 #include "exceptions/engine_exceptions.hpp"
 

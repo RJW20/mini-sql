@@ -2,8 +2,8 @@
 #define MINISQL_LEAF_NODE_HPP
 
 #include <cstddef>
-#include <utility>
 #include <cstring>
+#include <utility>
 
 #include "bplus_tree/node.hpp"
 #include "frame_manager/cache/frame_view.hpp"

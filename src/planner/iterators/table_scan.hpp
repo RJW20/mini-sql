@@ -1,17 +1,17 @@
 #ifndef MINISQL_PLANNER_TABLE_SCAN_HPP
 #define MINISQL_PLANNER_TABLE_SCAN_HPP
 
+#include <cfloat>
+#include <climits>
 #include <memory>
 #include <utility>
-#include <climits>
-#include <cfloat>
 
-#include "planner/iterators/iterator.hpp"
 #include "cursor.hpp"
-#include "row/schema.hpp"
 #include "field/field.hpp"
 #include "field/varchar.hpp"
+#include "planner/iterators/iterator.hpp"
 #include "row/row_view.hpp"
+#include "row/schema.hpp"
 
 namespace minisql::planner {
 

@@ -1,11 +1,11 @@
 #ifndef MINISQL_SCRIPT_READER_HPP
 #define MINISQL_SCRIPT_READER_HPP
 
+#include <algorithm>
 #include <cstddef>
 #include <istream>
 #include <optional>
 #include <string>
-#include <algorithm>
 
 namespace minisql {
 

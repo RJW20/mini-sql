@@ -3,14 +3,14 @@
 
 #include <cstddef>
 #include <filesystem>
-#include <string>
-#include <memory>
 #include <fstream>
+#include <memory>
+#include <string>
 
 #include "catalog/catalog.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
-#include "row/schema.hpp"
 #include "frame_manager/frame_manager.hpp"
+#include "row/schema.hpp"
 
 namespace minisql {
 

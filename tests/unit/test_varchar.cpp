@@ -1,11 +1,10 @@
 #include "field/varchar.hpp"
 
 #include <cassert>
-#include <iostream>
 #include <cstddef>
+#include <iostream>
 #include <utility>
 #include <vector>
-#include <functional>
 
 #include "byte_io.hpp"
 

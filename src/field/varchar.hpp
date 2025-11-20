@@ -1,15 +1,15 @@
 #ifndef MINISQL_VARCHAR_HPP
 #define MINISQL_VARCHAR_HPP
 
+#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <memory>
 #include <utility>
-#include <algorithm>
 
 #include "byte_io.hpp"
-#include "span.hpp"
 #include "exceptions/engine_exceptions.hpp"
+#include "span.hpp"
 
 namespace minisql {
 

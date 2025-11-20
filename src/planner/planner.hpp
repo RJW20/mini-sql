@@ -3,9 +3,9 @@
 
 #include <memory>
 
+#include "catalog/catalog.hpp"
 #include "planner/iterators/iterator.hpp"
 #include "validator/query.hpp"
-#include "catalog/catalog.hpp"
 
 namespace minisql::planner {
 

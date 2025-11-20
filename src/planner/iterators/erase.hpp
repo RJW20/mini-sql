@@ -4,8 +4,8 @@
 #include <memory>
 #include <utility>
 
-#include "planner/iterators/iterator.hpp"
 #include "cursor.hpp"
+#include "planner/iterators/iterator.hpp"
 #include "row/row_view.hpp"
 
 namespace minisql::planner {

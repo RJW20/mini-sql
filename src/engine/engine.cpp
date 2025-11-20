@@ -3,24 +3,22 @@
 #include <cstddef>
 #include <filesystem>
 #include <memory>
-#include <variant>
-#include <utility>
 #include <string>
 #include <string_view>
+#include <utility>
+#include <variant>
 
-#include "engine/database_handle.hpp"
 #include "database.hpp"
+#include "engine/database_handle.hpp"
+#include "engine/master_table.hpp"
+#include "field/varchar.hpp"
 #include "parser/ast.hpp"
 #include "parser/parser.hpp"
-#include "engine/master_table.hpp"
 #include "row/schema.hpp"
-#include "row_set/row_set.hpp"
 #include "row/row.hpp"
+#include "row_set/row_set.hpp"
 #include "validator/query.hpp"
 #include "validator/validator.hpp"
-#include "field/varchar.hpp"
-
-#include <iostream>
 
 namespace minisql {
 

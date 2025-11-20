@@ -1,8 +1,8 @@
 #ifndef MINISQL_HEADERS_HPP
 #define MINISQL_HEADERS_HPP
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 
 #include "frame_manager/disk_manager/page_id_t.hpp"
 

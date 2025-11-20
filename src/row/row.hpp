@@ -2,10 +2,10 @@
 #define MINISQL_ROW_HPP
 
 #include <cstddef>
-#include <vector>
 #include <memory>
-#include <utility>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "field/field.hpp"
 #include "row/schema.hpp"

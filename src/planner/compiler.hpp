@@ -6,8 +6,8 @@
 
 #include "field/field.hpp"
 #include "row/row_view.hpp"
-#include "validator/query.hpp"
 #include "row/schema.hpp"
+#include "validator/query.hpp"
 
 namespace minisql::planner {
 

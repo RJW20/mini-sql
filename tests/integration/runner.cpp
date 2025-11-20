@@ -1,9 +1,13 @@
 #include <cstddef>
-#include <iostream>
 #include <filesystem>
-#include <string>
 #include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 
+#include <minisql/script_reader.hpp>
+
+#include "connection.hpp"
 #include "directory_iterable.hpp"
 #include "executor.hpp"
 

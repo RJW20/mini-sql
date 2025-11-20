@@ -1,11 +1,11 @@
 #ifndef DIRECTORY_ITERABLE_HPP
 #define DIRECTORY_ITERABLE_HPP
 
-#include <filesystem>
 #include <algorithm>
-#include <vector>
+#include <filesystem>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace fs = std::filesystem;
 

@@ -1,11 +1,11 @@
 #include <minisql/script_reader.hpp>
 
-#include <iostream>
 #include <filesystem>
 #include <fstream>
-#include <vector>
-#include <string>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace fs = std::filesystem;
 

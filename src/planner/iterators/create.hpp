@@ -1,14 +1,14 @@
 #ifndef MINISQL_PLANNER_CREATE_HPP
 #define MINISQL_PLANNER_CREATE_HPP
 
-#include <string>
 #include <memory>
+#include <string>
 #include <utility>
 
-#include "planner/iterators/iterator.hpp"
 #include "catalog/catalog.hpp"
-#include "row/schema.hpp"
+#include "planner/iterators/iterator.hpp"
 #include "row/row_view.hpp"
+#include "row/schema.hpp"
 
 namespace minisql::planner {
 

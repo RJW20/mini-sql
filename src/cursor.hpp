@@ -6,12 +6,12 @@
 #include <variant>
 
 #include "bplus_tree/bplus_tree.hpp"
-#include "row/schema.hpp"
-#include "field/field.hpp"
-#include "row/row_view.hpp"
 #include "bplus_tree/leaf_node.hpp"
 #include "bplus_tree/node.hpp"
 #include "exceptions/engine_exceptions.hpp"
+#include "field/field.hpp"
+#include "row/row_view.hpp"
+#include "row/schema.hpp"
 
 namespace minisql {
 

@@ -1,14 +1,14 @@
 #ifndef MINISQL_SCHEMA_HPP
 #define MINISQL_SCHEMA_HPP
 
-#include <cstddef>
-#include <string>
-#include <memory>
-#include <vector>
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
-#include <utility>
+#include <memory>
+#include <string>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "field/field.hpp"
 

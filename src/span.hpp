@@ -1,9 +1,9 @@
 #ifndef MINISQL_SPAN_HPP
 #define MINISQL_SPAN_HPP
 
+#include <array>
 #include <cstddef>
 #include <type_traits>
-#include <array>
 #include <vector>
 
 namespace minisql {

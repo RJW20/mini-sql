@@ -2,12 +2,10 @@
 #define MINISQL_MASTER_TABLE_HPP
 
 #include <cstddef>
-#include <string>
-#include <sstream>
 #include <initializer_list>
+#include <sstream>
+#include <string>
 #include <unordered_map>
-
-#include "catalog/table.hpp"
 
 namespace minisql::master_table {
 

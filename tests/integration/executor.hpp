@@ -3,8 +3,8 @@
 
 #include <cstddef>
 #include <optional>
-#include <string>
 #include <sstream>
+#include <string>
 #include <variant>
 
 #include <minisql/script_reader.hpp>

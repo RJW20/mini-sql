@@ -1,10 +1,10 @@
 #ifndef MINISQL_FRAME_HPP
 #define MINISQL_FRAME_HPP
 
-#include <cstdint>
 #include <cstddef>
-#include <vector>
+#include <cstdint>
 #include <list>
+#include <vector>
 
 #include "frame_manager/disk_manager/page_id_t.hpp"
 

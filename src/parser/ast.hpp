@@ -2,10 +2,10 @@
 #define MINISQL_PARSER_AST_HPP
 
 #include <cstddef>
-#include <variant>
-#include <string>
-#include <vector>
 #include <optional>
+#include <string>
+#include <variant>
+#include <vector>
 
 #include "field/field.hpp"
 

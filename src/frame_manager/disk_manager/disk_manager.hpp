@@ -1,7 +1,6 @@
 #ifndef MINISQL_DISK_MANAGER_HPP
 #define MINISQL_DISK_MANAGER_HPP
 
-#include <cstdint>
 #include <cstddef>
 #include <fstream>
 

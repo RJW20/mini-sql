@@ -1,14 +1,15 @@
 #ifndef MINISQL_PLANNER_VALUES_HPP
 #define MINISQL_PLANNER_VALUES_HPP
 
-#include <vector>
-#include <utility>
 #include <limits>
+#include <memory>
+#include <utility>
+#include <vector>
 
-#include "planner/iterators/iterator.hpp"
 #include "field/field.hpp"
-#include "row/schema.hpp"
+#include "planner/iterators/iterator.hpp"
 #include "row/row_view.hpp"
+#include "row/schema.hpp"
 
 namespace minisql::planner {
 

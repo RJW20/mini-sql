@@ -1,13 +1,13 @@
 #ifndef MINISQL_CATALOG_HPP
 #define MINISQL_CATALOG_HPP
 
-#include <string>
 #include <memory>
+#include <string>
 #include <unordered_map>
 
-#include "row/schema.hpp"
-#include "frame_manager/disk_manager/page_id_t.hpp"
 #include "catalog/table.hpp"
+#include "frame_manager/disk_manager/page_id_t.hpp"
+#include "row/schema.hpp"
 
 namespace minisql {
 

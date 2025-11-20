@@ -5,8 +5,8 @@
 #include <cstring>
 #include <type_traits>
 
-#include "span.hpp"
 #include "exceptions/engine_exceptions.hpp"
+#include "span.hpp"
  
 namespace minisql {
 

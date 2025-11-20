@@ -2,8 +2,8 @@
 #define MINISQL_FIELD_HPP
 
 #include <cstdint>
-#include <variant>
 #include <type_traits>
+#include <variant>
 
 #include "field/varchar.hpp"
 

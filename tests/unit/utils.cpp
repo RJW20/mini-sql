@@ -4,11 +4,11 @@
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "frame_manager/disk_manager/page_id_t.hpp"
 #include "field/varchar.hpp"
+#include "frame_manager/disk_manager/page_id_t.hpp"
 #include "headers.hpp"
 
 // ----------------------------------------------------------------------------

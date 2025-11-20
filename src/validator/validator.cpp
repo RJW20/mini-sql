@@ -1,21 +1,21 @@
 #include "validator/validator.hpp"
 
 #include <cstddef>
-#include <variant>
-#include <string>
-#include <utility>
-#include <unordered_set>
 #include <numeric>
+#include <string>
+#include <unordered_set>
+#include <utility>
+#include <variant>
 #include <vector>
 
+#include "catalog/catalog.hpp"
+#include "engine/master_table.hpp"
+#include "exceptions/query_exceptions.hpp"
 #include "field/field.hpp"
 #include "parser/ast.hpp"
 #include "row/schema.hpp"
-#include "exceptions/query_exceptions.hpp"
-#include "validator/query.hpp"
-#include "catalog/catalog.hpp"
-#include "engine/master_table.hpp"
 #include "validator/constants.hpp"
+#include "validator/query.hpp"
 
 namespace minisql::validator {
 

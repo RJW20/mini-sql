@@ -1,8 +1,8 @@
 #ifndef MINISQL_DATABASE_HANDLE_HPP
 #define MINISQL_DATABASE_HANDLE_HPP
 
-#include <memory>
 #include <filesystem>
+#include <memory>
 #include <utility>
 
 #include "database.hpp"
@@ -18,7 +18,7 @@ public:
     DatabaseHandle(
         Engine& engine, std::shared_ptr<Database> db,
         const std::filesystem::path& path
-    ) : engine_(engine), db_(std::move(db)), path_(std::move(path)) {}
+    ) : engine_{engine}, db_{std::move(db)}, path_{std::move(path)} {}
 
     ~DatabaseHandle();
 

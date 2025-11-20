@@ -3,11 +3,11 @@
 #include <memory>
 
 #include "bplus_tree/bplus_tree.hpp"
-#include "row/schema.hpp"
+#include "exceptions/engine_exceptions.hpp"
 #include "field/field.hpp"
 #include "field/varchar.hpp"
 #include "row/row_view.hpp"
-#include "exceptions/engine_exceptions.hpp"
+#include "row/schema.hpp"
 
 namespace minisql {
 

@@ -1,16 +1,16 @@
 #include "parser/parser.hpp"
 
-#include <cstddef>
-#include <string_view>
-#include <vector>
-#include <string>
 #include <cctype>
+#include <cstddef>
+#include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
+#include "exceptions/query_exceptions.hpp"
+#include "field/field.hpp"
 #include "parser/ast.hpp"
 #include "parser/token.hpp"
-#include "field/field.hpp"
-#include "exceptions/query_exceptions.hpp"
 #include "validator/constants.hpp"
 
 namespace minisql::parser {

@@ -2,16 +2,16 @@
 
 #include <cstddef>
 #include <memory>
+#include <utility>
 #include <vector>
 #include <variant>
-#include <utility>
 
-#include "row/row_view.hpp"
-#include "span.hpp"
-#include "row/schema.hpp"
-#include "field/field.hpp"
 #include "byte_io.hpp"
+#include "field/field.hpp"
 #include "field/varchar.hpp"
+#include "row/row_view.hpp"
+#include "row/schema.hpp"
+#include "span.hpp"
 
 namespace minisql {
 

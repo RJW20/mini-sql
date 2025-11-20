@@ -1,28 +1,28 @@
 #include "planner/planner.hpp"
 
 #include <memory>
-#include <vector>
-#include <utility>
 #include <optional>
+#include <utility>
 #include <variant>
+#include <vector>
 
-#include "planner/iterators/table_scan.hpp"
-#include "cursor.hpp"
-#include "row/schema.hpp"
-#include "validator/query.hpp"
-#include "planner/iterators/index_scan.hpp"
-#include "planner/compiler.hpp"
 #include "catalog/catalog.hpp"
-#include "planner/iterators/create.hpp"
 #include "catalog/table.hpp"
-#include "planner/iterators/filter.hpp"
-#include "validator/constants.hpp"
-#include "planner/iterators/project.hpp"
-#include "planner/iterators/values.hpp"
-#include "planner/iterators/insert.hpp"
-#include "planner/iterators/update.hpp"
-#include "planner/iterators/erase.hpp"
+#include "cursor.hpp"
+#include "planner/compiler.hpp"
+#include "planner/iterators/create.hpp"
 #include "planner/iterators/drop.hpp"
+#include "planner/iterators/erase.hpp"
+#include "planner/iterators/filter.hpp"
+#include "planner/iterators/index_scan.hpp"
+#include "planner/iterators/insert.hpp"
+#include "planner/iterators/project.hpp"
+#include "planner/iterators/table_scan.hpp"
+#include "planner/iterators/update.hpp"
+#include "planner/iterators/values.hpp"
+#include "row/schema.hpp"
+#include "validator/constants.hpp"
+#include "validator/query.hpp"
 
 namespace minisql::planner {
 

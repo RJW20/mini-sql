@@ -5,9 +5,9 @@
 #include <filesystem>
 #include <string_view>
 
-#include "row_set/row_set.hpp"
-#include "engine/engine.hpp"
 #include "engine/database_handle.hpp"
+#include "engine/engine.hpp"
+#include "row_set/row_set.hpp"
 
 namespace minisql {
 
