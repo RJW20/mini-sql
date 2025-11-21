@@ -6,7 +6,8 @@
 #include <variant>
 #include <vector>
 
-#include "field/field.hpp"
+#include "field/type.hpp"
+#include "minisql/field.hpp"
 
 namespace minisql::validator {
 

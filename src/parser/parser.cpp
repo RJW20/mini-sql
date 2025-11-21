@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "exceptions/query_exceptions.hpp"
-#include "field/field.hpp"
+#include "field/type.hpp"
 #include "parser/ast.hpp"
 #include "parser/token.hpp"
 #include "validator/constants.hpp"

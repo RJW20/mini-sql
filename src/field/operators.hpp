@@ -1,19 +1,12 @@
-#ifndef MINISQL_FIELD_HPP
-#define MINISQL_FIELD_HPP
+#ifndef MINISQL_FIELD_OPERATORS_HPP
+#define MINISQL_FIELD_OPERATORS_HPP
 
-#include <cstdint>
 #include <type_traits>
 #include <variant>
 
-#include "minisql/varchar.hpp"
+#include "minisql/field.hpp"
 
 namespace minisql {
-
-// Enum detailing supported datatypes.
-enum class FieldType : std::uint8_t { INT, REAL, TEXT };
-
-// Variant holding any supported datatype.
-using Field = std::variant<int, double, Varchar>;
 
 // Less than operator for 2 Fields of the same type.
 template <typename T>
@@ -59,4 +52,4 @@ Field field_division(const Field& lhs, const Field& rhs) {
 
 } // namespace minisql
 
-#endif // MINISQL_FIELD_HPP
+#endif // MINISQL_FIELD_OPERATORS_HPP

@@ -7,7 +7,7 @@
 #include <variant>
 
 #include "byte_io.hpp"
-#include "field/field.hpp"
+#include "field/type.hpp"
 #include "minisql/varchar.hpp"
 #include "row/row_view.hpp"
 #include "row/schema.hpp"

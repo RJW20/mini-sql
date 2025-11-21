@@ -7,7 +7,7 @@
 #include <variant>
 #include <vector>
 
-#include "field/field.hpp"
+#include "field/type.hpp"
 
 namespace minisql::parser {
 

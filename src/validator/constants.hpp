@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <string>
 
-#include "field/field.hpp"
+#include "field/type.hpp"
 
 namespace minisql::validator {
     

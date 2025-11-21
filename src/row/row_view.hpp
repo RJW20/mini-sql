@@ -8,7 +8,8 @@
 #include <vector>
 
 #include "byte_io.hpp"
-#include "field/field.hpp"
+#include "field/type.hpp"
+#include "minisql/field.hpp"
 #include "minisql/varchar.hpp"
 #include "row.hpp"
 #include "row/schema.hpp"

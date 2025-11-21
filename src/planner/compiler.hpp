@@ -4,7 +4,8 @@
 #include <functional>
 #include <vector>
 
-#include "field/field.hpp"
+#include "field/type.hpp"
+#include "minisql/field.hpp"
 #include "row/row_view.hpp"
 #include "row/schema.hpp"
 #include "validator/query.hpp"

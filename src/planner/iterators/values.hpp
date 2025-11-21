@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-#include "field/field.hpp"
+#include "minisql/field.hpp"
 #include "planner/iterators/iterator.hpp"
 #include "row/row_view.hpp"
 #include "row/schema.hpp"

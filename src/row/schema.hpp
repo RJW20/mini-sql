@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "field/field.hpp"
+#include "field/type.hpp"
 
 namespace minisql {
 
