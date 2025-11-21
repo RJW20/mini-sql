@@ -8,7 +8,7 @@
 
 #include "byte_io.hpp"
 #include "field/field.hpp"
-#include "field/varchar.hpp"
+#include "minisql/varchar.hpp"
 #include "row/row_view.hpp"
 #include "row/schema.hpp"
 #include "span.hpp"

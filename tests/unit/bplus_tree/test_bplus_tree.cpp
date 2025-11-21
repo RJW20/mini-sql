@@ -9,9 +9,10 @@
 #include <typeinfo>
 #include <vector>
 
+#include <minisql/varchar.hpp>
+
 #include "bplus_tree/node.hpp"
 #include "byte_io.hpp"
-#include "field/varchar.hpp"
 #include "frame_manager/cache/frame.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "frame_manager/frame_manager.hpp"

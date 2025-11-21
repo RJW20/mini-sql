@@ -7,10 +7,6 @@
 #include <memory>
 #include <utility>
 
-#include "byte_io.hpp"
-#include "exceptions/engine_exceptions.hpp"
-#include "span.hpp"
-
 namespace minisql {
 
 /* Varchar
@@ -29,8 +25,6 @@ public:
     // Constructor: view-only
     Varchar(char* external, std::size_t size)
         : owned_{nullptr}, data_{external}, size_{size} {}
-
-    ~Varchar() = default;
 
     // Copy constructor: copy ownership (if applicable)
     Varchar(const Varchar& other) : size_{other.size_} {
@@ -119,47 +113,6 @@ private:
 
 // Minimum value for an object of type Varchar
 const Varchar VCHR_MIN("", 0);
-
-// ----------------------------------------------------------------------------
-// Template specialisations for byte_io
-// ----------------------------------------------------------------------------
-
-template <>
-inline Varchar byte_io::copy<Varchar>(
-    span<std::byte> bytes, std::size_t offset, std::size_t size
-) {
-    if (offset + size > bytes.size())
-        throw ByteIOException("copy", offset + size, bytes.size());
-    return Varchar(reinterpret_cast<const char*>(bytes.data() + offset), size);
-}
-
-template <>
-inline const Varchar byte_io::view<Varchar>(
-    span<std::byte> bytes, std::size_t offset, std::size_t size
-) {
-    if (offset + size > bytes.size())
-        throw ByteIOException("view", offset + size, bytes.size());
-    return Varchar(reinterpret_cast<char*>(bytes.data() + offset), size);
-}
-
-template <>
-inline void byte_io::write<Varchar>(
-    span<std::byte> bytes, std::size_t offset, const Varchar& v
-) {
-    const std::size_t size = v.size();
-    if (offset + size > bytes.size())
-        throw ByteIOException("write", offset + size, bytes.size());
-    std::memcpy(bytes.data() + offset, v.data(), size);
-}
-
-template <>
-class DuplicateKeyException<Varchar> : public CursorException {
-public:
-    explicit DuplicateKeyException(const Varchar& key)
-        : CursorException(
-            "key \"" + std::string(key.data()) + "\" already exists"
-        ) {}
-};
 
 } // namespace minisql
 

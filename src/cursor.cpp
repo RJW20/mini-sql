@@ -5,7 +5,7 @@
 #include "bplus_tree/bplus_tree.hpp"
 #include "exceptions/engine_exceptions.hpp"
 #include "field/field.hpp"
-#include "field/varchar.hpp"
+#include "minisql/varchar.hpp"
 #include "row/row_view.hpp"
 #include "row/schema.hpp"
 

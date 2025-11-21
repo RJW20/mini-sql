@@ -8,6 +8,7 @@
 #include "exceptions/exception.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "headers.hpp"
+#include "minisql/varchar.hpp"
 
 namespace minisql {
 
@@ -103,6 +104,15 @@ class DuplicateKeyException : public CursorException {
 public:
     explicit DuplicateKeyException(T key)
         : CursorException("key " + std::to_string(key) + " already exists") {}
+};
+
+template <>
+class DuplicateKeyException<Varchar> : public CursorException {
+public:
+    explicit DuplicateKeyException(const Varchar& key)
+        : CursorException(
+            "key \"" + std::string(key.data()) + "\" already exists"
+        ) {}
 };
 
 // Thrown when a cursor is position beyond the end of a tree.

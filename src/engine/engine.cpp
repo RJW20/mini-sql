@@ -11,7 +11,7 @@
 #include "database.hpp"
 #include "engine/database_handle.hpp"
 #include "engine/master_table.hpp"
-#include "field/varchar.hpp"
+#include "minisql/varchar.hpp"
 #include "parser/ast.hpp"
 #include "parser/parser.hpp"
 #include "row/schema.hpp"

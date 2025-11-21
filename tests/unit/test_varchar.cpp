@@ -1,12 +1,9 @@
-#include "field/varchar.hpp"
+#include <minisql/varchar.hpp>
 
 #include <cassert>
-#include <cstddef>
 #include <iostream>
 #include <utility>
 #include <vector>
-
-#include "byte_io.hpp"
 
 using namespace minisql;
 
@@ -105,16 +102,6 @@ void test_less_than_operator() {
     std::cout << "- test_less_than_operator passed" << std::endl;
 }
 
-void test_byte_io_write_copy_view() {
-    std::vector<std::byte> bytes(20);
-    const std::size_t test_offset = 0;
-    Varchar v("testing", 10);
-    byte_io::write<Varchar>(bytes, test_offset, v);
-    assert(byte_io::copy<Varchar>(bytes, test_offset, v.size()) == v);
-    assert(byte_io::view<Varchar>(bytes, test_offset, v.size()) == v);
-    std::cout << "- test_byte_io_write_copy_view passed" << std::endl;
-}
-
 int main() {
     test_constructor();
     test_view_constructor();
@@ -125,7 +112,6 @@ int main() {
     test_move_assignment();
     test_own_data();
     test_less_than_operator();
-    test_byte_io_write_copy_view();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

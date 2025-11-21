@@ -8,7 +8,7 @@
 
 #include "cursor.hpp"
 #include "field/field.hpp"
-#include "field/varchar.hpp"
+#include "minisql/varchar.hpp"
 #include "planner/iterators/iterator.hpp"
 #include "row/row_view.hpp"
 #include "row/schema.hpp"

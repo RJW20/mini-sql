@@ -9,7 +9,7 @@
 
 #include "byte_io.hpp"
 #include "field/field.hpp"
-#include "field/varchar.hpp"
+#include "minisql/varchar.hpp"
 #include "row.hpp"
 #include "row/schema.hpp"
 #include "span.hpp"

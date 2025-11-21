@@ -5,8 +5,9 @@
 #include <iostream>
 #include <typeinfo>
 
+#include <minisql/varchar.hpp>
+
 #include "bplus_tree/node.hpp"
-#include "field/varchar.hpp"
 #include "frame_manager/cache/frame.hpp"
 #include "frame_manager/cache/frame_view.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"

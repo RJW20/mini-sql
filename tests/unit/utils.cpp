@@ -7,7 +7,8 @@
 #include <string>
 #include <vector>
 
-#include "field/varchar.hpp"
+#include <minisql/varchar.hpp>
+
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "headers.hpp"
 

@@ -7,30 +7,32 @@
 #include <typeinfo>
 #include <vector>
 
+#include <minisql/varchar.hpp>
+
 #include "exceptions/engine_exceptions.hpp"
 
 using namespace minisql;
 
 template <typename T>
-void test_write_copy(T t) {
+void test_write_copy(T t, std::size_t size = sizeof(T)) {
     std::vector<std::byte> bytes(20);
     const std::size_t test_offset = 0;
     byte_io::write<T>(bytes, test_offset, t);
-    assert(byte_io::copy<T>(bytes, test_offset) == t);
+    assert(byte_io::copy<T>(bytes, test_offset, size) == t);
     std::cout << "- test_write_copy passed" << std::endl;
 }
 
 template <typename T>
-void test_out_of_range(T t) {
+void test_out_of_range(T t, std::size_t size = sizeof(T)) {
     std::vector<std::byte> bytes(20);
-    int test_offset = bytes.size() - sizeof(T) + 1;
+    int test_offset = bytes.size() - size + 1;
     try {
         byte_io::write<T>(bytes, test_offset, t);
         assert(false);
     }
     catch (const ByteIOException&) {}
     try {
-        byte_io::copy<T>(bytes, test_offset);
+        byte_io::copy<T>(bytes, test_offset, size);
         assert(false);
     }
     catch (const ByteIOException&) {}
@@ -38,10 +40,10 @@ void test_out_of_range(T t) {
 }
 
 template <typename T>
-void run_tests(T t) {
+void run_tests(T t, std::size_t size = sizeof(T)) {
     std::cout << "Running tests for " << typeid(T).name() << ":" << std::endl;
-    test_write_copy<T>(t);
-    test_out_of_range<T>(t);
+    test_write_copy<T>(t, size);
+    test_out_of_range<T>(t, size);
 }
 
 int main() {
@@ -49,6 +51,7 @@ int main() {
     run_tests<std::uint16_t>(0x8000);
     run_tests<int>(0x80000000);
     run_tests<double>(5555.5555);
+    run_tests<Varchar>({"test", 5}, 5);
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

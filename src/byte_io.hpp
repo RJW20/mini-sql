@@ -6,12 +6,13 @@
 #include <type_traits>
 
 #include "exceptions/engine_exceptions.hpp"
+#include "minisql/varchar.hpp"
 #include "span.hpp"
  
 namespace minisql {
 
-/* Namespace exposing functions for copying and writing trivially copyable
- * types from and to std::byte containers. */
+/* Namespace exposing functions for copying and writing objects from and to
+ * std::byte containers. */
 namespace byte_io {
 
 /* Copy T from bytes starting from the given offset.
@@ -58,6 +59,38 @@ void write(span<std::byte> bytes, std::size_t offset, const T& t) {
     if (offset + size > bytes.size())
         throw ByteIOException("write", offset + size, bytes.size());
     std::memcpy(bytes.data() + offset, &t, size);
+}
+
+// ----------------------------------------------------------------------------
+// Varchar specialisations
+// ----------------------------------------------------------------------------
+
+template <>
+inline Varchar copy<Varchar>(
+    span<std::byte> bytes, std::size_t offset, std::size_t size
+) {
+    if (offset + size > bytes.size())
+        throw ByteIOException("copy", offset + size, bytes.size());
+    return Varchar(reinterpret_cast<const char*>(bytes.data() + offset), size);
+}
+
+template <>
+inline const Varchar view<Varchar>(
+    span<std::byte> bytes, std::size_t offset, std::size_t size
+) {
+    if (offset + size > bytes.size())
+        throw ByteIOException("view", offset + size, bytes.size());
+    return Varchar(reinterpret_cast<char*>(bytes.data() + offset), size);
+}
+
+template <>
+inline void write<Varchar>(
+    span<std::byte> bytes, std::size_t offset, const Varchar& v
+) {
+    const std::size_t size = v.size();
+    if (offset + size > bytes.size())
+        throw ByteIOException("write", offset + size, bytes.size());
+    std::memcpy(bytes.data() + offset, v.data(), size);
 }
 
 } // namespace byte_io
