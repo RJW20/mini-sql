@@ -19,8 +19,6 @@ public:
     using pointer = Row*;
     using reference = Row&;
 
-    explicit RowIterator(planner::Iterator* it = nullptr);
-
     reference operator*() { return current_; }
     pointer operator->() { return &current_; }
 
@@ -31,6 +29,9 @@ public:
     bool operator!=(const RowIterator& other) const;
 
 private:
+    friend class RowSet;
+    explicit RowIterator(planner::Iterator* it = nullptr);
+
     planner::Iterator* it_;
     Row current_ {{}, nullptr};
     bool valid_ {false};
