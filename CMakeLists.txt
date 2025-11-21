@@ -23,6 +23,7 @@ set(SOURCES
     src/database.cpp
     src/engine/database_handle.cpp
     src/row_set/row_iterator.cpp
+    src/row_set/row_set.cpp
     src/engine/engine.cpp
 )
 add_library(minisql STATIC ${SOURCES})

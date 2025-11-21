@@ -1,28 +1,36 @@
 #ifndef MINISQL_ROW_SET_HPP
 #define MINISQL_ROW_SET_HPP
 
-#include <utility>
+#include <memory>
 
-#include "minisql/row_iterator.hpp"
-#include "planner/planner.hpp"
+#include <minisql/row.hpp>
+#include <minisql/row_iterator.hpp>
 
 namespace minisql {
+
+namespace planner {
+
+class Iterator;
+using Plan = std::unique_ptr<Iterator>;
+
+} // namespace planner
 
 /* RowSet
  * Wrapper over a Plan. */
 class RowSet {
 public:
-    explicit RowSet(planner::Plan plan) : plan_{std::move(plan)} {}
+    ~RowSet();
 
-    RowIterator begin() {
-        return plan_ ? RowIterator{plan_.get()} : RowIterator{};
-    }
-    RowIterator end() { return RowIterator{}; }
+    RowIterator begin();
+    RowIterator end();
 
-    bool next() { return (plan_ && plan_->next()); }
-    Row current() const { return plan_->current().deserialise(); }
+    bool next();
+    Row current() const;
 
 private:
+    friend class Engine;
+    explicit RowSet(planner::Plan plan);
+
     planner::Plan plan_;
 };
 

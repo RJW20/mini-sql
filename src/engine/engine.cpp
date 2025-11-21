@@ -12,11 +12,12 @@
 #include "engine/database_handle.hpp"
 #include "engine/master_table.hpp"
 #include "minisql/row.hpp"
+#include "minisql/row_set.hpp"
 #include "minisql/varchar.hpp"
 #include "parser/ast.hpp"
 #include "parser/parser.hpp"
+#include "planner/planner.hpp"
 #include "row/schema.hpp"
-#include "row_set/row_set.hpp"
 #include "validator/query.hpp"
 #include "validator/validator.hpp"
 

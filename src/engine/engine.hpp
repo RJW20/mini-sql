@@ -10,7 +10,7 @@
 
 #include "database.hpp"
 #include "engine/database_handle.hpp"
-#include "row_set/row_set.hpp"
+#include "minisql/row_set.hpp"
 
 namespace minisql {
 
