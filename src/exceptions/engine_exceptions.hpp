@@ -5,9 +5,9 @@
 #include <string>
 #include <type_traits>
 
-#include "exceptions/exception.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "headers.hpp"
+#include "minisql/exception.hpp"
 #include "minisql/varchar.hpp"
 
 namespace minisql {

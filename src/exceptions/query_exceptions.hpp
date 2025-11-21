@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <string>
 
-#include "exceptions/exception.hpp"
+#include "minisql/exception.hpp"
 
 namespace minisql {
 
