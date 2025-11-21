@@ -4,33 +4,34 @@
 #include <cstddef>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "minisql/field.hpp"
-#include "row/schema.hpp"
+#include <minisql/field.hpp>
 
 namespace minisql {
 
+// Forward declare serialisation function.
 class RowView;
+class Row;
+RowView serialise(const Row&);
+
+// Schema forward declaration.
+class Schema;
 
 /* Row
  * A vector containing fields indexable by index or name. */
 class Row {
 public:
-    Row(std::vector<Field> fields, std::shared_ptr<Schema> schema)
-        : fields_{std::move(fields)}, schema_{std::move(schema)} {}
+    Row(std::vector<Field> fields, std::shared_ptr<Schema> schema);
 
-    const Field& operator[](std::size_t index) const { return fields_[index]; }
-
-    const Field& operator[](const std::string& name) const {
-        return (*this)[schema_->index_of(name)];
-    }
+    const Field& operator[](std::size_t index) const;
+    const Field& operator[](const std::string& name) const;
 
     auto begin() const { return fields_.begin(); }
     auto end() const { return fields_.end(); }
+    std::size_t size() const { return fields_.size(); }
 
-    RowView serialise() const;
+    friend RowView serialise(const Row&);
 
 private:
     std::vector<Field> fields_;

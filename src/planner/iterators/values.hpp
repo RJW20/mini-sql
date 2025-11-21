@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "minisql/field.hpp"
+#include "minisql/row.hpp"
 #include "planner/iterators/iterator.hpp"
 #include "row/row_view.hpp"
 #include "row/schema.hpp"
@@ -28,7 +29,7 @@ public:
     }
 
     RowView current() override {
-        return Row{values_[pos_], schema_}.serialise();
+        return serialise(Row{values_[pos_], schema_});
     }
 
 private:

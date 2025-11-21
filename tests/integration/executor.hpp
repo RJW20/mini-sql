@@ -7,12 +7,12 @@
 #include <string>
 #include <variant>
 
+#include <minisql/row.hpp>
 #include <minisql/script_reader.hpp>
 
 #include "connection.hpp"
 #include "exceptions/exception.hpp"
 #include "row_set/row_set.hpp"
-#include "row/row.hpp"
 
 /* Executor
  * Yields output from executing the given script on the given connection. */

@@ -4,8 +4,8 @@
 #include <iterator>
 #include <utility>
 
+#include "minisql/row.hpp"
 #include "planner/iterators/iterator.hpp"
-#include "row/row.hpp"
 
 namespace minisql {
 

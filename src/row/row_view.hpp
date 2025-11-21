@@ -10,8 +10,8 @@
 #include "byte_io.hpp"
 #include "field/type.hpp"
 #include "minisql/field.hpp"
+#include "minisql/row.hpp"
 #include "minisql/varchar.hpp"
-#include "row.hpp"
 #include "row/schema.hpp"
 #include "span.hpp"
 
