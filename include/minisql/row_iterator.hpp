@@ -4,10 +4,11 @@
 #include <iterator>
 #include <utility>
 
-#include "minisql/row.hpp"
-#include "planner/iterators/iterator.hpp"
+#include <minisql/row.hpp>
 
 namespace minisql {
+
+namespace planner { class Iterator; }
 
 /* Row Iterator
  * STL-style iterator that materialises Rows from a planner::Iterator. */
@@ -50,17 +51,7 @@ private:
     Row current_ {{}, nullptr};
     bool valid_ {false};
 
-    void advance() {
-        if (it_ && it_->next()) {
-            current_ = it_->current().deserialise();
-            valid_ = true;
-        }
-        else {
-            it_ = nullptr;
-            current_ = {{}, nullptr};
-            valid_ = false;
-        }
-    }
+    void advance();
 };
 
 } // namespace minisql

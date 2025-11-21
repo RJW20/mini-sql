@@ -3,8 +3,8 @@
 
 #include <utility>
 
+#include "minisql/row_iterator.hpp"
 #include "planner/planner.hpp"
-#include "row_set/row_iterator.hpp"
 
 namespace minisql {
 
