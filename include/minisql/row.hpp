@@ -10,13 +10,9 @@
 
 namespace minisql {
 
-// Forward declare serialisation function.
-class RowView;
-class Row;
-RowView serialise(const Row&);
-
-// Schema forward declaration.
+// Forward declarations
 class Schema;
+class RowView;
 
 /* Row
  * A vector containing fields indexable by index or name. */
