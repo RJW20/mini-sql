@@ -2,7 +2,6 @@
 #define MINISQL_ROW_ITERATOR_HPP
 
 #include <iterator>
-#include <utility>
 
 #include <minisql/row.hpp>
 
@@ -20,31 +19,16 @@ public:
     using pointer = Row*;
     using reference = Row&;
 
-    explicit RowIterator(planner::Iterator* it = nullptr) : it_{it} {
-        advance();
-    }
+    explicit RowIterator(planner::Iterator* it = nullptr);
 
     reference operator*() { return current_; }
     pointer operator->() { return &current_; }
 
-    RowIterator& operator++() {
-        advance();
-        return *this;
-    }
+    RowIterator& operator++();
+    RowIterator operator++(int);
 
-    RowIterator operator++(int) {
-        RowIterator tmp = std::move(*this);
-        ++(*this);
-        return tmp;
-    }
-
-    bool operator==(const RowIterator& other) const {
-        return !valid_ && !other.valid_;
-    }
-
-    bool operator!=(const RowIterator& other) const {
-        return !(*this == other);
-    }
+    bool operator==(const RowIterator& other) const;
+    bool operator!=(const RowIterator& other) const;
 
 private:
     planner::Iterator* it_;
