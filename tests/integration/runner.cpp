@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
+#include <minisql/connection.hpp>
 #include <minisql/script_reader.hpp>
 
-#include "connection.hpp"
 #include "directory_iterable.hpp"
 #include "executor.hpp"
 

@@ -7,11 +7,11 @@
 #include <string>
 #include <variant>
 
+#include <minisql/connection.hpp>
 #include <minisql/row.hpp>
 #include <minisql/row_set.hpp>
 #include <minisql/script_reader.hpp>
 
-#include "connection.hpp"
 #include "exceptions/exception.hpp"
 
 /* Executor
