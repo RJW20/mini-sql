@@ -1,5 +1,9 @@
 #include "minisql/row_set.hpp"
 
+#include <memory>
+
+#include "minisql/row.hpp"
+#include "minisql/row_iterator.hpp"
 #include "row_set/row_set_impl.hpp"
 
 namespace minisql {
