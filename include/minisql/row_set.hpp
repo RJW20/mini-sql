@@ -8,30 +8,31 @@
 
 namespace minisql {
 
-namespace planner {
-
-class Iterator;
-using Plan = std::unique_ptr<Iterator>;
-
-} // namespace planner
-
 /* RowSet
- * Wrapper over a Plan. */
+ * Yields Rows from a SELECT statement. */
 class RowSet {
 public:
+    RowSet();
     ~RowSet();
 
+    RowSet(const RowSet&) = delete;
+    RowSet& operator=(const RowSet&) = delete;
+
+    RowSet(RowSet&&) noexcept;
+    RowSet& operator=(RowSet&&) noexcept;
+
+    // STL-style iteration
     RowIterator begin();
     RowIterator end();
 
+    // Manual iteration
     bool next();
     Row current() const;
 
 private:
     friend class Engine;
-    explicit RowSet(planner::Plan plan);
-
-    planner::Plan plan_;
+    class Impl;
+    std::unique_ptr<Impl> impl_;
 };
 
 } // namespace minisql

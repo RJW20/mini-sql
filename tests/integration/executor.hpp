@@ -46,7 +46,7 @@ public:
 private:
     minisql::ScriptReader& script_;
     minisql::Connection& conn_;
-    minisql::RowSet row_set_ {nullptr};
+    minisql::RowSet row_set_;
 
     static std::string to_string(const minisql::Row& row) {
         std::ostringstream out;

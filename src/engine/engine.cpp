@@ -18,6 +18,7 @@
 #include "parser/parser.hpp"
 #include "planner/planner.hpp"
 #include "row/schema.hpp"
+#include "row_set/row_set_impl.hpp"
 #include "validator/query.hpp"
 #include "validator/validator.hpp"
 
@@ -134,8 +135,9 @@ std::size_t Engine::exec(
 RowSet Engine::query(std::string_view sql, Database& db) {
     parser::AST ast = parser::parse(sql);
     validator::Query query = validator::validate(ast, db, false);
-    planner::Plan plan = planner::plan(query, db);
-    return RowSet{std::move(plan)};
+    RowSet row_set;
+    row_set.impl_->plan = planner::plan(query, db);
+    return row_set;
 }
 
 } // namespace minisql
