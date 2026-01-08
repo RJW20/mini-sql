@@ -49,11 +49,16 @@ target_include_directories(minisql
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# Define export macro for Windows DLL builds
-target_compile_definitions(minisql
-    PRIVATE
-        $<$<AND:$<BOOL:${BUILD_SHARED_LIBS}>,$<STREQUAL:$<PLATFORM_ID>,Windows>>:MINISQL_EXPORTS>
-)
+if(BUILD_SHARED_LIBS)
+    # Define MINISQL_EXPORTS for shared builds
+    target_compile_definitions(minisql PRIVATE MINISQL_EXPORTS)
+else()
+    # Define MINISQL_STATIC for static builds and consumer
+    target_compile_definitions(minisql
+        PRIVATE MINISQL_STATIC
+        INTERFACE MINISQL_STATIC
+    )
+endif()
 
 # -----------------------------------------------------------------------------
 # Optional tests
