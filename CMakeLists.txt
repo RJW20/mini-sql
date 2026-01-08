@@ -10,7 +10,7 @@ include(GNUInstallDirs)
 option(BUILD_SHARED_LIBS
     "Build shared libraries (.dll/.so/.dylib) instead of static (.a/.lib)" OFF
 )
-option(BUILD_TESTING "Build tests" OFF)
+option(BUILD_TESTS "Build tests" OFF)
 
 # -----------------------------------------------------------------------------
 # Library target
@@ -63,7 +63,7 @@ endif()
 # -----------------------------------------------------------------------------
 # Optional tests
 # -----------------------------------------------------------------------------
-if(BUILD_TESTING)
+if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
