@@ -1,0 +1,7 @@
+// INTERNAL TYPE LIST — do not include directly
+// Intended for macro expansion only
+// NOTE: no include guards on purpose
+
+FIELD_TYPE(int)
+FIELD_TYPE(double)
+FIELD_TYPE_LAST(Varchar)

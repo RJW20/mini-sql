@@ -76,6 +76,24 @@ private:
     }
 };
 
+// Extern declarations for explicitly instantiated template methods.
+#define FIELD_TYPE(T)                                                         \
+    extern template T InternalNode::split<T>(InternalNode*, InternalNode*);   \
+    extern template void InternalNode::merge<T>(                              \
+        InternalNode*, InternalNode*, const T&                                \
+    );                                                                        \
+    extern template T InternalNode::take_back<T>(                          \
+        InternalNode*, InternalNode*, const T&                                \
+    );                                                                        \
+    extern template T InternalNode::take_front<T>(                         \
+        InternalNode*, InternalNode*, const T&                                \
+    );
+#define FIELD_TYPE_LAST(T) FIELD_TYPE(T)
+
+#include "minisql/field_types.def"
+#undef FIELD_TYPE
+#undef FIELD_TYPE_LAST
+
 } // namespace minisql
 
 #endif // MINISQL_INTERNAL_NODE_HPP

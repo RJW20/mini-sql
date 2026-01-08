@@ -8,7 +8,6 @@
 #include "bplus_tree/leaf_node.hpp"
 #include "bplus_tree/node.hpp"
 #include "exceptions/engine_exceptions.hpp"
-#include "field/instantiator.hpp"
 #include "frame_manager/cache/frame_view.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "frame_manager/frame_manager.hpp"
@@ -341,47 +340,26 @@ void BPlusTree::destroy(std::unique_ptr<Node> node) {
     fm_->deallocate(node->pid());
 }
 
-// Wrapper for all templated methods.
-template <typename T>
-struct Wrapper {
-    static void instantiate() {
-        auto fn1 = &BPlusTree::seek_slot<T>;
-        auto fn2 = &BPlusTree::seek_leaf<T>;
-        auto fn3 = static_cast<
-            void (BPlusTree::*)(LeafNode*, BPlusTree::size_t, span<std::byte>)
-        >(&BPlusTree::template insert_into<T>);
-        auto fn4 = static_cast<
-            void (BPlusTree::*)(LeafNode*, BPlusTree::size_t)
-        >(&BPlusTree::template erase_from<T>);
-        auto fn5 = static_cast<
-            void (BPlusTree::*)(
-                std::unique_ptr<InternalNode>, BPlusTree::size_t, const T&,
-                page_id_t
-            )
-        >(&BPlusTree::template insert_into<T>);
-        auto fn6 = static_cast<
-            void (BPlusTree::*)(
-                std::unique_ptr<InternalNode>, BPlusTree::size_t
-            )
-        >(&BPlusTree::template erase_from<T>);
-
-        // Force ODR-use on all platforms
-        (void)fn1;
-        (void)fn2;
-        (void)fn3;
-        (void)fn4;
-        (void)fn5;
-        (void)fn6;
-    }
-};
-
-namespace {
-
 // Explicitly instantiate templated methods for all Field types.
-[[maybe_unused]] const auto _ = (
-    InstantiateForField<Wrapper>::instantiate(), true
-);
+#define FIELD_TYPE(T)                                                         \
+    template BPlusTree::size_t BPlusTree::seek_slot<T>(Node*, const T&);      \
+    template std::unique_ptr<LeafNode> BPlusTree::seek_leaf<T>(               \
+        const T&                                                              \
+    ) const;                                                                  \
+    template void BPlusTree::insert_into<T>(                                  \
+        LeafNode*, size_t, span<std::byte> bytes                              \
+    );                                                                        \
+    template void BPlusTree::erase_from<T>(LeafNode*, size_t);                \
+    template void BPlusTree::insert_into<T>(                                  \
+        std::unique_ptr<InternalNode>, size_t, const T&, page_id_t            \
+    );                                                                        \
+    template void BPlusTree::erase_from<T>(                                   \
+        std::unique_ptr<InternalNode>, size_t                                 \
+    );
+#define FIELD_TYPE_LAST(T) FIELD_TYPE(T)
 
-} // namespace
+#include "minisql/field_types.def"
+#undef FIELD_TYPE
+#undef FIELD_TYPE_LAST
 
 } // namespace minisql

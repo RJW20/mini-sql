@@ -66,6 +66,30 @@ private:
     friend struct Wrapper;
 };
 
+// Extern declarations for explicitly instantiated template methods.
+#define FIELD_TYPE(T)                                                         \
+    extern template BPlusTree::size_t BPlusTree::seek_slot<T>(                \
+        Node*, const T&                                                       \
+    );                                                                        \
+    extern template std::unique_ptr<LeafNode> BPlusTree::seek_leaf<T>(        \
+        const T&                                                              \
+    ) const;                                                                  \
+    extern template void BPlusTree::insert_into<T>(                           \
+        LeafNode*, size_t, span<std::byte> bytes                              \
+    );                                                                        \
+    extern template void BPlusTree::erase_from<T>(LeafNode*, size_t);         \
+    extern template void BPlusTree::insert_into<T>(                           \
+        std::unique_ptr<InternalNode>, size_t, const T&, page_id_t            \
+    );                                                                        \
+    extern template void BPlusTree::erase_from<T>(                            \
+        std::unique_ptr<InternalNode>, size_t                                 \
+    );
+#define FIELD_TYPE_LAST(T) FIELD_TYPE(T)
+
+#include "minisql/field_types.def"
+#undef FIELD_TYPE
+#undef FIELD_TYPE_LAST
+
 } // namespace minisql
 
 #endif // MINISQL_BPLUS_TREE_HPP

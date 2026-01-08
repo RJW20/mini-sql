@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "field/instantiator.hpp"
 #include "frame_manager/cache/frame_view.hpp"
 #include "frame_manager/disk_manager/page_id_t.hpp"
 #include "headers.hpp"
@@ -75,30 +74,22 @@ Key InternalNode::take_front(
     return new_separator;
 }
 
-// Wrapper for all templated methods.
-template <typename T>
-struct Wrapper {
-    static void instantiate() {
-        auto fn1 = &InternalNode::split<T>;
-        auto fn2 = &InternalNode::merge<T>;
-        auto fn3 = &InternalNode::take_back<T>;
-        auto fn4 = &InternalNode::take_front<T>;
+// Explicitly instantiate templated methods for all Field types.
+#define FIELD_TYPE(T)                                                         \
+    template T InternalNode::split<T>(InternalNode*, InternalNode*);          \
+    template void InternalNode::merge<T>(                                     \
+        InternalNode*, InternalNode*, const T&                                 \
+    );                                                                        \
+    template T InternalNode::take_back<T>(                                 \
+        InternalNode*, InternalNode*, const T&                                 \
+    );                                                                        \
+    template T InternalNode::take_front<T>(                                \
+        InternalNode*, InternalNode*, const T&                                 \
+    );
+#define FIELD_TYPE_LAST(T) FIELD_TYPE(T)
 
-        // Force ODR-use on all platforms
-        (void)fn1;
-        (void)fn2;
-        (void)fn3;
-        (void)fn4;
-    }
-};
-
-namespace {
-
-// Explicitly instantiate templated methods for all Field types.  
-[[maybe_unused]] const auto _ = (
-    InstantiateForField<Wrapper>::instantiate(), true
-);
-
-} // namespace
+#include "minisql/field_types.def"
+#undef FIELD_TYPE
+#undef FIELD_TYPE_LAST
 
 } // namespace minisql
