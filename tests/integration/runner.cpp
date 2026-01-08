@@ -59,7 +59,7 @@ TestResult run_test(const fs::path& filename) {
         }
     }
 
-    std::filesystem::remove(db_path);
+    fs::remove(db_path);
     return result;
 }
 
