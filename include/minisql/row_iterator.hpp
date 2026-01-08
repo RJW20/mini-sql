@@ -3,6 +3,7 @@
 
 #include <iterator>
 
+#include <minisql/minisql_export.hpp>
 #include <minisql/row.hpp>
 
 namespace minisql {
@@ -11,7 +12,7 @@ namespace planner { class Iterator; }
 
 /* Row Iterator
  * STL-style iterator that materialises Rows from a planner::Iterator. */
-class RowIterator {
+class MINISQL_API RowIterator {
 public:
     using iterator_category = std::input_iterator_tag;
     using value_type = Row;

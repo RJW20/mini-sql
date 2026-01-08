@@ -1,10 +1,21 @@
-cmake_minimum_required(VERSION 3.10)
-project(mini-sql)
+cmake_minimum_required(VERSION 3.15)
+project(mini-sql VERSION 1.0 LANGUAGES CXX)
 
-find_package(Python3 REQUIRED)
+# Setup installation directories
+include(GNUInstallDirs)
 
+# -----------------------------------------------------------------------------
+# Options
+# -----------------------------------------------------------------------------
+option(BUILD_SHARED_LIBS
+    "Build shared libraries (.dll/.so/.dylib) instead of static (.a/.lib)" OFF
+)
+option(BUILD_TESTING "Build tests" OFF)
+
+# -----------------------------------------------------------------------------
+# Library target
+# -----------------------------------------------------------------------------
 set(CMAKE_CXX_STANDARD 17)
-
 set(SOURCES
     src/frame_manager/disk_manager/disk_manager.cpp
     src/frame_manager/cache/frame_view.cpp
@@ -27,14 +38,70 @@ set(SOURCES
     src/engine/engine.cpp
     src/connection.cpp
 )
-add_library(minisql STATIC ${SOURCES})
+add_library(minisql ${SOURCES})
+add_library(minisql::minisql ALIAS minisql)
 
 target_include_directories(minisql
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-add_subdirectory(tests)
+# Define export macro for Windows DLL builds
+target_compile_definitions(minisql
+    PRIVATE
+        $<$<AND:$<BOOL:${BUILD_SHARED_LIBS}>,
+        $<PLATFORM_ID:Windows>>:MINISQL_EXPORTS>
+)
+
+# -----------------------------------------------------------------------------
+# Optional tests
+# -----------------------------------------------------------------------------
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
+
+# -----------------------------------------------------------------------------
+# Installation
+# -----------------------------------------------------------------------------
+# Install library and generate exported targets
+install(
+    TARGETS minisql
+    EXPORT mini-sqlTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}     # DLLs on Windows
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}     # static lib or import lib
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}     # .so/.dylib
+)
+
+# Install headers
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Export targets for find_package
+install(
+    EXPORT mini-sqlTargets
+    NAMESPACE minisql::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mini-sql
+)
+
+# Generate config file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/mini-sqlConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+configure_package_config_file(
+    "${CMAKE_CURRENT_LIST_DIR}/mini-sqlConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/mini-sqlConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mini-sql
+)
+
+# Install config files
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/mini-sqlConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/mini-sqlConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mini-sql
+)

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <minisql/field.hpp>
+#include <minisql/minisql_export.hpp>
 
 namespace minisql {
 
@@ -16,7 +17,7 @@ class RowView;
 
 /* Row
  * A vector containing fields indexable by index or name. */
-class Row {
+class MINISQL_API Row {
 public:
     Row(std::vector<Field> fields, std::shared_ptr<Schema> schema);
 

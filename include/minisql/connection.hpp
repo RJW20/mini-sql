@@ -5,13 +5,14 @@
 #include <filesystem>
 #include <string_view>
 
+#include <minisql/minisql_export.hpp>
 #include <minisql/row_set.hpp>
 
 namespace minisql {
 
 /* Connection.
  * Provides access to a Database via sql commands. */
-class Connection {
+class MINISQL_API Connection {
 public:
     explicit Connection(const std::filesystem::path& path);
     ~Connection();

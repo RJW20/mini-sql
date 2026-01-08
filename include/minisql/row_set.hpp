@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include <minisql/minisql_export.hpp>
 #include <minisql/row.hpp>
 #include <minisql/row_iterator.hpp>
 
@@ -10,7 +11,7 @@ namespace minisql {
 
 /* RowSet
  * Yields Rows from a SELECT statement. */
-class RowSet {
+class MINISQL_API RowSet {
 public:
     RowSet();
     ~RowSet();

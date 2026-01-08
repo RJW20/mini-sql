@@ -1,3 +1,5 @@
+find_package(Python3 REQUIRED)
+
 # Integration test executable
 add_executable(runner runner.cpp)
 target_link_libraries(runner PRIVATE minisql)
