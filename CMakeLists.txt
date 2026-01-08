@@ -52,8 +52,7 @@ target_include_directories(minisql
 # Define export macro for Windows DLL builds
 target_compile_definitions(minisql
     PRIVATE
-        $<$<AND:$<BOOL:${BUILD_SHARED_LIBS}>,
-        $<PLATFORM_ID:Windows>>:MINISQL_EXPORTS>
+        $<$<AND:$<BOOL:${BUILD_SHARED_LIBS}>,$<STREQUAL:$<PLATFORM_ID>,Windows>>:MINISQL_EXPORTS>
 )
 
 # -----------------------------------------------------------------------------
