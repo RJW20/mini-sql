@@ -45,7 +45,7 @@ jobs:
         run: cmake --install build
 
       - name: Install mini-sql on Windows
-        if: runner.os != 'Windows'
+        if: runner.os == 'Windows'
         run: cmake --install build --config Release
 
       - name: Configure consumer
