@@ -22,12 +22,13 @@ jobs:
           cmake -S . -B build
           -DBUILD_SHARED_LIBS=${{ matrix.shared }}
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
+          -DCMAKE_BUILD_TYPE=Release
 
       - name: Build mini-sql
-        run: cmake --build build --config Release
+        run: cmake --build build
 
       - name: Install mini-sql
-        run: cmake --install build --config Release
+        run: cmake --install build
 
       - name: Configure consumer
         run: >
@@ -35,4 +36,4 @@ jobs:
           -DCMAKE_PREFIX_PATH=${{ github.workspace }}/install
 
       - name: Build consumer
-        run: cmake --build consumer-build --config Release
+        run: cmake --build consumer-build
