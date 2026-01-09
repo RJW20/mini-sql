@@ -48,10 +48,26 @@ jobs:
         if: runner.os == 'Windows'
         run: cmake --install build --config Release
 
-      - name: Configure consumer
+      - name: Configure consumer on Linux/macOS
+        if: runner.os != 'Windows'
         run: >
           cmake -S consumer -B consumer-build
           -DCMAKE_PREFIX_PATH=${{ github.workspace }}/install
 
-      - name: Build consumer
+      - name: Configure consumer on Windows
+        if: runner.os == 'Windows'
+        run: >
+          cmake -S consumer -B consumer-build
+          -DCMAKE_PREFIX_PATH=${{ github.workspace }}/install
+          -DCMAKE_BUILD_TYPE=RELEASE
+
+      - name: Build consumer on Linux/macOS
+        if: runner.os != 'Windows'
+        run: cmake --build consumer-build --config Release
+
+      - name: Build consumer on Windows
+        if: runner.os == 'Windows'
         run: cmake --build consumer-build
+
+      - name: Run consumer
+        run: ./consumer-build/consumer
