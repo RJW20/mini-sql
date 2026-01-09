@@ -48,6 +48,7 @@ jobs:
           fi
 
       - name: Configure consumer
+        shell: bash
         run: |
           cmake -S consumer -B consumer-build \
           -DCMAKE_PREFIX_PATH=${{ github.workspace }}/install
