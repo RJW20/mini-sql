@@ -21,16 +21,16 @@ jobs:
         if: runner.os != 'Windows'
         run: >
           cmake -S . -B build
-            -DBUILD_SHARED_LIBS=${{ matrix.shared }}
-            -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
+          -DBUILD_SHARED_LIBS=${{ matrix.shared }}
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
 
       - name: Configure mini-sql on Windows
         if: runner.os == 'Windows'
         run: >
           cmake -S . -B build
-            -DBUILD_SHARED_LIBS=${{ matrix.shared }}
-            -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
-            -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_SHARED_LIBS=${{ matrix.shared }}
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
+          -DCMAKE_BUILD_TYPE=Release
 
       - name: Build mini-sql on Linux/macOS
         if: runner.os != 'Windows'
@@ -51,7 +51,7 @@ jobs:
       - name: Configure consumer
         run: >
           cmake -S consumer -B consumer-build
-            -DCMAKE_PREFIX_PATH=${{ github.workspace }}/install
+          -DCMAKE_PREFIX_PATH=${{ github.workspace }}/install
 
       - name: Build consumer
         run: cmake --build consumer-build
