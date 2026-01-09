@@ -75,7 +75,7 @@ jobs:
 
       - name: Copy mini-sql dll on Windows shared build
         if: ${{ (runner.os == 'Windows') && (matrix.shared == 'ON') }}
-        run: copy ${{ github.workspace }}/install/bin/minisql.dll ${{ github.workspace }}/consumer-build/minisql.dll
+        run: copy ${{ github.workspace }}/install/bin/minisql.dll ${{ github.workspace }}/consumer-build/Release/minisql.dll
 
       - name: Run consumer on Windows
         if: runner.os == 'Windows'
