@@ -85,6 +85,7 @@ install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 # Export targets for find_package
 install(
     EXPORT mini-sqlTargets
+    FILE mini-sqlTargets.cmake
     NAMESPACE minisql::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mini-sql
 )
