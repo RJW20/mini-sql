@@ -69,5 +69,10 @@ jobs:
         if: runner.os == 'Windows'
         run: cmake --build consumer-build  --config Release
 
-      - name: Run consumer
+      - name: Run consumer on Linux/macOS
+        if: runner.os != 'Windows'
         run: ./consumer-build/consumer
+
+      - name: Run consumer on Windows
+        if: runner.os == 'Windows'
+        run: ./consumer-build/Release/consumer
