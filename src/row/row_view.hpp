@@ -14,6 +14,7 @@
 #include "minisql/varchar.hpp"
 #include "row/schema.hpp"
 #include "span.hpp"
+#include "unreachable.hpp"
 
 namespace minisql {
 
@@ -40,7 +41,7 @@ public:
                     data_, column->offset, column->size
                 );
         }
-        __builtin_unreachable();
+        unreachable();
     }
 
     Field operator[](const std::string& name) const {

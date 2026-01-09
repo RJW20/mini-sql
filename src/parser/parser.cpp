@@ -11,6 +11,7 @@
 #include "field/type.hpp"
 #include "parser/ast.hpp"
 #include "parser/token.hpp"
+#include "unreachable.hpp"
 #include "validator/constants.hpp"
 
 namespace minisql::parser {
@@ -34,7 +35,7 @@ public:
             case TokenType::DROP: return parse_drop();
             default: raise_exception();
         }
-        __builtin_unreachable();
+        unreachable();
     }
 
 private:
@@ -66,14 +67,14 @@ private:
         if (t.type == TokenType::REAL) return FieldType::REAL;
         if (t.type == TokenType::TEXT) return FieldType::TEXT;
         raise_exception();
-        __builtin_unreachable();
+        unreachable();
     }
     Value parse_value() {
         Token& t = advance();
         if (t.type == TokenType::NUMBER) return std::stod(t.text);
         if (t.type == TokenType::STRING) return t.text;
         raise_exception();
-        __builtin_unreachable();
+        unreachable();
     }
 
     Condition parse_condition();

@@ -15,6 +15,7 @@
 #include "minisql/field.hpp"
 #include "parser/ast.hpp"
 #include "row/schema.hpp"
+#include "unreachable.hpp"
 #include "validator/constants.hpp"
 #include "validator/query.hpp"
 
@@ -39,7 +40,7 @@ Field validate(const parser::Value& value, const Schema::Column* column) {
                 throw ColumnTypeException(column->name, "TEXT");
             return Varchar{std::get<std::string>(value).data(), column->size};
     }
-    __builtin_unreachable();
+    unreachable();
 }
 
 /* Return a validated Condition from the given parser::Condition while:

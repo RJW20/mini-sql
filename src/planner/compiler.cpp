@@ -13,6 +13,7 @@
 #include "minisql/varchar.hpp"
 #include "row/row_view.hpp"
 #include "row/schema.hpp"
+#include "unreachable.hpp"
 #include "validator/query.hpp"
 
 namespace minisql::planner {
@@ -27,7 +28,7 @@ std::function<bool(const Field&, const Field&)> compile_less_than(
         case FieldType::REAL: return field_less_than<double>;
         case FieldType::TEXT: return field_less_than<Varchar>;
     };
-    __builtin_unreachable();
+    unreachable();
 }
 
 namespace {
@@ -42,7 +43,7 @@ std::function<Field(const Field&, const Field&)> compile_addition(
         case FieldType::REAL: return field_addition<double>;
         case FieldType::TEXT: throw CompilationException("addition");
     };
-    __builtin_unreachable();
+    unreachable();
 }
 
 /* Return the template instance of field_subtraction corresponding to the given
@@ -55,7 +56,7 @@ std::function<Field(const Field&, const Field&)> compile_subtraction(
         case FieldType::REAL: return field_subtraction<double>;
         case FieldType::TEXT: throw CompilationException("subtraction");
     };
-    __builtin_unreachable();
+    unreachable();
 }
 
 /* Return the template instance of field_multiplication corresponding to the
@@ -68,7 +69,7 @@ std::function<Field(const Field&, const Field&)> compile_multiplication(
         case FieldType::REAL: return field_multiplication<double>;
         case FieldType::TEXT: throw CompilationException("multiplication");
     };
-    __builtin_unreachable();
+    unreachable();
 }
 
 /* Return the template instance of field_division corresponding to the given
@@ -81,7 +82,7 @@ std::function<Field(const Field&, const Field&)> compile_division(
         case FieldType::REAL: return field_division<double>;
         case FieldType::TEXT: throw CompilationException("division");
     };
-    __builtin_unreachable();
+    unreachable();
 }
 
 Predicate compile(const validator::Condition& condition, const Schema& schema)
@@ -117,7 +118,7 @@ Predicate compile(const validator::Condition& condition, const Schema& schema)
             };
     }
 
-    __builtin_unreachable();
+    unreachable();
 }
 
 Modifier compile(
@@ -205,7 +206,7 @@ Modifier compile(
             }
     }
 
-    __builtin_unreachable();
+    unreachable();
 }
 
 } // namespace
