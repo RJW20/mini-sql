@@ -17,46 +17,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure mini-sql
-        shell: bash
-        run: |
-          FLAGS=(
+      - name: Configure mini-sql on Linux/macOS
+        if: runner.os != 'Windows'
+        run: >
+          cmake -S . -B build
             -DBUILD_SHARED_LIBS=${{ matrix.shared }}
             -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
-          )
-          if [[ "${{ matrix.os }}" != "windows-latest" ]]; then
-            FLAGS+=(-DCMAKE_BUILD_TYPE=Release)
-          fi
-          cmake -S . -B build "${FLAGS[@]}"
 
-      - name: Build mini-sql
-        shell: bash
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            cmake --build build --config Release
-          else
-            cmake --build build
-          fi
+      - name: Configure mini-sql on Windows
+        if: runner.os == 'Windows'
+        run: >
+          cmake -S . -B build
+            -DBUILD_SHARED_LIBS=${{ matrix.shared }}
+            -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
+            -DCMAKE_BUILD_TYPE=Release
 
-      - name: Install mini-sql
-        shell: bash
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            cmake --install build --config Release
-          else
-            cmake --install build
-          fi
+      - name: Build mini-sql on Linux/macOS
+        if: runner.os != 'Windows'
+        run: cmake --build build
+
+      - name: Build mini-sql on Windows
+        if: runner.os == 'Windows'
+        run: cmake --build build --config Release
+
+      - name: Install mini-sql on Linux/macOS
+        if: runner.os != 'Windows'
+        run: cmake --install build
+
+      - name: Install mini-sql on Windows
+        if: runner.os != 'Windows'
+        run: cmake --install build --config Release
 
       - name: Configure consumer
-        shell: bash
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            cmake -S consumer -B consumer-build \
-              -DCMAKE_PREFIX_PATH=${{ github.workspace }}/install/Release
-          else
-            cmake -S consumer -B consumer-build \
-              -DCMAKE_PREFIX_PATH=${{ github.workspace }}/install
-          fi
+        run: >
+          cmake -S consumer -B consumer-build
+            -DCMAKE_PREFIX_PATH=${{ github.workspace }}/install
 
       - name: Build consumer
         run: cmake --build consumer-build
