@@ -3,7 +3,8 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <istream>
+#include <filesystem>
+#include <fstream>
 #include <optional>
 #include <string>
 
@@ -14,7 +15,8 @@ namespace minisql {
  * Ignores all characters between any # and the next \n. */
 class ScriptReader {
 public:
-    explicit ScriptReader(std::istream& script) : script_{script} {}
+    explicit ScriptReader(const std::filesystem::path& script)
+        : script_{script} {}
 
     std::optional<std::string> next() {
         if (std::optional<std::string> statement = extract_statement())
@@ -32,8 +34,10 @@ public:
         return std::nullopt;
     }
 
+    bool is_open() const { return script_.is_open(); }
+
 private:
-    std::istream& script_;
+    std::ifstream script_;
     std::string buffer_;
     bool inside_quote_ {false};
     std::size_t buffer_pos_ {0};

@@ -33,8 +33,10 @@ TestResult run_test(const fs::path& filename) {
     std::string name = filename.stem().string();
     TestResult result{name, false, 0};
 
-    std::ifstream script{filename};
-    std::ifstream output{filename.parent_path().parent_path() / "output" / (name + ".out")};
+    minisql::ScriptReader script{filename};
+    std::ifstream output{
+        filename.parent_path().parent_path() / "output" / (name + ".out")
+    };
     if (!script.is_open() || !output.is_open()) {
         std::cerr << "Failed to open files for test: " << name << "\n";
         return result;
@@ -42,9 +44,8 @@ TestResult run_test(const fs::path& filename) {
 
     const fs::path db_path = name + ".db";
     {
-        minisql::ScriptReader reader{script};
         minisql::Connection connection{db_path};
-        Executor executor{reader, connection};
+        Executor executor{script, connection};
         while (true) {
             result.line++;
             if (!std::getline(output, result.expected)) result.expected = "";

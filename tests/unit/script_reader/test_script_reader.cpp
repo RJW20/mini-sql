@@ -11,25 +11,30 @@ namespace fs = std::filesystem;
 
 bool round_trip_test(const fs::path& filename) {
 
+    const fs::path FIRST_PASS_OUTPUT = "first_path_output.sql";
+
     // Read original file
-    std::ifstream script{filename};
-    if (!script.is_open()) {
+    minisql::ScriptReader script_1{filename};
+    if (!script_1.is_open()) {
         std::cerr << "Failed to open file: " << filename << "\n";
         return false;
     }
-    minisql::ScriptReader reader_1{script};
     std::vector<std::string> statements_1;
-    while (auto statement = reader_1.next())
+    while (auto statement = script_1.next())
         statements_1.push_back(*statement);
 
     // Second pass on first output
-    std::ostringstream output;
-    for (const std::string& s : statements_1) output << s << '\n';
-    std::istringstream output_script{output.str()};
-    minisql::ScriptReader reader_2{output_script};
+    {
+        std::ofstream output{FIRST_PASS_OUTPUT};
+        for (const std::string& s : statements_1) output << s << '\n';
+    }
     std::vector<std::string> statements_2;
-    while (auto statement = reader_2.next())
-        statements_2.push_back(*statement);
+    {
+        minisql::ScriptReader script_2{FIRST_PASS_OUTPUT};
+        while (auto statement = script_2.next())
+            statements_2.push_back(*statement);
+    }
+    fs::remove(FIRST_PASS_OUTPUT);
 
     // Compare outputs
     if (statements_1.size() != statements_2.size()) {
@@ -51,9 +56,10 @@ bool round_trip_test(const fs::path& filename) {
     std::cout << "  PASS: " << filename.filename() << " ("
         << statements_1.size() << " statement"
         << ((statements_1.size() > 1) ? "s)" : ")") << "\n";
-    return true;
 
+    return true; 
 }
+
 
 int main() {
 
