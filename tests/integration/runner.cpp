@@ -103,5 +103,5 @@ int main(int argc, char* argv[]) {
     std::cout << "Summary: " << pass_count << "/" << pass_count + fail_count
         << " tests passed." << COLOR_RESET << "\n";
 
-    return !fail_count ? 0 : 1;
+    return fail_count;
 }

@@ -80,3 +80,19 @@ jobs:
       - name: Run consumer on Windows
         if: runner.os == 'Windows'
         run: ./consumer-build/Release/consumer
+
+  test:
+    runs-on: ubuntu-latests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure mini-sql
+        run: cmake -S . -B build -DBUILD_TESTS=ON
+
+      - name: Build mini-sql
+        run: cmake --build build
+
+      - name: Run integration tests
+        run: ./build/tests/integration/runner 0 1 2 3
