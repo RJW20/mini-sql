@@ -82,7 +82,7 @@ jobs:
         run: ./consumer-build/Release/consumer
 
   test:
-    runs-on: ubuntu-latests
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
