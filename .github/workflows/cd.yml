@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure & Build Shared Library
+        shell: bash
         run: |
           cmake -S . -B build-shared \
           -DBUILD_SHARED_LIBS=ON \
@@ -28,6 +29,7 @@ jobs:
           cmake --install build-shared
 
       - name: Configure & Build Static Library
+        shell: bash
         run: |
           cmake -S . -B build-static \
           -DCMAKE_INSTALL_PREFIX=install/static \
