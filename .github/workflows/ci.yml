@@ -33,7 +33,7 @@ jobs:
       - name: Configure consumer
         run: >
           cmake -S consumer -B consumer/build
-          -DCMAKE_PREFIX_PATH=build/install
+          -DCMAKE_PREFIX_PATH=install
           -DCMAKE_BUILD_TYPE=Release
 
       - name: Build consumer
@@ -41,7 +41,7 @@ jobs:
 
       - name: Copy mini-sql dll on Windows shared build
         if: ${{ (matrix.os == 'windows-latest') && (matrix.shared == 'ON') }}
-        run: copy build/install/bin/minisql.dll consumer/build/Release/minisql.dll
+        run: copy install/bin/minisql.dll consumer/build/Release/minisql.dll
 
       - name: Run consumer
         shell: bash
