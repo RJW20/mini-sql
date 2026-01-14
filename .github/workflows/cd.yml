@@ -69,7 +69,7 @@ jobs:
           cp README.md package/ || true
 
           ARCHIVE_NAME="$PACKAGE_NAME.tar.gz"
-          tar -czf "$PACKAGE_NAME" -C package .
+          tar -czf "$ARCHIVE_NAME" -C package .
 
           echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> $GITHUB_ENV
 
