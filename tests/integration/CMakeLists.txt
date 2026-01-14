@@ -1,7 +1,15 @@
 find_package(Python3 REQUIRED)
 
+# Configure script/output paths
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/integration_test_paths.hpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/integration_test_paths.hpp
+    @ONLY
+)
+
 # Integration test executable
 add_executable(runner runner.cpp)
+target_include_directories(runner PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(runner PRIVATE minisql)
 
 # Dataset generator script + stamp

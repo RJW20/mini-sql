@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "unit_test_paths.hpp"
+
 namespace fs = std::filesystem;
 
 bool round_trip_test(const fs::path& filename) {
@@ -65,7 +67,7 @@ int main() {
 
     std::cout << "ScriptReader Tests:\n";
 
-    const fs::path test_dir = "../tests/unit/script_reader";
+    const fs::path test_dir = fs::path{UNIT_TEST_ROOT} / "script_reader";
     if (!fs::exists(test_dir)) {
         std::cerr << "Test directory not found: " << test_dir << "\n";
         return 1;

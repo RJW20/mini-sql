@@ -10,6 +10,7 @@
 
 #include "directory_iterable.hpp"
 #include "executor.hpp"
+#include "integration_test_paths.hpp"
 
 namespace fs = std::filesystem;
 
@@ -34,9 +35,7 @@ TestResult run_test(const fs::path& filename) {
     TestResult result{name, false, 0};
 
     minisql::ScriptReader script{filename};
-    std::ifstream output{
-        filename.parent_path().parent_path() / "output" / (name + ".out")
-    };
+    std::ifstream output{fs::path{INTEGRATION_TEST_OUTPUT} / (name + ".out")};
     if (!script.is_open() || !output.is_open()) {
         std::cerr << "Failed to open files for test: " << name << "\n";
         return result;
@@ -73,7 +72,7 @@ TestResult run_test(const fs::path& filename) {
  * - 0 runs all scripts 0xx_{name}.sql */
 int main(int argc, char* argv[]) {
 
-    const fs::path script_dir = "../tests/integration/scripts";
+    const fs::path script_dir = INTEGRATION_TEST_SCRIPTS;
     DirectoryIterable scripts = (argc > 1)
         ? DirectoryIterable(
             script_dir,
