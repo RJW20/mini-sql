@@ -56,7 +56,7 @@ jobs:
 
           # Copy headers and CMake configs (shared build is enough)
           cp -r install/shared/include/* package/include/
-          cp -r install/shared/cmake/* package/cmake/
+          cp -r install/shared/lib/cmake/* package/cmake/
 
           # Copy shared libs
           cp -r install/shared/lib/* package/lib/ || true
