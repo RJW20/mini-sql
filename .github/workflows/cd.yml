@@ -41,10 +41,10 @@ jobs:
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "release" ]; then
-            	VERSION="${GITHUB_REF_NAME#v}"
-            else
-              VERSION="dev-${GITHUB_SHA::7}"
-            fi
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
           OS_NAME=${{ runner.os }}
           PACKAGE_NAME="mini-sql-$VERSION-$OS_NAME"
 
@@ -58,7 +58,11 @@ jobs:
 
           cp -r install/shared/include/* package/include/
           cp -r install/shared/lib/cmake/mini-sql/* package/cmake/
-          cp -r install/shared/lib/libminisql.so package/lib/ || true
+          if [ "${{ runner.os}}" = "Linux" ]; then
+            cp -r install/shared/lib/libminisql.so package/lib/ || true
+          else
+            cp -r install/shared/lib/libminisql.dylib package/lib/ || true
+          fi
           cp -r install/static/lib/libminisql.a package/lib/ || true
 
           cp LICENSE package/ || true
