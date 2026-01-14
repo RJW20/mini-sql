@@ -46,8 +46,6 @@ cmake -S . -B build \
 cmake --build build
 cmake --install build
 ```
-Both static and shared builds are supported and tested automatically via
-GitHub actions on every push.
 
 ### Linking
 Once installed, `mini-sql` can be found using `find_package`. In your project's
@@ -68,6 +66,9 @@ cmake -S . -B build -DCMAKE_PREFIX_PATH=/path/to/install
 ```
 If you created a shared build for `mini-sql` and are on Windows ensure to copy
 `minisql.dll` from the install to your projects `build` folder.
+
+Both static and shared builds and linking are supported and tested
+automatically via GitHub actions on every push.
 
 ## API
 
@@ -223,14 +224,14 @@ DROP TABLE <table_name>;
 ### Data Types
 Mini-SQL supports 3 data types:
 
-| Data Type | Stores                          | Accepts (auto-modifications)                       |
-|-----------|---------------------------------|----------------------------------------------------|
-| `INT`     | integer (32 bit)                | integers, doubles (truncated towards 0)            |
-| `REAL`    | double precision float (64 bit) | integers, doubles                                  |
-| `TEXT(n)` | text of size $n$                | double-quotes strings (padded/truncated to size n) |
+| Data Type | Stores                          | Accepts (auto-modifications)                         |
+|-----------|---------------------------------|------------------------------------------------------|
+| `INT`     | integer (32 bit)                | integers, doubles (truncated towards 0)              |
+| `REAL`    | double precision float (64 bit) | integers, doubles                                    |
+| `TEXT(n)` | text of size $n$                | double-quotes strings (padded/truncated to size $n$) |
 
 ## Architecture Overview
-Mini-SQL follows a traditional relation database architecture, with a clear
+Mini-SQL follows a traditional relational database architecture, with a clear
 separation between query execution, storage and resource management.
 
 ### Execution Model
@@ -310,6 +311,35 @@ connections to the same database file are supported, though the engine is
 currently single-threaded and does not implement locking.
 
 ## Testing
+To build tests, set the `BUILD_TESTS` flag during the configuration:
+```
+cmake -S . -B build -DBUILD_TESTS=ON
+cmake --build build
+```
+
+### Integration Tests
+There is extensive [integration testing](tests/integration/README.md) covering
+SQL execution and storage behaviour. To run the integration tests:
+```
+./build/tests/integration/runner
+```
+By default, this runs all integration tests. Providing runtime arguments allows
+selection of specific prefixes of scripts to run, with execution order
+preserved. For example:
+- `001` runs just script `001_<name>.sql`
+- `001 002` runs scripts `001_<name>.sql` and `002_<name>.sql`
+- `0` runs all scripts `0XX_<name>.sql`
+- `0 1` runs all scripts `0XX_<name>.sql` and `1XX_<name>.sql`
+
+All integration tests are run via GitHub actions on every push.
+
+### Unit Tests
+There are also [unit tests](tests/unit/) for a limited number of components.
+Each unit test is built into its own executable and can be run using:
+```
+./build/unit/<test_name>
+```
+where `<test_name>` corresponds to the unit test source file.
 
 ## Limitations
 - Single-threaded

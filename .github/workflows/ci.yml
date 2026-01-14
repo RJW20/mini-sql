@@ -95,4 +95,4 @@ jobs:
         run: cmake --build build
 
       - name: Run integration tests
-        run: ./build/tests/integration/runner 0 1 2 3
+        run: ./build/tests/integration/runner

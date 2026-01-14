@@ -41,7 +41,7 @@ SELECT * FROM people;                                 # select from the table
 
 ### Output File Format (`.out`)
 Mirrors the expected output for the result of each statement:
-- "X rows affected" - for CREATE, INSERT, UPDATE, DELETE
+- "X rows affected" - for CREATE, INSERT, UPDATE, DELETE, DROP
 - `|` separated values - for SELECT
 - "&lt;error category&gt; error: &lt;message&gt;" - for failed statements
 
