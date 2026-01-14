@@ -57,9 +57,9 @@ jobs:
           mkdir -p package/lib package/include package/cmake
 
           cp -r install/shared/include/* package/include/
-          cp -r install/shared/lib/cmake/* package/cmake/
-          cp -r install/shared/lib/*.so package/lib/ || true
-          cp -r install/static/lib/*.a package/lib/ || true
+          cp -r install/shared/lib/cmake/mini-sql/* package/cmake/
+          cp -r install/shared/lib/libminisql.so package/lib/ || true
+          cp -r install/static/lib/libminisql.a package/lib/ || true
 
           cp LICENSE package/ || true
           cp README.md package/ || true
@@ -76,9 +76,9 @@ jobs:
           New-Item -ItemType Directory package\lib, package\include, package\cmake | Out-Null
 
           Copy-Item install\shared\include\* package\include -Recurse
-          Copy-Item install\shared\lib\cmake\* package\cmake -Recurse
-          Copy-Item install\shared\lib\*.dll package\lib -Recurse -ErrorAction SilentlyContinue
-          Copy-Item install\static\lib\*.lib package\lib -ErrorAction SilentlyContinue
+          Copy-Item install\shared\lib\cmake\mini-sql\* package\cmake -Recurse
+          Copy-Item install\shared\bin\minisql.dll package\lib -Recurse -ErrorAction SilentlyContinue
+          Copy-Item install\static\lib\minisql.lib package\lib -ErrorAction SilentlyContinue
 
           Copy-Item LICENSE package -ErrorAction SilentlyContinue
           Copy-Item README.md package -ErrorAction SilentlyContinue
