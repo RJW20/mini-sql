@@ -33,7 +33,7 @@ jobs:
       - name: Configure consumer
         run: >
           cmake -S consumer -B consumer/build
-          -DCMAKE_PREFIX_PATH=install
+          -DCMAKE_PREFIX_PATH=${{ github.workspace}}/install
           -DCMAKE_BUILD_TYPE=Release
 
       - name: Build consumer
@@ -46,7 +46,7 @@ jobs:
       - name: Run consumer
         shell: bash
         run: |
-          if [ "${{ matrix.os}}" = "windows-latest "]; then
+          if [ "${{ matrix.os}}" = "windows-latest"]; then
             ./consumer/build/Release/consumer
           else
             ./consumer/build/consumer
