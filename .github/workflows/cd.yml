@@ -48,7 +48,7 @@ jobs:
           OS_NAME=${{ runner.os }}
           PACKAGE_NAME="mini-sql-$VERSION-$OS_NAME"
 
-          echo "PACAKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
 
       - name: Package (Linux/macOS)
         if: runner.os != 'Windows'
