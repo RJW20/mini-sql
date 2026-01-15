@@ -10,9 +10,28 @@ jobs:
     name: Build and Release Prebuilt Binaries
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+        - runner: ubuntu-latest
+          os: linux
+          arch: amd64
+
+        - runner: ubuntu-latest
+          os: linux
+          arch: arm64
+
+        - runner: windows-latest
+          os: windows
+          arch: amd64
+
+        - runner: macos-latest
+          os: darwin
+          arch: arm64
+
+        - runner: macos-13
+          os: darwin
+          arch: amd64
     
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - name: Checkout repository
@@ -41,24 +60,25 @@ jobs:
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "release" ]; then
-            VERSION="${GITHUB_REF_NAME#v}"
+            VERSION="${GITHUB_REF_NAME}"
           else
             VERSION="dev-${GITHUB_SHA::7}"
           fi
-          OS_NAME=${{ runner.os }}
-          PACKAGE_NAME="mini-sql-$VERSION-$OS_NAME"
+          OS_NAME=${{ matrix.os }}
+          ARCH=${{ matrix.arch }}
+          PACKAGE_NAME="mini-sql-$VERSION-$OS_NAME-$ARCH"
 
           echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_ENV
 
       - name: Package (Linux/macOS)
-        if: runner.os != 'Windows'
+        if: runner.os != 'windows'
         run: |
           rm -rf package
           mkdir -p package/lib package/include package/cmake
 
           cp -r install/shared/include/* package/include/
           cp -r install/shared/lib/cmake/mini-sql/* package/cmake/
-          if [ "${{ runner.os}}" = "Linux" ]; then
+          if [ "${{ runner.os}}" = "linux" ]; then
             cp -r install/shared/lib/libminisql.so package/lib/ || true
           else
             cp -r install/shared/lib/libminisql.dylib package/lib/ || true
@@ -74,7 +94,7 @@ jobs:
           echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> $GITHUB_ENV
 
       - name: Package (Windows)
-        if: runner.os == 'Windows'
+        if: runner.os == 'windows'
         run: |
           Remove-Item -Recurse -Force package -ErrorAction SilentlyContinue
           New-Item -ItemType Directory package\lib, package\include, package\cmake | Out-Null
