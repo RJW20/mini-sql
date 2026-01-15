@@ -5,6 +5,13 @@ on:
     types: [published]
   workflow_dispatch:  # allows manual dispatch
 
+permissions:
+  contents: read
+  packages: write
+  actions: read
+  id-token: write
+  releases: write
+
 jobs:
   build:
     name: Build and Release Prebuilt Binaries
