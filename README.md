@@ -28,17 +28,36 @@ dependencies.
 - C++17-compatible compiler
 
 ### Installation
-You can either download and extract a release archive from the GitHub releases
-page or clone the repository `git clone https://github.com/RJW20/mini-sql.git`.
-Then build and install the library:
+`mini-sql` can be installed either from prebuilt release archives or by
+building from source.
+
+#### Option 1: Prebuilt Binaries
+Prebuilt binaries are available on the releases page for supported platforms.
+
+Download the appropriate archive for your operating system and architecture
+(e.g. `mini-sql-v1.0.0-linux-amd64.tar.gz`), and extract it.
+
+Note: the automatically generated source code (`.zip`/`.tar.gz`) assets on
+the release page contain the full source tree and are intended for building
+from source, not for direct use.
+
+#### Option 2: Build From Source
+You can build and install `mini-sql` from source either by downloading a source
+archive from the releases page or by cloning the repository:
+```
+git clone https://github.com/RJW20/mini-sql.git`
+cd mini-sql
+```
+Configure, build and install using CMake:
 ```
 cmake -S . -B build
 cmake --build build
 cmake --install build
 ```
 By default, this builds a static library and installs to your system’s standard
-CMake prefix (e.g. /usr/local on Linux/macOS). You can build a shared library by enabling `BUILD_SHARED_LIBS=ON` or specify a custom install location using
-`CMAKE_INSTALL_PREFIX`:
+CMake prefix (e.g. /usr/local on Linux/macOS).
+
+To build a shared library or install to a custom location:
 ```
 cmake -S . -B build \
   -DBUILD_SHARED_LIBS=ON \
@@ -46,6 +65,9 @@ cmake -S . -B build \
 cmake --build build
 cmake --install build
 ```
+
+Both static and shared builds are continuously tested via GitHub Actions on all
+supported platforms.
 
 ### Linking
 Once installed, `mini-sql` can be found using `find_package`. In your project's
@@ -59,16 +81,16 @@ find_package(mini-sql CONFIG REQUIRED)
 add_executable(myproject main.cpp)
 target_link_libraries(myproject PRIVATE minisql::minisql)
 ```
-If you installed `mini-sql` to a non-standard location, tell CMake where to
-find it:
+If you used the prebuilt binaries or installed `mini-sql` to a non-standard
+location, tell CMake where to find it:
 ```
-cmake -S . -B build -DCMAKE_PREFIX_PATH=/path/to/install
+cmake -S . -B build -DCMAKE_PREFIX_PATH=/path/to/mini-sql
 ```
-If you created a shared build for `mini-sql` and are on Windows ensure to copy
-`minisql.dll` from the install to your projects `build` folder.
 
-Both static and shared builds and linking are supported and tested
-automatically via GitHub actions on every push.
+#### Windows Note
+If you are using a shared build on Windows, ensure that `minisql.dll` from
+the installation directory is available at runtime (e.g. copied into your
+application’s build or executable directory).
 
 ## API
 
@@ -111,7 +133,7 @@ line. To execute such a script:
 ```
 #include <minisql/script_reader.hpp>
 
-minisql::ScriptReader script{"script.sql"};
+minisql::ScriptReader script{"/* script name */.sql"};
 while (auto statement = script.next()) {
     connnection.exec(*stmt);
 }
@@ -131,7 +153,8 @@ Supported data types can be found [here](#data-types).
 A `TABLE` may not:
 - share its name with any others in the same database
 - have duplicate column names
-- exceed **508 bytes** in width (or **512** if specifying a `PRIMARY KEY`, see below)
+- exceed **508 bytes** in width (or **512** if specifying a `PRIMARY KEY`, see
+  below)
 
 ### `PRIMARY KEY`
 The `PRIMARY KEY` constraint may be specified for any column in a `TABLE`:
