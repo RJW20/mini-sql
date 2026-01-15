@@ -78,7 +78,7 @@ jobs:
 
           cp -r install/shared/include/* package/include/
           cp -r install/shared/lib/cmake/mini-sql/* package/cmake/
-          if [ "${{ runner.os}}" = "linux" ]; then
+          if [ "${{ runner.os }}" = "Linux" ]; then
             cp -r install/shared/lib/libminisql.so package/lib/ || true
           else
             cp -r install/shared/lib/libminisql.dylib package/lib/ || true
